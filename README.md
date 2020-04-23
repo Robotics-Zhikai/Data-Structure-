@@ -18,3 +18,5 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 排序1000000个元素对比
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/C%2B%2B%E5%B8%8C%E5%B0%94.png)
+
+20200423 Practice8 判断是否是同一颗二叉搜索树 二叉搜索树的插入、删除操作等
