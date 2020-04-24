@@ -306,7 +306,7 @@ vector <ElemenType> Change2Heap(vector <ElemenType> RandomElement, int root, int
 	return RandomElement;
 }
 
-vector <double> HeapSort(vector<double> Data)
+vector <double> HeapSortfaster(vector<double> Data)
 //堆排序
 //复杂度为O(nlogn)
 //平均比较次数是2NlogN-O(NloglogN) 但实际效果不如用Sedgewick增量序列的希尔排序
@@ -320,6 +320,29 @@ vector <double> HeapSort(vector<double> Data)
 	while (Data.size()!=0)
 	{
 		result.push_back(Ope.DeleteHeapRoot(Data));
+	}
+	return result;
+}
+
+vector <double> HeapSortslow(vector<double> Data)
+//堆排序
+//复杂度为O(nlogn)
+//平均比较次数是2NlogN-O(NloglogN) 但实际效果不如用Sedgewick增量序列的希尔排序
+{
+	if (Data.size() <= 1)
+		return Data;
+
+	HeapOperate Ope(2, Data.size());
+	vector <double> data1;
+	for (int i = 0; i < Data.size(); i++)
+	{
+		Ope.InsertHeapElement(data1, Data[i]);
+	}
+	
+	vector <double> result;
+	while (data1.size() != 0)
+	{
+		result.push_back(Ope.DeleteHeapRoot(data1));
 	}
 	return result;
 }

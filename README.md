@@ -29,3 +29,6 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/12.5w%E5%B8%8C%E5%B0%94%E5%A0%86.png)
 
+测试完毕所有堆相关的.cpp .h文件，可以直接用了。测试的同时，更新了SortAlgorithm文件夹，利用insert的堆函数，对比了用不同方式建立堆的时间复杂度n 和 nlogn
+
+

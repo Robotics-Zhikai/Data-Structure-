@@ -22,5 +22,6 @@ public:
 vector<double> BubbleSort(vector<double> Data);
 vector <double> InsertionSort(vector<double> Data);
 vector <double> ShellSort(vector<double> Data);
-vector <double> HeapSort(vector<double> Data);
+vector <double> HeapSortfaster(vector<double> Data);
+vector <double> HeapSortslow(vector<double> Data);
 #endif

@@ -74,7 +74,7 @@ void testShellSort(vector<double> Data)
 	cout << "希尔排序算法用时" << endtime << "s" << endl;
 }
 
-void testHeapSort(vector<double> Data)
+void testHeapSortfaster(vector<double> Data)
 {
 	clock_t start, end;
 	RandomData test;
@@ -83,18 +83,35 @@ void testHeapSort(vector<double> Data)
 	Data.push_back(1); Data.push_back(2); Data.push_back(3); Data.push_back(4); Data.push_back(1);*/
 	cout << test.CheckSorted(Data);
 	start = clock();
-	Data = HeapSort(Data);
+	Data = HeapSortfaster(Data);
 	end = clock();
 	cout << test.CheckSorted(Data);
 	//test.PrintData(Data);
 	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
-	cout << "堆排序算法用时" << endtime << "s" << endl;
+	cout << "快速堆排序算法用时" << endtime << "s" << endl;
+}
+
+void testHeapSortslow(vector<double> Data)
+{
+	clock_t start, end;
+	RandomData test;
+	//vector<double> Data = test.GenerateRandomData(10000, 1, 100);
+	/*vector<double> Data;
+	Data.push_back(1); Data.push_back(2); Data.push_back(3); Data.push_back(4); Data.push_back(1);*/
+	cout << test.CheckSorted(Data);
+	start = clock();
+	Data = HeapSortslow(Data);
+	end = clock();
+	cout << test.CheckSorted(Data);
+	//test.PrintData(Data);
+	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "慢速堆排序算法用时" << endtime << "s" << endl;
 }
 
 int main()
 { 
 	RandomData test;
-	vector<double> Data = test.GenerateRandomData(125000, 1, 100);
+	vector<double> Data = test.GenerateRandomData(95000, 1, 100);
 	for (int i = 0; i < 500; i++)
 	{
 		Data.push_back(43.2);
@@ -103,7 +120,8 @@ int main()
 	//testBubbleSort(Data);
 	//testInsertionSort(Data);
 	testShellSort(Data);
-	testHeapSort(Data);
+	testHeapSortfaster(Data);
+	testHeapSortslow(Data);
 
 	system("pause");
 
