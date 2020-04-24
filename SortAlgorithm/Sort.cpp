@@ -82,7 +82,8 @@ vector<double> BubbleSort(vector<double> Data)
 }
 
 vector <double> InsertionSort(vector<double> Data)
-//插入排序
+//插入排序，类比打扑克摸牌整理
+//O(n^2)
 {
 	if (Data.size() <= 1)
 		return Data;
@@ -134,6 +135,8 @@ vector <double> InsertionSort(vector<double> Data)
 }
 
 vector <double> ShellSort(vector<double> Data)
+//猜想 平均复杂度为O(n^(7/6)) 最坏复杂度为O(n^(4/3))
+//思想是尽量远的消除逆序对，一次消除好几个逆序对
 {
 	if (Data.size() <= 1)
 		return Data;
@@ -183,5 +186,141 @@ vector <double> ShellSort(vector<double> Data)
 		}
 	}
 	return Data;
+}
+
+vector <ElemenType> Change2Heap(vector <ElemenType> RandomElement, int root, int maxormin)
+//以root为根节点，调整对应的子树为Heap,当然必须是在一定基础上调整
+//复杂度为logn
+{
+	if (RandomElement.size() <= 1)
+		return RandomElement;
+
+	if (maxormin == 1)
+	{
+		for (int i = root; i < RandomElement.size(); )
+		{
+			int lchild = i * 2 + 1;
+			int rchild = lchild + 1;
+			if (lchild >= RandomElement.size())
+				break;
+			if (rchild < RandomElement.size())
+			{
+				if (RandomElement[lchild] > RandomElement[i] && RandomElement[rchild] > RandomElement[i])
+				{
+					if (RandomElement[rchild] >= RandomElement[lchild])
+					{
+						ElemenType mid = RandomElement[rchild];
+						RandomElement[rchild] = RandomElement[i];
+						RandomElement[i] = mid;
+						i = rchild;
+					}
+					else
+					{
+						ElemenType mid = RandomElement[lchild];
+						RandomElement[lchild] = RandomElement[i];
+						RandomElement[i] = mid;
+						i = lchild;
+					}
+				}
+				else if (RandomElement[lchild] >= RandomElement[i] && RandomElement[rchild] < RandomElement[i])
+				{
+					ElemenType mid = RandomElement[lchild];
+					RandomElement[lchild] = RandomElement[i];
+					RandomElement[i] = mid;
+					i = lchild;
+				}
+				else if (RandomElement[rchild] >= RandomElement[i] && RandomElement[lchild] < RandomElement[i])
+				{
+					ElemenType mid = RandomElement[rchild];
+					RandomElement[rchild] = RandomElement[i];
+					RandomElement[i] = mid;
+					i = rchild;
+				}
+			}
+			else
+			{
+				if (RandomElement[lchild] > RandomElement[i])
+				{
+					ElemenType mid = RandomElement[lchild];
+					RandomElement[lchild] = RandomElement[i];
+					RandomElement[i] = mid;
+					i = lchild;
+				}
+			}
+		}
+	}
+	if (maxormin == 2)
+	{
+		for (int i = root; i < RandomElement.size(); )
+		{
+			int lchild = i * 2 + 1;
+			int rchild = lchild + 1;
+			if (lchild >= RandomElement.size())
+				break;
+			if (rchild < RandomElement.size())
+			{
+				if (RandomElement[lchild] < RandomElement[i] && RandomElement[rchild] < RandomElement[i])
+				{
+					if (RandomElement[rchild] <= RandomElement[lchild])
+					{
+						ElemenType mid = RandomElement[rchild];
+						RandomElement[rchild] = RandomElement[i];
+						RandomElement[i] = mid;
+						i = rchild;
+					}
+					else
+					{
+						ElemenType mid = RandomElement[lchild];
+						RandomElement[lchild] = RandomElement[i];
+						RandomElement[i] = mid;
+						i = lchild;
+					}
+				}
+				else if (RandomElement[lchild] <= RandomElement[i] && RandomElement[rchild] > RandomElement[i])
+				{
+					ElemenType mid = RandomElement[lchild];
+					RandomElement[lchild] = RandomElement[i];
+					RandomElement[i] = mid;
+					i = lchild;
+				}
+				else if (RandomElement[rchild] <= RandomElement[i] && RandomElement[lchild] > RandomElement[i])
+				{
+					ElemenType mid = RandomElement[rchild];
+					RandomElement[rchild] = RandomElement[i];
+					RandomElement[i] = mid;
+					i = rchild;
+				}
+			}
+			else
+			{
+				if (RandomElement[lchild] < RandomElement[i])
+				{
+					ElemenType mid = RandomElement[lchild];
+					RandomElement[lchild] = RandomElement[i];
+					RandomElement[i] = mid;
+					i = lchild;
+				}
+			}
+		}
+	}
+	return RandomElement;
+}
+
+vector <double> HeapSort(vector<double> Data)
+//堆排序
+//复杂度为O(nlogn)
+//平均比较次数是2NlogN-O(NloglogN) 但实际效果不如用Sedgewick增量序列的希尔排序
+{
+	if (Data.size() <= 1)
+		return Data;
+
+	HeapOperate Ope(2,Data.size());
+	Ope.CreateHeap(Data);
+	vector <double> result;
+	while (Data.size()!=0)
+	{
+		result.push_back(Ope.DeleteHeapRoot(Data));
+	}
+	return result;
 }
 

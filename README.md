@@ -19,4 +19,11 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/C%2B%2B%E5%B8%8C%E5%B0%94.png)
 
-20200423 Practice8 判断是否是同一颗二叉搜索树 二叉搜索树的插入、删除操作等
+20200423 Practice9 判断是否是同一颗二叉搜索树 二叉搜索树的插入、删除操作等
+
+20200424 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件。
+
+更新SortAlgorithm文件夹，更新堆排序
+
+
+
