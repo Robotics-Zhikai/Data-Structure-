@@ -1,201 +1,346 @@
-//An inorder binary tree traversal can be implemented in a non - recursive way with a stack.For example, suppose that when a 6 - node binary tree(with the keys numbered from 1 to 6) is traversed, the stack operations are : push(1); push(2); push(3); pop(); pop(); push(4); pop(); pop(); push(5); push(6); pop(); pop().Then a unique binary tree(shown in Figure 1) can be generated from this sequence of operations.Your task is to give the postorder traversal sequence of this tree.
-//
-//
-//Figure 1
-//Input Specification :
-//Each input file contains one test case.For each case, the first line contains a positive integer N(≤30) which is the total number of nodes in a tree(and hence the nodes are numbered from 1 to N).Then 2N lines follow, each describes a stack operation in the format : "Push X" where X is the index of the node being pushed onto the stack; or "Pop" meaning to pop one node from the stack.
-//
-//Output Specification :
-//For each test case, print the postorder traversal sequence of the corresponding tree in one line.A solution is guaranteed to exist.All the numbers must be separated by exactly one space, and there must be no extra space at the end of the line.
-//
-//Sample Input :
-//6
-//Push 1
-//Push 2
-//Push 3
-//Pop
-//Pop
-//Push 4
-//Pop
-//Pop
-//Push 5
-//Push 6
-//Pop
-//Pop
-//
-//
-//
-//Sample Output :
-//3 4 2 6 5 1
+//创建一个普遍的树，即其儿子不一定只有两个，并遍历 n叉树
 
 #include<iostream>
 #include<stdio.h>
 #include<stdlib.h>
 #include<vector>
 #include<algorithm>
-#include<string.h>
 using namespace std;
+/*
 
-struct TreeNode
+
+*/
+typedef struct Node * NodeAddress;
+struct Node //储存n叉树的一个节点的下一个节点集合
 {
-	int thisNum;
-	int left;
-	int right;
+	int NumData;
+	NodeAddress Next;
 };
 
-int IsEqual(char * string1,char * string2)
+typedef struct TreeNode* TreeNodeAddress;
+struct TreeNode
 {
-	int flag = 0;
-	for (int i = 0; string1[i] != '\0'; i++)
+	int TreeNodeNumData;
+	NodeAddress Next;
+};
+
+typedef struct TreeListNode * TreeNodeListAdd;
+struct TreeListNode
+{
+	TreeNodeAddress This;
+	TreeNodeListAdd Next;
+	int RootNum;
+};
+
+void AddNode2List(NodeAddress List,int NumData) //往链表的尾端添加数据
+{
+	NodeAddress temp = List->Next;
+	NodeAddress templast = List;
+	while (temp != NULL)
 	{
-		if (string1[i] != string2[i])
-		{
-			flag = 1;
-			break;
-		}
+		templast = temp;
+		temp = temp->Next;
 	}
-	if (flag == 1)
-		return 0;
-	else
-		return 1;
+	NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
+	NewNode->NumData = NumData;
+	NewNode->Next = NULL;
+	templast->Next = NewNode;
 }
 
-vector <TreeNode> CreateTree()
+TreeNodeListAdd CreateStorageTreeList()
 {
-	vector <TreeNode> Tree;
-	vector <TreeNode> PopStorage; //需要这个来做一个时滞的储存
-	vector <TreeNode> Result; //储存最后的结果
-	int Allnum;
-	char tempchar;
-	scanf("%d", &Allnum);
-	int flag = 0;
-	for (int i = 0; i < 2 * Allnum; i++)
+	printf("输入待存储的树的数据\n");
+	int NumAll;
+	scanf("%d", &NumAll);
+	TreeNodeListAdd TreeNodeListNew = (TreeNodeListAdd)malloc(sizeof(TreeNodeListAdd));
+	TreeNodeListAdd Result = TreeNodeListNew;
+	TreeNodeListNew->Next = NULL;
+	for (int i = 0; i < NumAll; i++)
 	{
-		char tempstring[10];
+		TreeNodeListAdd temp = (TreeNodeListAdd)malloc(sizeof(TreeNodeListAdd));
+		temp->This = (TreeNodeAddress)malloc(sizeof(TreeNode));
+
+		temp->This->TreeNodeNumData = i;
+
+		temp->This->Next = (NodeAddress)malloc(sizeof(Node));
+		temp->This->Next->Next = NULL;
 		int num;
-		scanf("%s", tempstring);
-		if (IsEqual(tempstring,"Push"))
+		scanf("%d", &num);
+		AddNode2List(temp->This->Next, num);
+		while (num != -1)
 		{
 			scanf("%d", &num);
-			TreeNode temp;
-			temp.thisNum = num;
-			temp.left = -1;
-			temp.right = -1;
-			
-			if (Tree.empty() == 0)
-			{
-				TreeNode popelement = *(Tree.end() - 1);
-				if (popelement.left == -1)
-				{
-					popelement.left = num;
-					Tree.pop_back();
-					Tree.push_back(popelement);
-				}
-				
-			}
-			if (PopStorage.empty() == 0)
-			{
-				PopStorage[0].right = num;
-				Result.push_back(PopStorage[0]);
-				PopStorage.pop_back();
-			}
-			Tree.push_back(temp);
+			AddNode2List(temp->This->Next, num);
 		}
-		else if (IsEqual(tempstring, "Pop"))
-		{
-			flag = 1;
-			TreeNode temp;
-			temp = *(Tree.end()-1);
-			if (PopStorage.empty() == 0)
-			{
-				PopStorage[0].right = -1;
-				Result.push_back(PopStorage[0]);
-				PopStorage.pop_back();
-				PopStorage.push_back(temp);
-			}
-			else
-				PopStorage.push_back(temp);
-			
-			Tree.pop_back();
-		}
+
+		TreeNodeListNew->Next = temp;
+		TreeNodeListNew = temp;
 	}
-	if (PopStorage.empty() == 0)
-		Result.push_back(PopStorage[0]);
+	TreeNodeListNew->Next = NULL;
+
+	vector <int> StorageNumCode;
+	
+	TreeNodeListAdd Temp = Result->Next;
+	while (Temp != NULL)
+	{
+		NodeAddress tempthis = Temp->This->Next;
+		while (tempthis != NULL)
+		{
+			StorageNumCode.push_back(tempthis->NumData);
+			tempthis = tempthis->Next;
+		}
+		Temp = Temp->Next;
+	}
+	sort(StorageNumCode.begin(), StorageNumCode.end());
+
+	int num = 0;
+	for (auto i = StorageNumCode.begin(); i != StorageNumCode.end(); i++)
+	{
+		if ((*i) == num)
+			num++; 
+	}
+	if (num == NumAll)
+	{
+		Result->RootNum = -99999;
+		printf("树没有根节点\n");
+	}
+	else
+		Result->RootNum = num;
 	return Result;
 }
 
-int FindRoot(vector <TreeNode> Tree)
+TreeNodeListAdd FindNumNodeAddress(TreeNodeListAdd List,int num)
 {
-	vector<int>store;
-	for (auto i = Tree.begin(); i != Tree.end(); i++)
+	//int root = List->RootNum;
+	if (num == -1)
+		return NULL;
+	TreeNodeListAdd temp = List->Next;
+	while (temp != NULL)
 	{
-		if ((*i).left!=-1)
-			store.push_back((*i).left);
-		if ((*i).right != -1)
-			store.push_back((*i).right);
-	}
-	for (int j = 1; j <= store.size(); j++)
-	{
-		int flag = 0;
-		for (auto i = store.begin(); i != store.end(); i++)
-		{
-			if (j == (*i))
-			{
-				flag = 1;
-				break;
-			}
-		}
-		if (flag == 0)
-			return j;
-	}
-	return 0; //找不到根节点
-}
-
-TreeNode FindNumTreeNode(vector <TreeNode> Tree,int num)
-{
-	TreeNode temp;
-	temp.thisNum = -1; //如果不初始化的话最后会出现错误
-	temp.left = -1;
-	temp.right = -1;
-	for (int j = 0; j < Tree.size(); j++)
-	{
-		if (Tree[j].thisNum == num)
-		{
-			temp = Tree[j];
+		if (temp->This->TreeNodeNumData == num)
 			return temp;
-		}
+		temp = temp->Next;
 	}
-	return temp;
+	return NULL;
 }
 
-void PostOrderTravesal(vector <TreeNode> Tree,TreeNode Node)
+vector <NodeAddress> GetNodechildrenAdd(TreeNodeListAdd List,int NumNode)
 {
-	if (Node.thisNum == -1)
+	vector <NodeAddress> Result;
+	TreeNodeListAdd Add = FindNumNodeAddress(List, NumNode);
+	if (Add == NULL)
+		return Result;
+	NodeAddress temp = Add->This->Next->Next;
+	while (temp != NULL)
+	{
+		Result.push_back(temp);
+		temp = temp->Next;
+	}
+	return Result;
+}
+
+NodeAddress GetNodeFirstChildAdd(TreeNodeListAdd List, int NumNode)
+{
+	TreeNodeListAdd Add = FindNumNodeAddress(List, NumNode);
+	if (Add == NULL)
+		return NULL;
+	NodeAddress temp = Add->This->Next->Next;
+	if (temp->NumData == -1)
+		return NULL;
+	else
+		return temp;
+}
+
+void PostOrderTraversalOrdinaryStack(TreeNodeListAdd List)                    //这个非递归遍历非常好，容易理解，且后序遍历非常方便
+{
+	vector <NodeAddress> Stack; //用vector来模拟堆栈
+	TreeNodeListAdd temp = FindNumNodeAddress(List, List->RootNum);
+	if (temp == NULL)
 		return;
-	PostOrderTravesal(Tree, FindNumTreeNode(Tree, Node.left));
-	PostOrderTravesal(Tree, FindNumTreeNode(Tree, Node.right));
-	printf("%d ", Node.thisNum);
+	NodeAddress RootNode = (NodeAddress)malloc(sizeof(Node));
+	RootNode->NumData = List->RootNum;
+	RootNode->Next = NULL;
+	Stack.push_back(RootNode);
+
+	NodeAddress tempNodeAddress = temp->This->Next->Next;
+	while (Stack.empty() == 0)
+	{
+		while (tempNodeAddress != NULL)
+		{
+			Stack.push_back(tempNodeAddress);
+			tempNodeAddress = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
+		}
+		int flag = 0;
+		while (Stack.empty() == 0)
+		{
+			NodeAddress PopElement = *(Stack.end() - 1);
+			Stack.pop_back();
+			printf("%d ", PopElement->NumData);
+			tempNodeAddress = PopElement->Next;
+			while ((tempNodeAddress!=NULL)&&(tempNodeAddress->NumData != -1))
+			{
+				Stack.push_back(tempNodeAddress);
+				NodeAddress tempthis = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
+				if (tempthis != NULL)
+				{
+					tempNodeAddress = tempthis;
+					flag = 1;
+					break;
+				}
+				else
+				{
+					PopElement = *(Stack.end() - 1);
+					Stack.pop_back();
+					printf("%d ", PopElement->NumData);
+				}
+
+				tempNodeAddress = tempNodeAddress->Next;
+			}
+			if (flag == 1)
+				break;
+		}
+	}
+}
+
+void PreOrderTraversalOrdinaryStack(TreeNodeListAdd List)
+{
+	vector <NodeAddress> Stack; //用vector来模拟堆栈
+	TreeNodeListAdd temp = FindNumNodeAddress(List, List->RootNum);
+	if (temp == NULL)
+		return;
+	NodeAddress RootNode = (NodeAddress)malloc(sizeof(Node));
+	RootNode->NumData = List->RootNum;
+	RootNode->Next = NULL;
+	Stack.push_back(RootNode);
+	printf("%d ", RootNode->NumData);
+
+	NodeAddress tempNodeAddress = temp->This->Next->Next;
+	while (Stack.empty() == 0)
+	{
+		while (tempNodeAddress != NULL)
+		{
+			Stack.push_back(tempNodeAddress);
+			printf("%d ", tempNodeAddress->NumData);
+			tempNodeAddress = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
+		}
+		int flag = 0;
+		while (Stack.empty() == 0)
+		{
+			NodeAddress PopElement = *(Stack.end() - 1);
+			Stack.pop_back();
+			tempNodeAddress = PopElement->Next;
+			while ((tempNodeAddress != NULL) && (tempNodeAddress->NumData != -1))
+			{
+				Stack.push_back(tempNodeAddress);
+				printf("%d ", tempNodeAddress->NumData);
+				NodeAddress tempthis = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
+				if (tempthis != NULL)
+				{
+					tempNodeAddress = tempthis;
+					flag = 1;
+					break;
+				}
+				else
+				{
+					PopElement = *(Stack.end() - 1);
+					Stack.pop_back();
+				}
+
+				tempNodeAddress = tempNodeAddress->Next;
+			}
+			if (flag == 1)
+				break;
+		}
+	}
+
+}
+
+
+void PreOrderTraversalOrdinary(TreeNodeListAdd List,int NumNode)//用递归法遍历
+{
+	if (NumNode == -1)
+		return;
+	printf("%d ",NumNode);
+	vector <NodeAddress> NodeList = GetNodechildrenAdd(List,NumNode);
+	for (auto i = NodeList.begin(); i != NodeList.end(); i++)
+	{
+		PreOrderTraversalOrdinary(List, (*i)->NumData);
+	}
+}
+
+void PostOrderTraversalOrdinary(TreeNodeListAdd List, int NumNode)//后序遍历，先访问子节点，后访问根节点
+{
+	if (NumNode == -1)
+		return;
+	vector <NodeAddress> NodeList = GetNodechildrenAdd(List, NumNode);
+	for (auto i = NodeList.begin(); i != NodeList.end(); i++)
+	{
+		PostOrderTraversalOrdinary(List, (*i)->NumData);
+	}
+	printf("%d ", NumNode);
 }
 
 int main()
 {
 	/*
-6
-Push 1
-Push 2
-Push 3
-Pop
-Pop
-Push 4
-Pop
-Pop
-Push 5
-Push 6
-Pop
-Pop
+46
+1 2 3 -1 
+4 5 6 7 -1 
+8 -1 
+9 10 11 -1 
+12 13 -1 
+14 -1 
+15 -1 
+16 17 -1 
+18 19 -1 
+20 21 -1 
+-1
+22 23 -1 
+24 25 26 27 -1 
+-1
+-1
+-1
+-1
+-1
+28 29 30 31 32 -1 
+-1 
+-1
+-1
+-1
+-1
+-1
+-1
+34 35 -1
+-1
+-1
+-1
+-1
+-1
+-1
+0 -1
+-1 
+36 -1
+37 -1
+38 -1
+39 -1
+40 -1
+41 -1
+42 -1
+43 -1
+44 45 -1
+-1 
+-1 
 */
-	
-	vector <TreeNode> Tree = CreateTree();
-	int root = FindRoot(Tree);
-	PostOrderTravesal(Tree,FindNumTreeNode(Tree,root));
+
+
+	TreeNodeListAdd temp = CreateStorageTreeList();
+
+	PreOrderTraversalOrdinary(temp, temp->RootNum);
+	cout << endl;
+	PreOrderTraversalOrdinaryStack(temp);
+	cout << endl;
+
+	PostOrderTraversalOrdinary(temp, temp->RootNum);
+	cout << endl;
+	PostOrderTraversalOrdinaryStack(temp);
 }

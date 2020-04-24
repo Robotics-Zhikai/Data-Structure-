@@ -1,398 +1,240 @@
-ï»¿/*
-02 - çº¿æ€§ç»“æ„3 Reversing Linked List(25åˆ†)
-Given a constant K and a singly linked list L, you are supposed to reverse the links of every K elements on L.For example, given L being 1â†’2â†’3â†’4â†’5â†’6, if K = 3, then you must output 3â†’2â†’1â†’6â†’5â†’4; if K = 4, you must output 4â†’3â†’2â†’1â†’5â†’6.
+/*Éè¼Æº¯Êı·Ö±ğÇóÁ½¸öÒ»Ôª¶àÏîÊ½µÄ³Ë»ıÓëºÍ¡£
 
-Input Specification :
-Each input file contains one test case.For each case, the first line contains the address of the first node, a positive N(â‰¤10
-	â€‹5
-	â€‹â€‹) which is the total number of nodes, and a positive K(â‰¤N) which is the length of the sublist to be reversed.The address of a node is a 5 - digit nonnegative integer, and NULL is represented by - 1.
+ÊäÈë¸ñÊ½:
+ÊäÈë·Ö2ĞĞ£¬Ã¿ĞĞ·Ö±ğÏÈ¸ø³ö¶àÏîÊ½·ÇÁãÏîµÄ¸öÊı£¬ÔÙÒÔÖ¸Êıµİ½µ·½Ê½ÊäÈëÒ»¸ö¶àÏîÊ½·ÇÁãÏîÏµÊıºÍÖ¸Êı£¨¾ø¶ÔÖµ¾ùÎª²»³¬¹ı1000µÄÕûÊı£©¡£Êı×Ö¼äÒÔ¿Õ¸ñ·Ö¸ô¡£
 
-	Then N lines follow, each describes a node in the format :
+Êä³ö¸ñÊ½ :
+Êä³ö·Ö2ĞĞ£¬·Ö±ğÒÔÖ¸Êıµİ½µ·½Ê½Êä³ö³Ë»ı¶àÏîÊ½ÒÔ¼°ºÍ¶àÏîÊ½·ÇÁãÏîµÄÏµÊıºÍÖ¸Êı¡£Êı×Ö¼äÒÔ¿Õ¸ñ·Ö¸ô£¬µ«½áÎ²²»ÄÜÓĞ¶àÓà¿Õ¸ñ¡£Áã¶àÏîÊ½Ó¦Êä³ö0 0¡£
 
-Address Data Next
-
-
-
-where Address is the position of the node, Data is an integer, and Next is the position of the next node.
-
-Output Specification :
-For each case, output the resulting ordered linked list.Each node occupies a line, and is printed in the same format as in the input.
-
-Sample Input :
-00100 6 4
-00000 4 99999
-00100 1 12309
-68237 6 - 1
-33218 3 00000
-99999 5 68237
-12309 2 33218
+ÊäÈëÑùÀı :
+4 3 4 - 5 2  6 1 - 2 0
+3 5 20 - 7 4  3 1
 
 
 
-Sample Output :
-00000 4 33218
-33218 3 12309
-12309 2 00100
-00100 1 99999
-99999 5 68237
-68237 6 - 1
-*/
-/*ä¸ºäº†è®­ç»ƒæ–‡ä»¶æ“ä½œï¼Œè¾“å…¥è¾“å‡ºæ•°æ®éƒ½å‚¨å­˜åœ¨txtä¸­*/
-
-#include<iostream>
+Êä³öÑùÀı :
+	15 24 - 25 22 30 21 - 10 20 - 21 8 35 6 - 33 5 14 4 - 15 3 18 2 - 6 1
+	5 20 - 4 4 - 5 2 9 1 - 2 0
+	*/
 #include<stdio.h>
 #include<stdlib.h>
+#include<iostream>
 using namespace std;
 
-typedef struct Node * NodeAddress;
-struct Node
+typedef struct PolyNode* Polynomial;
+struct PolyNode
 {
-	char Address[6];
-	int Data;
-	char Next[6];
-	NodeAddress NextNode;
+	int Coef;
+	int Expon;
+	Polynomial Next;
 };
 
-int ValidAddress(char*ch) //åˆ¤æ–­åœ°å€æ˜¯å¦åˆç†
+Polynomial ReadPolynomial(int * input)
 {
-	if (((ch[5] == '\0') && (ch[4] != '\0'))||(*ch=='-'&&*(ch+1)=='1'))
-		return 1;
-	else
-		return 0;
-}
-
-NodeAddress Read()
-{
-	char ch[7] = { 0 };
-	NodeAddress first = (NodeAddress)malloc(sizeof(Node));
-	first->NextNode = NULL;
-	NodeAddress temp = first;
-	int num = 0;
-	while (scanf("%s", ch)!=EOF) //å‡è®¾æ ¼å¼è¿˜æ˜¯å¯¹çš„ï¼Œåªæ˜¯å¶å°”æœ‰äº›è¡Œå‡ºç°åœ°å€é”™è¯¯çš„æƒ…å†µ
-	{
-		num++;
-		if (!ValidAddress(ch))
-		{
-			scanf("%s", ch);
-			scanf("%s", ch);
-			continue;
-		}
-		NodeAddress newnode = (NodeAddress)malloc(sizeof(Node));
-		for (int i = 0; i < 6; i++)
-		{
-			newnode->Address[i] = ch[i];
-		}
-		int data;
-		if (!scanf("%d", &data))
-		{
-			scanf("%s", ch);
-			scanf("%s", ch);
-			continue;
-		}
-		newnode->Data = data;
-		char ch1[6] = { 0 };
-		scanf("%s", ch1);
-		if (!ValidAddress(ch1))
-			continue;
-		for (int i = 0; i < 6; i++)
-		{
-			newnode->Next[i] = ch1[i];
-		}
-		newnode->NextNode = NULL;
-		temp->NextNode = newnode;
-		temp = newnode;
-		/*if (num == 10)
-			break;*/
-	}
-	return first;
-}
-
-void disp(NodeAddress node)
-{
-	NodeAddress temp = node->NextNode;
-	while (temp != NULL)
-	{
-		printf("%s ", temp->Address);
-		printf("%d ", temp->Data);
-		printf("%s", temp->Next);
-		printf("\n");
-		temp = temp->NextNode;
-	}
-}
-
-void GenerateData(int N)
-{
-	for (int i = 0; i < N; i++)
-	{
-		printf("11111 32 22222\n");
-	}
-}
-
-int isequal(char * char1, char * char2) //å¯¹æ¯”ä¸¤å­—ç¬¦ä¸²æ˜¯å¦ç›¸ç­‰ è¾“å…¥çš„é•¿åº¦åº”è¯¥ç›¸ç­‰
-{
-	int result = 1;
-	for (int i = 0; char1[i] != '\0'; i++)
-	{
-		if (char1[i] != char2[i])
-		{
-			result = result * 0;
-			break;
-		}
-	}
-	return result;
-}
-
-NodeAddress FindLocationData(NodeAddress Node1, char*Location) //åœ¨é“¾è¡¨ä¸­æ‰¾åˆ°ç‰¹å®šåœ°å€ä¸‹çš„æ•°æ®çš„åœ°å€
-{
-	if ((*Location == '-') && (*(Location + 1) == '1'))
-		return NULL;
-	NodeAddress temp = Node1->NextNode;
-	while (temp != NULL)
-	{
-		if (isequal(temp->Address, Location))
-			return temp;
-		temp = temp->NextNode;
-	}
-	return NULL;//æ²¡æ‰¾åˆ°è¿”å›NULL
-}
-
-int Length(NodeAddress Node,char*firstlocation)
-{
-	NodeAddress temp = FindLocationData(Node, firstlocation);
-	int num = 0;
-	while (temp != NULL)
-	{
-		num++;
-		temp = FindLocationData(Node,temp->Next);
-	}
-	return num;
-}
-
-void Copychar2TOchar1(char * char1, char * char2)
-{
-	int i;
-	for (i = 0; char2[i] != '\0'; i++)
-	{
-		char1[i] = char2[i];
-	}
-	char1[i] = '\0';
-	return;
-}
-
-void ReverseList(NodeAddress Node,int K)
-{
-	if (K > Length(Node,Node->NextNode->Address))
-	{
-		printf("æ— æ³•åè½¬ï¼ŒK>N\n");
-		return ;
-	}
-	if (K == 0||K == 1)
-	{
-		printf("æ— éœ€åè½¬\n");
-		return ;
-	}
-	if (K < 0)
-	{
-		printf("Kåº”è¯¥å¤§äº0\n");
-		return ;
-	}
-	int num = 0;
-	NodeAddress temp = Node->NextNode;
-	if (temp == NULL)
-		return;
-	NodeAddress midtemp = temp->NextNode;
-	if (midtemp == NULL)
-		return;
-	NodeAddress tempstorage = temp;
-	NodeAddress tempNextStorage = midtemp;
-	while (temp != NULL)
-	{
-		NodeAddress midtempNextStorage = midtemp->NextNode;
-		midtemp->NextNode = temp;
-		if (num != 0)
-		{
-			temp->NextNode = tempNextStorage;
-			tempNextStorage = midtemp;
-		}
-		num++;
-		if (num == K / 2)
-		{
-			if (K % 2 == 0)
-			{
-				Node->NextNode = midtemp;
-				tempstorage->NextNode = midtempNextStorage;
-				break;
-			}
-			else
-			{
-				Node->NextNode = midtempNextStorage;
-				tempstorage->NextNode = midtempNextStorage->NextNode;
-				midtempNextStorage->NextNode = midtemp;
-				break;
-			}
-		}
-		temp = midtempNextStorage;
-		midtemp = temp->NextNode;
-	}
-	temp = Node->NextNode;
-	while (temp->NextNode != NULL)
-	{
-		Copychar2TOchar1(temp->Next, temp->NextNode->Address);
-		temp = temp->NextNode;
-	}
-	Copychar2TOchar1(temp->Next, "-1");
-}
-
-void SwapNodeData(NodeAddress swap1, NodeAddress swap2)
-{
-	int middata;
-	NodeAddress tempstorage = swap1;
-	NodeAddress temp = swap2;
-	middata = temp->Data;
-	temp->Data = tempstorage->Data;
-	tempstorage->Data = middata;
-	int i;
-	for (i = 0; i<6 ; i++)
-	{
-		middata = temp->Next[i];
-		temp->Next[i] = tempstorage->Next[i];
-		tempstorage->Next[i] = middata;
-
-		middata = temp->Address[i];
-		temp->Address[i] = tempstorage->Address[i];
-		tempstorage->Address[i] = middata;
-	}
-}
-
-void ArangeList(NodeAddress Node,char * BeginLocation) //å¯¹å‚¨å­˜åœ¨é¡ºåºè¡¨ä¸­çš„æ•°æ®è¿›è¡Œé¡ºåºä¿®æ•´ é“¾è¡¨åªæ˜¯ä¸€ç§å®ç°æ— é™å­˜å‚¨çš„æ–¹å¼
-{
-	NodeAddress temp = Node->NextNode;
-	NodeAddress tempstorage = temp;
-	char * Location = BeginLocation;
-
-	while (temp != NULL)
-	{
-		if (isequal(temp->Address, Location))
-		{
-			if (temp == tempstorage)
-			{
-				Location = tempstorage->Next;
-				if (isequal("-1", Location))
-				{
-					tempstorage->NextNode = NULL;
-					break;
-				}
-				temp = tempstorage->NextNode;
-				tempstorage = tempstorage->NextNode;
-				continue;
-			}
-			Location = tempstorage->Next;
-			SwapNodeData(tempstorage, temp);
-			if (isequal("-1", Location))
-			{
-				tempstorage->NextNode = NULL;
-				break;
-			}
-			temp = tempstorage->NextNode;
-			tempstorage = tempstorage->NextNode;
-			continue;
-		}
-		temp = temp->NextNode;
-	}
-}
-
-void ReverseListMethod2(NodeAddress Node, int K,char*firstLocation)
-{
-	if (K > Length(Node, firstLocation))
-	{
-		printf("æ— æ³•åè½¬ï¼ŒK>N\n");
-		return;
-	}
-	if (K == 0 || K == 1)
-	{
-		printf("æ— éœ€åè½¬\n");
-		return;
-	}
-	if (K < 0)
-	{
-		printf("Kåº”è¯¥å¤§äº0\n");
-		return;
-	}
-
-	NodeAddress temp = FindLocationData(Node, firstLocation); //è¿™ä¸ªç”¨åœ¨æ•°ç»„é‡Œçš„è¯å¯ä»¥å¯¹åº”çš„è½¬æ¢æˆæ•°ç»„ä¸‹æ ‡
-	if (temp == NULL)
-		return;
-	NodeAddress firstNodestorage = temp;
-	NodeAddress tempNext = FindLocationData(Node, temp->Next);
-	if (tempNext == NULL)
-		return;
-	NodeAddress tempNextNextStorage = FindLocationData(Node, tempNext->Next);
-
-	int num = 0;
-	while (1)
-	{
-		Copychar2TOchar1(tempNext->Next, temp->Address);
-		num = num + 1;
-		if (num ==(K-(K%2))/2 )
-		{
-			if (K % 2 == 0)
-			{
-				if (tempNextNextStorage == NULL)
-					Copychar2TOchar1(firstNodestorage->Next, "-1");
-				else
-					Copychar2TOchar1(firstNodestorage->Next, tempNextNextStorage->Address);
-				Copychar2TOchar1(firstLocation, tempNext->Address);
-				return;
-			}
-			else
-			{
-				NodeAddress tempNextNextNext = FindLocationData(Node, tempNextNextStorage->Next);
-				if (tempNextNextNext == NULL)
-					Copychar2TOchar1(firstNodestorage->Next, "-1");
-				else
-					Copychar2TOchar1(firstNodestorage->Next, tempNextNextNext->Address);
-				Copychar2TOchar1(tempNextNextStorage->Next, tempNext->Address);
-				Copychar2TOchar1(firstLocation, tempNextNextStorage->Address);
-				return;
-			}
-		}
-		temp = tempNextNextStorage;
-		NodeAddress tempNextstorage = tempNext;
-		tempNext = FindLocationData(Node, temp->Next);
-		Copychar2TOchar1(temp->Next, tempNextstorage->Address);
-		tempNextNextStorage = FindLocationData(Node, tempNext->Next);
-	}
-}
-
-void dispMethod2(NodeAddress Node,char*firstLocation)
-{
-	NodeAddress temp = FindLocationData(Node, firstLocation);
-	while (temp->Address!=NULL)
-	{
-		printf("%s ", temp->Address);
-		printf("%d ", temp->Data);
-		printf("%s\n", temp->Next);
-		temp = FindLocationData(Node, temp->Next);
-	}
-}
-
-#define ChOOSEFUNCTION 1
-#ifdef ChOOSEFUNCTION
-int main()
-{
-	NodeAddress first;
-	first = Read(); //åŒ…æ‹¬åºŸæ•°æ®çš„æ¶ˆå»
-	ArangeList(first, "33128");
-	ReverseList(first, 1);
-	disp(first);//å°†å¤„ç†åçš„æ•°æ®å¼„åˆ°å¦ä¸€ä¸ªæ–‡ä»¶é‡Œ
-	//char string1[6] = "33218";
-	//ReverseListMethod2(first, 4 ,string1);
-	//dispMethod2(first, string1);
+	//int input[] = { 4,3,4,-5,2,6,1,-2,0 };
+	Polynomial Begin;
+	Begin = (Polynomial)malloc(sizeof(PolyNode));
 	
+	Begin->Next = (Polynomial)malloc(sizeof(PolyNode));
+	if (input[0] == 0)
+	{
+		Begin->Next->Coef = 0;
+		Begin->Next->Expon = 0;
+		Begin->Next->Next = NULL;
+		return Begin;
+	}
+	Polynomial temp;
+	temp = Begin->Next;
+	for (int i = 0; i < 2*input[0]; )
+	{
+		temp->Coef = input[++i];
+		temp->Expon = input[++i];
+		if (i <2* input[0])
+		{
+			temp->Next = (Polynomial)malloc(sizeof(PolyNode));
+			temp = temp->Next;
+		}
+		else
+			temp->Next = NULL;
+	}
+	return Begin;
+
 }
-#else
+
+Polynomial Multiple(Polynomial Polynomial1, Polynomial Polynomial2)
+{
+	Polynomial Begin = (Polynomial)malloc(sizeof(PolyNode));
+	Polynomial temp1 = Polynomial1->Next;
+	Polynomial temp2 ;
+	int num = 0;
+	Polynomial Storage;
+	while (temp1 != NULL)
+	{
+		temp2 = Polynomial2->Next;
+		while (temp2 != NULL)
+		{
+			num++;
+			Polynomial NewNode = (Polynomial)malloc(sizeof(PolyNode));
+ 			NewNode->Coef = temp1->Coef * temp2->Coef;
+			NewNode->Expon = temp1->Expon + temp2->Expon;
+			NewNode->Next = NULL;
+			if (num == 1)
+			{
+				Begin->Next = NewNode;
+			}
+			else
+			{
+				Storage->Next = NewNode;
+			}
+			Storage = NewNode;
+			temp2 = temp2->Next;
+		}
+		temp1 = temp1->Next;
+	}
+	Polynomial temp3 = Begin->Next;
+	while (temp3 != NULL)
+	{
+		Polynomial temp4 = temp3->Next;
+		int tempcoef = temp3->Coef;
+		Polynomial Storetemp4 = temp3;
+		while (temp4 != NULL)
+		{
+			if (temp4->Expon == temp3->Expon)
+			{
+				tempcoef = tempcoef + temp4->Coef;
+				Storetemp4->Next = temp4->Next;
+				free(temp4);
+				temp4 = Storetemp4;
+			}
+			Storetemp4 = temp4;
+			temp4 = temp4->Next;
+		}
+		temp3->Coef = tempcoef;
+		temp3 = temp3->Next;
+	}
+	return Begin;
+}
+
+Polynomial Link(Polynomial Polynomial1, Polynomial Polynomial2) //Á¬½ÓÁ½¸öÁ´±íµ½ĞÂµÄÁ´±í£¬·µ»ØĞÂÁ´±íµÄµØÖ·
+{
+	Polynomial Result = (Polynomial)malloc(sizeof(PolyNode));
+	Result->Next = NULL;
+	Polynomial temp1 = Polynomial1->Next;
+	Polynomial temp2 = Polynomial2->Next;
+	Polynomial tempstorage = Result;
+	while (temp1 != NULL)
+	{
+		Polynomial NewNode = (Polynomial)malloc(sizeof(PolyNode));
+		NewNode->Coef = temp1->Coef;
+		NewNode->Expon = temp1->Expon;
+		tempstorage->Next = NewNode;
+		tempstorage = NewNode;
+		temp1 = temp1->Next;
+	}
+	while (temp2 != NULL)
+	{
+		Polynomial NewNode = (Polynomial)malloc(sizeof(PolyNode));
+		NewNode->Coef = temp2->Coef;
+		NewNode->Expon = temp2->Expon;
+		tempstorage->Next = NewNode;
+		tempstorage = NewNode;
+		temp2 = temp2->Next;
+	}
+	tempstorage->Next = NULL;
+	return Result;
+}
+
+Polynomial Add(Polynomial Polynomial1, Polynomial Polynomial2)
+{
+	Polynomial Linked = Link(Polynomial1, Polynomial2);
+	Polynomial temp3 = Linked->Next;
+	while (temp3 != NULL)
+	{
+		Polynomial temp4 = temp3->Next;
+		int tempcoef = temp3->Coef;
+		Polynomial Storetemp4 = temp3;
+		while (temp4 != NULL)
+		{
+			if (temp4->Expon == temp3->Expon)
+			{
+				tempcoef = tempcoef + temp4->Coef;
+				Storetemp4->Next = temp4->Next;
+				free(temp4);
+				temp4 = Storetemp4;
+			}
+			Storetemp4 = temp4;
+			temp4 = temp4->Next;
+		}
+		temp3->Coef = tempcoef;
+		temp3 = temp3->Next;
+	}
+	return Linked;
+}
+
+void printPolynomial(Polynomial Polynomial1)
+{
+	Polynomial temp = Polynomial1->Next;
+	int num = 0;
+	while (temp != NULL)
+	{
+		num++;
+		temp = temp->Next;
+	}
+	cout << num << " ";
+	temp = Polynomial1->Next;
+	while (temp != NULL)
+	{
+		cout << temp->Coef << " " << temp->Expon<<" ";
+		temp = temp->Next;
+	}
+	cout << endl;
+}
+
+void sortPolynomial(Polynomial Polynomial1) //Á´±íÅÅĞò ´Ó´óµ½Ğ¡ Ã°ÅİÅÅĞò·¨
+{
+	Polynomial temp = Polynomial1->Next;
+	Polynomial tempstorage = NULL;
+	while (temp != NULL)
+	{
+		if (temp->Next == tempstorage)
+		{
+			tempstorage = temp;
+			temp = Polynomial1->Next;
+			continue;
+		}
+		if (temp->Next != NULL)
+		{
+			if (temp->Next->Expon > temp->Expon)
+			{
+				int midCoef,midExpon;
+				midCoef = temp->Next->Coef  ;
+				midExpon = temp->Next->Expon ;
+				temp->Next->Coef = temp->Coef;
+				temp->Next->Expon = temp->Expon;
+				temp->Coef = midCoef;
+				temp->Expon = midExpon;
+			}
+		} 
+		temp = temp->Next;
+	}
+}
+
 int main()
 {
-	GenerateData(1000);
+	Polynomial temp;
+	int input[] = { 4,3,4,-5,2,6,1,-2,0 };
+	
+	temp = ReadPolynomial(input);
+	Polynomial temp1;
+	int input1[] = { 3,5,20,-7,4,3,1 };
+	temp1 = ReadPolynomial(input1);
+	Polynomial MultipleResult = Multiple(temp, temp1);
+	Polynomial AddResult = Add(temp, temp1);
+	sortPolynomial(MultipleResult);
+	sortPolynomial(AddResult);
+	printPolynomial(temp);
+	printPolynomial(temp1);
+	printPolynomial(MultipleResult);
+	printPolynomial(AddResult);
+	system("pause");
 }
-#endif

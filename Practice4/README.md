@@ -1,25 +1,24 @@
-/*Given a tree, you are supposed to list all the leaves in the order of top down, and left to right.
+/*Given a stack which can keep M numbers at most. Push N numbers in the order of 1, 2, 3, ..., N and pop randomly. You are supposed to tell if a given sequence of numbers is a possible pop sequence of the stack. For example, if M is 5 and N is 7, we can obtain 1, 2, 3, 4, 5, 6, 7 from the stack, but not 3, 2, 1, 7, 5, 6, 4.
 
-Input Specification :
-Each input file contains one test case.For each case, the first line gives a positive integer N(≤10) which is the total number of nodes in the tree-- and hence the nodes are numbered from 0 to N−1.Then N lines follow, each corresponds to a node, and gives the indices of the left and right children of the node.If the child does not exist, a "-" will be put at the position.Any pair of children are separated by a space.
+Input Specification:
+Each input file contains one test case. For each case, the first line contains 3 numbers (all no more than 1000): M (the maximum capacity of the stack), N (the length of push sequence), and K (the number of pop sequences to be checked). Then K lines follow, each contains a pop sequence of N numbers. All the numbers in a line are separated by a space.
 
-Output Specification :
-For each test case, print in one line all the leaves' indices in the order of top down, and left to right. There must be exactly one space between any adjacent numbers, and no extra space at the end of the line.
+Output Specification:
+For each pop sequence, print in one line "YES" if it is indeed a possible pop sequence of the stack, or "NO" if not.
 
-Sample Input :
-8
-1 -1
--1 -1
-0 -1
-2 7
--1 -1
--1 -1
-5 -1
-4 6
+Sample Input:
+5 7 5
+1 2 3 4 5 6 7
+3 2 1 7 5 6 4
+7 6 5 4 3 2 1
+5 6 4 3 7 2 1
+1 7 6 5 4 3 2
 
-
-
-Sample Output :
-4 1 5*/
-
-二叉树的递归非递归遍历（后序 中序 前序）
+      
+    
+Sample Output:
+YES
+NO
+NO
+YES
+NO*/

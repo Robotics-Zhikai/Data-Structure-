@@ -1,24 +1,40 @@
-/*Given a stack which can keep M numbers at most. Push N numbers in the order of 1, 2, 3, ..., N and pop randomly. You are supposed to tell if a given sequence of numbers is a possible pop sequence of the stack. For example, if M is 5 and N is 7, we can obtain 1, 2, 3, 4, 5, 6, 7 from the stack, but not 3, 2, 1, 7, 5, 6, 4.
+/*
+02 - 线性结构3 Reversing Linked List(25分)
+Given a constant K and a singly linked list L, you are supposed to reverse the links of every K elements on L.For example, given L being 1→2→3→4→5→6, if K = 3, then you must output 3→2→1→6→5→4; if K = 4, you must output 4→3→2→1→5→6.
 
-Input Specification:
-Each input file contains one test case. For each case, the first line contains 3 numbers (all no more than 1000): M (the maximum capacity of the stack), N (the length of push sequence), and K (the number of pop sequences to be checked). Then K lines follow, each contains a pop sequence of N numbers. All the numbers in a line are separated by a space.
+Input Specification :
+Each input file contains one test case.For each case, the first line contains the address of the first node, a positive N(≤10
+	​5
+	​​) which is the total number of nodes, and a positive K(≤N) which is the length of the sublist to be reversed.The address of a node is a 5 - digit nonnegative integer, and NULL is represented by - 1.
 
-Output Specification:
-For each pop sequence, print in one line "YES" if it is indeed a possible pop sequence of the stack, or "NO" if not.
+	Then N lines follow, each describes a node in the format :
 
-Sample Input:
-5 7 5
-1 2 3 4 5 6 7
-3 2 1 7 5 6 4
-7 6 5 4 3 2 1
-5 6 4 3 7 2 1
-1 7 6 5 4 3 2
+Address Data Next
 
-      
-    
-Sample Output:
-YES
-NO
-NO
-YES
-NO*/
+
+
+where Address is the position of the node, Data is an integer, and Next is the position of the next node.
+
+Output Specification :
+For each case, output the resulting ordered linked list.Each node occupies a line, and is printed in the same format as in the input.
+
+Sample Input :
+00100 6 4
+00000 4 99999
+00100 1 12309
+68237 6 - 1
+33218 3 00000
+99999 5 68237
+12309 2 33218
+
+
+
+Sample Output :
+00000 4 33218
+33218 3 12309
+12309 2 00100
+00100 1 99999
+99999 5 68237
+68237 6 - 1
+*/
+/*为了训练文件操作，输入输出数据都储存在txt中*/

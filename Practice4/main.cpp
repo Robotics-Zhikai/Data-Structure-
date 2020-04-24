@@ -1,374 +1,457 @@
-Ôªø/*Given a tree, you are supposed to list all the leaves in the order of top down, and left to right.
+/*Given a stack which can keep M numbers at most. Push N numbers in the order of 1, 2, 3, ..., N and pop randomly. You are supposed to tell if a given sequence of numbers is a possible pop sequence of the stack. For example, if M is 5 and N is 7, we can obtain 1, 2, 3, 4, 5, 6, 7 from the stack, but not 3, 2, 1, 7, 5, 6, 4.
 
-Input Specification :
-Each input file contains one test case.For each case, the first line gives a positive integer N(‚â§10) which is the total number of nodes in the tree-- and hence the nodes are numbered from 0 to N‚àí1.Then N lines follow, each corresponds to a node, and gives the indices of the left and right children of the node.If the child does not exist, a "-" will be put at the position.Any pair of children are separated by a space.
+Input Specification:
+Each input file contains one test case. For each case, the first line contains 3 numbers (all no more than 1000): M (the maximum capacity of the stack), N (the length of push sequence), and K (the number of pop sequences to be checked). Then K lines follow, each contains a pop sequence of N numbers. All the numbers in a line are separated by a space.
 
-Output Specification :
-For each test case, print in one line all the leaves' indices in the order of top down, and left to right. There must be exactly one space between any adjacent numbers, and no extra space at the end of the line.
+Output Specification:
+For each pop sequence, print in one line "YES" if it is indeed a possible pop sequence of the stack, or "NO" if not.
 
-Sample Input :
-8
-1 -1
--1 -1
-0 -1
-2 7
--1 -1
--1 -1
-5 -1
-4 6
+Sample Input:
+5 7 5
+1 2 3 4 5 6 7
+3 2 1 7 5 6 4
+7 6 5 4 3 2 1
+5 6 4 3 7 2 1
+1 7 6 5 4 3 2
+
+      
+    
+Sample Output:
+YES
+NO
+NO
+YES
+NO*/
 
 
 
-Sample Output :
-4 1 5*/
-//‰∫åÂèâÊ†ë
+
+
 #include <iostream>
 #include <stdio.h>
-#include<stdlib.h>
-#include "Queue.h"
-#include "Stack.h"
+#include <stdlib.h>
 using namespace std;
 
-int LengthList(ListNodeAddress List)
+typedef struct Node * NodeAddress;
+typedef NodeAddress Stack;
+typedef struct StackInfo * StackInfoAddress;
+struct StackInfo
 {
+	NodeAddress top;
+	NodeAddress Next;
+};
+
+struct Node
+{
+	int Data;
+	NodeAddress Next;
+};
+
+StackInfoAddress CreatStack(int MaxSize)
+{
+	if (MaxSize == 0)
+	{
+		StackInfoAddress Result = (StackInfoAddress)malloc(sizeof(StackInfo));
+		Result->Next = NULL;
+		Result->top = NULL;
+		return Result;
+	}
+	StackInfoAddress Result = (StackInfoAddress)malloc(sizeof(StackInfo));
+	NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
+	Result->Next = NewNode;
+	Result->top = NewNode;
+	NewNode->Next = NULL;
+	NodeAddress Storage;
+	Storage = NewNode;
+	for (int i = 1; i < MaxSize; i++)
+	{
+		NodeAddress NewNode1 = (NodeAddress)malloc(sizeof(Node));
+		Storage->Next = NewNode1;
+		Storage = NewNode1;
+	}
+	Storage->Next = NULL;
+	return Result;
+}
+
+int IsEmpty(StackInfoAddress s)
+{
+	if ((s->Next == NULL) || (s->Next == s->top))
+		return 1;
+	else
+		return 0;
+}
+
+int IsFull(StackInfoAddress s)
+{
+	if (IsEmpty(s))
+		return 0;
+	if (s->top == NULL)
+		return 1;
+	else
+		return 0;
+}
+
+void Push(StackInfoAddress s, int element)
+{
+	if (IsFull(s) == 1)
+		return;
+	else
+	{
+		s->top->Data = element;
+		s->top = s->top->Next;
+	}
+}
+
+int Pop(StackInfoAddress s)
+{
+	if (IsEmpty(s) == 1)
+	{
+		return -1;
+	}
+	NodeAddress temp = s->Next;
+	NodeAddress tempNext = temp->Next;
+
+	while (tempNext != NULL)
+	{
+		if (s->top == tempNext)
+		{
+			s->top = temp;
+			return s->top->Data;
+		}
+		tempNext = tempNext->Next;
+		temp = temp->Next;
+	}
+	s->top = temp;
+	return s->top->Data;
+}
+
+int GetTopStackData(StackInfoAddress stack) // µ√µΩ’ª∂•‘™Àÿ÷µ
+{
+	if (IsEmpty(stack) == 1) //Œﬁ∑®µ√µΩ’ª∂•‘™Àÿ÷µ’ªŒ™ø’
+		return -1;
+	NodeAddress temp;
+	temp = stack->Next;
+	while (temp != NULL)
+	{
+		if (temp->Next == stack->top)
+			return temp->Data;
+		temp = temp->Next;
+	}
+}
+
+NodeAddress ReadOneline(int maxnumN) //Õ∑Ω·µ„ ≤√¥∂º√ª”–
+{
+	if (maxnumN == 0)
+		return NULL;
+	NodeAddress FirstNode = (NodeAddress)malloc(sizeof(Node));
+	NodeAddress storage = FirstNode;
+	for (int i = 0; i < maxnumN; i++)
+	{
+		NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
+		int num;
+		scanf("%d", &num);
+		NewNode->Data = num;
+		storage->Next = NewNode;
+		storage = NewNode;
+	}
+	storage->Next = NULL;
+	return FirstNode;
+}
+
+typedef struct linenode * linenodeAddress;
+struct linenode
+{
+	NodeAddress rownext;
+	linenodeAddress verticalnext;
+};
+
+linenodeAddress Readmatrix(int linenum,int maxnumN)
+{
+	if ((linenum == 0)||(maxnumN==0))
+		return NULL;
+	linenodeAddress First = (linenodeAddress)malloc(sizeof(linenode));
+	linenodeAddress Result = First;
+	First->rownext = ReadOneline(maxnumN);
+	First->verticalnext = NULL;
+	for (int i = 1; i < linenum; i++)
+	{
+		linenodeAddress NewlienNode = (linenodeAddress)malloc(sizeof(linenode));
+		NewlienNode->rownext = ReadOneline(maxnumN);
+		First->verticalnext = NewlienNode;
+		First = First->verticalnext;
+	}
+	First->verticalnext = NULL;
+	return Result;
+}
+
+NodeAddress DeleteNode(NodeAddress first, NodeAddress deleteNode)
+{
+	NodeAddress temp = first->Next;
+	NodeAddress NodeStorage = first;
+	while (temp != NULL)
+	{
+		if (temp == deleteNode)
+		{
+			NodeStorage->Next = temp->Next;
+			free(temp);
+			break;
+		}
+		NodeStorage = temp;
+		temp = temp->Next;
+	}
+	return first;
+}
+
+NodeAddress GenerateDataOneLine(int maxnumN) //…˙≥…1-maxnumNµƒ»´≈≈¡–µƒ∆‰÷–“ª∏ˆ
+{
+	if (maxnumN == 0)
+	{
+		NodeAddress temp = (NodeAddress)malloc(sizeof(Node));
+		temp->Next = NULL;
+		return temp;
+	}
+	NodeAddress temp = (NodeAddress)malloc(sizeof(Node));
+	NodeAddress storage = temp;
+	for (int i = 1; i <= maxnumN; i++)
+	{
+		NodeAddress Newnode = (NodeAddress)malloc(sizeof(Node));
+		Newnode->Data = i;
+		Newnode->Next = NULL;
+		temp->Next = Newnode;
+		temp = temp->Next;
+	}
+	temp = storage->Next;
+	NodeAddress Result = (NodeAddress)malloc(sizeof(Node));
+	NodeAddress tempResult = Result;
+	int randamnum = rand() % maxnumN + 1;
 	int num = 0;
-	ListNodeAddress temp = List->Next;
+	while (temp != NULL)
+	{
+		num++;
+		if (num == randamnum)
+		{
+			NodeAddress Newnode = (NodeAddress)malloc(sizeof(Node));
+			Newnode->Data = temp->Data;
+			storage = DeleteNode(storage, temp);
+			temp = storage->Next;
+			Newnode->Next = NULL;
+			tempResult->Next = Newnode;
+			tempResult = tempResult->Next;
+			maxnumN--;
+			num = 0;
+			if (maxnumN == 0)
+				break;
+			randamnum = rand() % maxnumN + 1;
+			continue;
+		}
+		temp = temp->Next;
+	}
+	return Result;
+}
+
+void PrintData(int linenum,int maxnumN)
+{
+	NodeAddress dispfirst;
+	for (int i = 0; i < linenum; i++)
+	{
+		dispfirst = GenerateDataOneLine(maxnumN);
+		NodeAddress temp;
+		temp = dispfirst->Next;
+		while (temp != NULL)
+		{
+			printf("%d ", temp->Data);
+			temp = temp->Next;
+		}
+		printf("\n");
+	}
+}
+
+typedef struct QueueInfo * QueueInfoAddress;
+struct QueueInfo
+{
+	NodeAddress Rear;
+	NodeAddress Front;
+	NodeAddress HeadNode;
+};
+
+QueueInfoAddress CreateQueue(int Maxsize)
+{
+	if (Maxsize == 0)
+	{
+		QueueInfoAddress Result;
+		Result->Front = NULL;
+		Result->Rear = NULL;
+		return Result;
+	}
+
+	QueueInfoAddress Result = (QueueInfoAddress)malloc(sizeof(QueueInfo));
+	NodeAddress HeadNode = (NodeAddress)malloc(sizeof(Node));
+	NodeAddress temp = HeadNode;
+	int num = 0;
+	while (temp != NULL)
+	{
+		num++;
+		NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
+		temp->Next = NewNode;
+		temp = temp->Next;
+		if (num == Maxsize)
+		{
+			temp->Next = HeadNode->Next;
+			break;
+		}
+	}
+	Result->HeadNode = HeadNode;
+	Result->Front = HeadNode->Next;
+	Result->Rear = HeadNode;
+	return Result;
+}
+
+int IsEmptyQueue(QueueInfoAddress Queue)
+{
+	if ((Queue->Front == NULL) && (Queue->Rear == NULL))
+		return 1;
+	if (Queue->Rear == Queue->HeadNode)
+		return 1;
+	else
+		return 0;
+}
+
+int IsfullQueue(QueueInfoAddress Queue)
+{
+	if (IsEmptyQueue(Queue) == 1)
+		return 0;
+	if (Queue->Front == Queue->Rear)
+		return 1;
+}
+
+QueueInfoAddress PushQueue(QueueInfoAddress Queue,int data)
+{
+	if ((Queue->Front == NULL) && (Queue->Rear == NULL)) //Àµ√˜ «ø’∂”¡– ÕÍ»´√ª”–∂”¡–Ω·ππ
+		return Queue;
+	if (IsfullQueue(Queue) == 1)
+		return Queue;
+	if (Queue->Rear == Queue->HeadNode)
+	{
+		Queue->Front->Data = data;
+		Queue->Rear = Queue->HeadNode->Next;
+		Queue->Front = Queue->Front->Next;
+	}
+	else
+	{
+		Queue->Front->Data = data;
+		Queue->Front = Queue->Front->Next;
+	}
+	return Queue;
+}
+
+int PopQueue(QueueInfoAddress Queue)
+{
+	if (IsEmptyQueue(Queue) == 1)
+		return -1;
+	if (Queue->Rear->Next == Queue->Front)
+	{
+		int num;
+		num = Queue->Rear->Data;
+		Queue->Front = Queue->HeadNode->Next;
+		Queue->Rear = Queue->HeadNode;
+		return num;
+	}
+	int num1 = Queue->Rear->Data;
+	Queue->Rear = Queue->Rear->Next;
+	return num1;
+}
+
+
+int CheckValidSequence(NodeAddress rowdata, StackInfoAddress Stack)
+{
+	if (rowdata->Next == NULL)
+		return -1;
+	int num = 0;
+	NodeAddress temp = rowdata->Next;
 	while (temp != NULL)
 	{
 		num++;
 		temp = temp->Next;
 	}
-	return num;
-}
-
-ListNodeAddress FindNumNodeAddress(ListNodeAddress List, int NumNode)
-{
-	ListNodeAddress temp = List->Next;
+	QueueInfoAddress Queue = CreateQueue(num);
+	
+	temp = rowdata->Next;
 	while (temp != NULL)
 	{
-		if (temp->TreeNodeAdd->NumNode == NumNode)
-		{
-			return temp;
-		}
+		PushQueue(Queue, temp->Data);
 		temp = temp->Next;
 	}
-	return NULL;
-}
-
-void LevelOrderTraversalQueue(ListNodeAddress list , int TreeNum)//Â±ÇÊ¨°ÈÅçÂéÜÁî®ÈòüÂàóÈùûÂ∏∏Êñπ‰æø
-{
-	if (LengthList(list) == 0)
+	for (int i = 1; i <= num; i++)
 	{
-		printf("Á©∫Ê†ëÔºåÊó†Ê≥ïÂ±ÇÂ∫èÈÅçÂéÜ!\n");
-		return;
-	}
-	ListNodeAddress temp = list->Next;
-	ListNodeAddress NewNodeAddressAddress = FindNumNodeAddress(list, list->Root);
-	QueueInfoAddress QueueNew = CreateQueue(TreeNum+5);
-	QueueNew = QueuePush(QueueNew, NewNodeAddressAddress);
-	while (IsQueueEmpty(QueueNew)==0)
-	{
-		ElementTypeQueue PopElement = QueuePop(QueueNew);
-		/*if ((PopElement->TreeNodeAdd->left ==-1)&&(PopElement->TreeNodeAdd->right == -1))
+		Push(Stack, i);
+		while (IsEmpty(Stack) == 0 && IsEmptyQueue(Queue) == 0&&( GetTopStackData(Stack) == Queue->Rear->Data))
 		{
-			printf("%d ", PopElement->TreeNodeAdd->NumNode);
-		}*/
-		printf("%d ", PopElement->TreeNodeAdd->NumNode);
-		if (PopElement->TreeNodeAdd->left != -1)
-		{
-			QueueNew = QueuePush(QueueNew, FindNumNodeAddress(list, PopElement->TreeNodeAdd->left));
-		}
-		if (PopElement->TreeNodeAdd->right != -1)
-		{
-			QueueNew = QueuePush(QueueNew, FindNumNodeAddress(list, PopElement->TreeNodeAdd->right));
+			Pop(Stack);
+			PopQueue(Queue);
 		}
 	}
-}
-
-void PreOrderTraversalStack(ListNodeAddress List, int TrrNum)
-{
-	StackInfoAddress StackNew = CreatStack(TrrNum);
-	ListNodeAddress NumNodeAddress = FindNumNodeAddress(List, List->Root);
-	StackPush(StackNew, NumNodeAddress);
-	printf("%d ", NumNodeAddress->TreeNodeAdd->NumNode);
-	while (IsStackEmpty(StackNew)==0)
-	{
-		while (NumNodeAddress->TreeNodeAdd->left != -1)
-		{
-			NumNodeAddress = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->left);
-			StackPush(StackNew, NumNodeAddress);
-			printf("%d ", NumNodeAddress->TreeNodeAdd->NumNode);
-		}
-		ElementTypeStack PopElement = StackPop(StackNew);
-		NumNodeAddress = FindNumNodeAddress(List, PopElement->TreeNodeAdd->right);
-		while ((NumNodeAddress == NULL)&& (IsStackEmpty(StackNew) == 0))
-		{
-			NumNodeAddress = StackPop(StackNew);
-			NumNodeAddress = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->right);
-		}
-		StackPush(StackNew, NumNodeAddress);
-		if (NumNodeAddress!=NULL)
-			printf("%d ", NumNodeAddress->TreeNodeAdd->NumNode);
-		/*if (PopElement->TreeNodeAdd->right != -1)
-		{
-			NumNodeAddress = FindNumNodeAddress(List, PopElement->TreeNodeAdd->right);
-			StackPush(StackNew, NumNodeAddress);
-		}*/
-	}
-}
-
-void InOrderTraversalStack(ListNodeAddress List, int TrrNum)
-{
-	StackInfoAddress StackNew = CreatStack(TrrNum);
-	ListNodeAddress NumNodeAddress = FindNumNodeAddress(List, List->Root);
-	StackPush(StackNew, NumNodeAddress);
-	while (IsStackEmpty(StackNew)==0)
-	{
-		while (NumNodeAddress->TreeNodeAdd->left != -1)
-		{
-			NumNodeAddress = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->left);
-			StackPush(StackNew, NumNodeAddress);
-		}
-		ElementTypeStack PopElement = StackPop(StackNew);
-		printf("%d ", PopElement->TreeNodeAdd->NumNode);
-		NumNodeAddress = FindNumNodeAddress(List, PopElement->TreeNodeAdd->right);
-		while ((NumNodeAddress == NULL)&& (IsStackEmpty(StackNew) == 0))
-		{
-			NumNodeAddress = StackPop(StackNew);
-			printf("%d ", NumNodeAddress->TreeNodeAdd->NumNode);
-			NumNodeAddress = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->right);
-		}
-		StackPush(StackNew, NumNodeAddress);
-
-		/*if (PopElement->TreeNodeAdd->right != -1)
-		{
-			NumNodeAddress = FindNumNodeAddress(List, PopElement->TreeNodeAdd->right);
-			StackPush(StackNew, NumNodeAddress);
-		}*/
-	}
-}
-
-void PostOrderTraversalStack(ListNodeAddress List, int TrrNum)                                //Ëøô‰∏™Ê≠ªÊ¥ª‰∏ç‰ºöÔºÅÔºÅÔºÅÔºÅÔºÅÔºÅÔºÅÊêû‰∏ç‰∫Ü Áªà‰∫éÊêûÂÆö‰∫ÜÔºÅÔºÅÔºÅ
-{
-	StackInfoAddress StackNew = CreatStack(TrrNum);
-	ListNodeAddress NumNodeAddress = FindNumNodeAddress(List, List->Root);
-	ListNodeAddress Storage;
-	ListNodeAddress StorageVisit = NULL;
-	while (NumNodeAddress != NULL)
-	{
-		StackPush(StackNew, NumNodeAddress);
-		NumNodeAddress = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->left);
-	}
-	while ((IsStackEmpty(StackNew) == 0))
-	{
-		NumNodeAddress = StackPop(StackNew);
-		Storage = NumNodeAddress;
-		NumNodeAddress = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->right);
-		if ((NumNodeAddress == NULL)|| (NumNodeAddress == StorageVisit))
-		{
-			//ListNodeAddress temp = StackPop(StackNew);
-			StorageVisit = Storage;
-			printf("%d ", Storage->TreeNodeAdd->NumNode);
-			//printf("%d ", Storage->TreeNodeAdd->NumNode);
-		}
-		else
-		{
-			StackPush(StackNew, Storage);
-			ListNodeAddress temp = NumNodeAddress;
-			while (temp != NULL)
-			{
-				StackPush(StackNew, temp);
-				temp = FindNumNodeAddress(List, temp->TreeNodeAdd->left);
-			}
-			//printf("%d ", Storage->TreeNodeAdd->NumNode);
-		}
-	}
-}
-
-void PreOrderTraversal(ListNodeAddress List,int ListRoot)
-{
-	ListNodeAddress NumNodeAddress = FindNumNodeAddress(List, ListRoot);
-	if (NumNodeAddress == NULL)
-		return;
-	printf("%d ", ListRoot);
-	ListNodeAddress NumNodeAddressleft = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->left);
-	if (NumNodeAddressleft == NULL)
-		PreOrderTraversal(List, -1);
+	if (IsEmpty(Stack) == 1)
+		return 1;
 	else
-		PreOrderTraversal(List, NumNodeAddressleft->TreeNodeAdd->NumNode);
+		return 0;
 
-	ListNodeAddress NumNodeAddressright = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->right);
-	if (NumNodeAddressright == NULL)
-		PreOrderTraversal(List, -1);
-	else
-		PreOrderTraversal(List, NumNodeAddressright->TreeNodeAdd->NumNode);
+
+
+
+
+
+
+	//À∆∫ı≤ª”√∂—’ª∂”¡–∏˘±æ≤ª––
+	//temp = rowdata->Next;
+	//int num1 = 1;
+	//while (temp != NULL)
+	//{
+	//	for (int i = num1; i <= num; i++)
+	//	{
+	//		if (i != temp->Data)
+	//			Push(Stack, i);
+	//		else
+	//		{
+	//			Push(Stack, i);
+	//			PushQueue(Queue, temp->Data);
+	//			Pop(Stack);
+	//			PopQueue(Queue);
+	//			num1 = i + 1;
+	//			break;
+	//		}
+	//	}
+	//	temp = temp->Next;
+	//}
+	//if (IsEmpty(Stack))
+	//	return 1;
+	//else
+	//	return 0;
+
 }
-
-void InOrderTraversal(ListNodeAddress List, int ListRoot)
-{
-	ListNodeAddress NumNodeAddress = FindNumNodeAddress(List, ListRoot);
-	if (NumNodeAddress == NULL)
-		return;
-	ListNodeAddress NumNodeAddressleft = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->left);
-	if (NumNodeAddressleft == NULL)
-		InOrderTraversal(List, -1);
-	else
-		InOrderTraversal(List, NumNodeAddressleft->TreeNodeAdd->NumNode);
-
-	printf("%d ", ListRoot);
-
-	ListNodeAddress NumNodeAddressright = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->right);
-	if (NumNodeAddressright == NULL)
-		InOrderTraversal(List, -1);
-	else
-		InOrderTraversal(List, NumNodeAddressright->TreeNodeAdd->NumNode);
-}
-
-void PostOrderTraversal(ListNodeAddress List, int ListRoot)
-{
-	ListNodeAddress NumNodeAddress = FindNumNodeAddress(List, ListRoot);
-	if (NumNodeAddress == NULL)
-		return;
-	ListNodeAddress NumNodeAddressleft = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->left);
-	if (NumNodeAddressleft == NULL)
-		PostOrderTraversal(List, -1);
-	else
-		PostOrderTraversal(List, NumNodeAddressleft->TreeNodeAdd->NumNode);
-
-	ListNodeAddress NumNodeAddressright = FindNumNodeAddress(List, NumNodeAddress->TreeNodeAdd->right);
-	if (NumNodeAddressright == NULL)
-		PostOrderTraversal(List, -1);
-	else
-		PostOrderTraversal(List, NumNodeAddressright->TreeNodeAdd->NumNode);
-	printf("%d ", ListRoot);
-}
-
-
-//Áî®‰∏Ä‰∏™Á∫øÊÄßË°®ÂÇ®Â≠òÊ†ëÁªìÊûÑ,Âπ∂ÊâæÂà∞Ê†πËäÇÁÇπ
-ListNodeAddress CreateTree()
-{
-	ListNodeAddress Result = (ListNodeAddress)malloc(sizeof(ListNode));
-	ListNodeAddress temp = Result;
-	int num;
-	int Allnum;
-	scanf("%d", &Allnum);
-	if (Allnum == 0)
-		Result->Root = -1;
-	for (int i = 0; i < Allnum; i++)
-	{
-		ListNodeAddress NewNode = (ListNodeAddress)malloc(sizeof(ListNode));
-		temp->Next = NewNode;
-		TreeNodeAddress NewTreeNode = (TreeNodeAddress)malloc(sizeof(TreeNode));
-		NewNode->TreeNodeAdd = NewTreeNode;
-		NewTreeNode->NumNode = i;
-		scanf("%d", &num);
-		NewTreeNode->left = num;
-		scanf("%d", &num);
-		NewTreeNode->right = num;
-		//NewNode->TreeNodeAdd = 
-		temp = temp->Next;
-	}
-	temp->Next = NULL;
-
-	typedef struct Nodetemp * NodetempAddress;
-	struct Nodetemp
-	{
-		int num;
-		int flag;
-		NodetempAddress Next;
-	};
-	NodetempAddress tempListNode = (NodetempAddress)malloc(sizeof(Nodetemp));
-	NodetempAddress temptemp = tempListNode;
-	for (int i = 0; i < Allnum; i++)
-	{
-		temptemp->Next = (NodetempAddress)malloc(sizeof(Nodetemp));
-		temptemp->Next->num = i;
-		temptemp->Next->flag = 0;
-		temptemp = temptemp->Next;
-	}
-	temptemp->Next = NULL;
-
-	temp = Result->Next;
-	while (temp != NULL)
-	{
-		temptemp = tempListNode->Next;
-		while (temptemp != NULL)
-		{
-			if (temp->TreeNodeAdd->left == temptemp->num)
-			{
-				temptemp->flag = 1;
-				break;
-			}
-				temptemp = temptemp->Next;
-		}
-
-		temptemp = tempListNode->Next;
-		while (temptemp != NULL)
-		{
-			if (temp->TreeNodeAdd->right == temptemp->num)
-			{
-				temptemp->flag = 1;
-				break;
-			}
-			temptemp = temptemp->Next;
-		}
-
-		temp = temp->Next;
-	}
-
-	temptemp = tempListNode->Next;
-	while (temptemp != NULL)
-	{
-		if (temptemp->flag == 0)
-		{
-			Result->Root = temptemp->num;
-			break;
-		}
-		temptemp = temptemp->Next;
-	}
-
-	return Result;
-}
-
 int main()
 {
-	/*
-	16
-	1 2
-	3 4
-	5 12
-	6 -1
-	7 8
-	-1 -1
-	9 -1
-	-1 -1
-	-1 -1
-	10 11
-	-1 -1
-	-1 -1
-	13 -1
-	14 15
-	-1 -1
-	-1 -1
-	
-	*/
-	ListNodeAddress List = CreateTree();
-	int TreeNum = LengthList(List);
-	LevelOrderTraversalQueue(List,TreeNum);
-	cout << endl;
+	int maxsize;
+	scanf("%d", &maxsize);
+	int maxnumN;
+	scanf("%d", &maxnumN);
+	int linenum;
+	scanf("%d", &linenum);
+	//printf("%d %d %d\n", maxsize, maxnumN, linenum);
+	//PrintData(linenum, maxnumN);
+	linenodeAddress StorageMatrix;
+	StorageMatrix = Readmatrix(linenum, maxnumN);
 
-	PreOrderTraversalStack(List, TreeNum);
-	cout << endl;
-	PreOrderTraversal(List, List->Root);
-	cout << endl;
+	StackInfoAddress Stack = CreatStack(maxsize);
 
-	InOrderTraversalStack(List, TreeNum);
-	cout << endl;
-	InOrderTraversal(List, List->Root);
-	cout << endl;
-
-	PostOrderTraversalStack(List, TreeNum);
-	cout << endl;
-	PostOrderTraversal(List, List->Root);
-	cout << endl;
+	linenodeAddress tempVertical = StorageMatrix;
+	while (tempVertical != NULL)
+	{
+		Stack = CreatStack(maxsize);
+		NodeAddress temp = tempVertical->rownext;
+		if (CheckValidSequence(temp,  Stack) == 1)
+			printf("YES\n");
+		else
+			printf("NO\n");
+		tempVertical = tempVertical->verticalnext;
+	}
 }

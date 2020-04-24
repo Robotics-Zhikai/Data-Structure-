@@ -1,31 +1,32 @@
-/*
-给定一个插入序列就可以唯一确定一棵二叉搜索树。然而，一棵给定的二叉搜索树却可以由多种不同的插入序列得到。例如分别按照序列{ 2, 1, 3 }和{ 2, 3, 1 }插入初始为空的二叉搜索树，都得到一样的结果。于是对于输入的各种插入序列，你需要判断它们是否能生成一样的二叉搜索树。
-
-输入格式 :
-输入包含若干组测试数据。每组数据的第1行给出两个正整数N(≤10)和L，分别是每个序列插入元素的个数和需要检查的序列个数。第2行给出N个以空格分隔的正整数，作为初始插入序列。最后L行，每行给出N个插入的元素，属于L个需要检查的序列。
-
-简单起见，我们保证每个插入序列都是1到N的一个排列。当读到N为0时，标志输入结束，这组数据不要处理。
-
-输出格式 :
-对每一组需要检查的序列，如果其生成的二叉搜索树跟对应的初始序列生成的一样，输出“Yes”，否则输出“No”。
-
-输入样例 :
-4 2
-3 1 4 2
-3 4 1 2
-3 2 4 1
-2 1
-2 1
-1 2
-0
-
-
-
-输出样例:
-Yes
-No
-No
-*/
+//An inorder binary tree traversal can be implemented in a non - recursive way with a stack.For example, suppose that when a 6 - node binary tree(with the keys numbered from 1 to 6) is traversed, the stack operations are : push(1); push(2); push(3); pop(); pop(); push(4); pop(); pop(); push(5); push(6); pop(); pop().Then a unique binary tree(shown in Figure 1) can be generated from this sequence of operations.Your task is to give the postorder traversal sequence of this tree.
+//
+//
+//Figure 1
+//Input Specification :
+//Each input file contains one test case.For each case, the first line contains a positive integer N(≤30) which is the total number of nodes in a tree(and hence the nodes are numbered from 1 to N).Then 2N lines follow, each describes a stack operation in the format : "Push X" where X is the index of the node being pushed onto the stack; or "Pop" meaning to pop one node from the stack.
+//
+//Output Specification :
+//For each test case, print the postorder traversal sequence of the corresponding tree in one line.A solution is guaranteed to exist.All the numbers must be separated by exactly one space, and there must be no extra space at the end of the line.
+//
+//Sample Input :
+//6
+//Push 1
+//Push 2
+//Push 3
+//Pop
+//Pop
+//Push 4
+//Pop
+//Pop
+//Push 5
+//Push 6
+//Pop
+//Pop
+//
+//
+//
+//Sample Output :
+//3 4 2 6 5 1
 
 #include<iostream>
 #include<stdio.h>
@@ -35,278 +36,166 @@ No
 #include<string.h>
 using namespace std;
 
-typedef struct TreeNode * TreeNodeAdd;
 struct TreeNode
 {
-	int num;
-	TreeNodeAdd lchild;
-	TreeNodeAdd rchild;
-	TreeNodeAdd thisAdd;
+	int thisNum;
+	int left;
+	int right;
 };
 
-TreeNodeAdd InsertElement(TreeNodeAdd head, int Element)
+int IsEqual(char * string1,char * string2)
 {
-	if (head == NULL)
+	int flag = 0;
+	for (int i = 0; string1[i] != '\0'; i++)
 	{
-		head = (TreeNodeAdd)malloc(sizeof(TreeNode));
-		head->lchild = NULL;
-		head->rchild = NULL;
-		head->num = Element;
-		return head;
-	}
-	TreeNodeAdd Current = head;
-	TreeNodeAdd Last;
-	int LorR = -1;
-	while (Current != NULL)
-	{
-		Last = Current;
-		LorR = 0;
-		if (Element > Current->num)
+		if (string1[i] != string2[i])
 		{
-			Current = Current->rchild;
-			LorR = 2;
-		}
-		else if (Element < Current->num)
-		{
-			Current = Current->lchild;
-			LorR = 1;
-		}
-		else
+			flag = 1;
 			break;
+		}
 	}
-	if (LorR == 0)
-	{
-		printf("有相同的元素插入\n");
-	}
-	else if (LorR == 1)
-	{
-		Last->lchild = (TreeNodeAdd)malloc(sizeof(TreeNode));
-		Last->lchild->num = Element;
-		Last->lchild->thisAdd = Last->lchild;
-		Last->lchild->lchild = NULL;
-		Last->lchild->rchild = NULL;
-	}
-	else if (LorR == 2)
-	{
-		Last->rchild = (TreeNodeAdd)malloc(sizeof(TreeNode));
-		Last->rchild->num = Element;
-		Last->rchild->thisAdd = Last->rchild;
-		Last->rchild->lchild = NULL;
-		Last->rchild->rchild = NULL;
-	}
-	else if (LorR == -1)
-	{
-		head = (TreeNodeAdd)malloc(sizeof(TreeNode));
-		head->lchild = NULL;
-		head->rchild = NULL;
-		head->num = Element;
-		head->thisAdd = head;
-	}
-	return head;
-
+	if (flag == 1)
+		return 0;
+	else
+		return 1;
 }
 
-TreeNodeAdd Find(TreeNodeAdd head,int Element)
+vector <TreeNode> CreateTree()
 {
-	TreeNodeAdd temp = head;
-	while (temp != NULL)
+	vector <TreeNode> Tree;
+	vector <TreeNode> PopStorage; //需要这个来做一个时滞的储存
+	vector <TreeNode> Result; //储存最后的结果
+	int Allnum;
+	char tempchar;
+	scanf("%d", &Allnum);
+	int flag = 0;
+	for (int i = 0; i < 2 * Allnum; i++)
 	{
-		if (Element > temp->num)
+		char tempstring[10];
+		int num;
+		scanf("%s", tempstring);
+		if (IsEqual(tempstring,"Push"))
 		{
-			temp = temp->rchild;
+			scanf("%d", &num);
+			TreeNode temp;
+			temp.thisNum = num;
+			temp.left = -1;
+			temp.right = -1;
+			
+			if (Tree.empty() == 0)
+			{
+				TreeNode popelement = *(Tree.end() - 1);
+				if (popelement.left == -1)
+				{
+					popelement.left = num;
+					Tree.pop_back();
+					Tree.push_back(popelement);
+				}
+				
+			}
+			if (PopStorage.empty() == 0)
+			{
+				PopStorage[0].right = num;
+				Result.push_back(PopStorage[0]);
+				PopStorage.pop_back();
+			}
+			Tree.push_back(temp);
 		}
-		else if (Element < temp->num)
+		else if (IsEqual(tempstring, "Pop"))
 		{
-			temp = temp->lchild;
+			flag = 1;
+			TreeNode temp;
+			temp = *(Tree.end()-1);
+			if (PopStorage.empty() == 0)
+			{
+				PopStorage[0].right = -1;
+				Result.push_back(PopStorage[0]);
+				PopStorage.pop_back();
+				PopStorage.push_back(temp);
+			}
+			else
+				PopStorage.push_back(temp);
+			
+			Tree.pop_back();
 		}
-		else
+	}
+	if (PopStorage.empty() == 0)
+		Result.push_back(PopStorage[0]);
+	return Result;
+}
+
+int FindRoot(vector <TreeNode> Tree)
+{
+	vector<int>store;
+	for (auto i = Tree.begin(); i != Tree.end(); i++)
+	{
+		if ((*i).left!=-1)
+			store.push_back((*i).left);
+		if ((*i).right != -1)
+			store.push_back((*i).right);
+	}
+	for (int j = 1; j <= store.size(); j++)
+	{
+		int flag = 0;
+		for (auto i = store.begin(); i != store.end(); i++)
 		{
-			break;
+			if (j == (*i))
+			{
+				flag = 1;
+				break;
+			}
+		}
+		if (flag == 0)
+			return j;
+	}
+	return 0; //找不到根节点
+}
+
+TreeNode FindNumTreeNode(vector <TreeNode> Tree,int num)
+{
+	TreeNode temp;
+	temp.thisNum = -1; //如果不初始化的话最后会出现错误
+	temp.left = -1;
+	temp.right = -1;
+	for (int j = 0; j < Tree.size(); j++)
+	{
+		if (Tree[j].thisNum == num)
+		{
+			temp = Tree[j];
+			return temp;
 		}
 	}
 	return temp;
 }
 
-TreeNodeAdd FindMin(TreeNodeAdd head)
+void PostOrderTravesal(vector <TreeNode> Tree,TreeNode Node)
 {
-	TreeNodeAdd temp = head;
-	TreeNodeAdd Last = temp;
-	while (temp != NULL)
-	{
-		Last = temp;
-		temp = temp->lchild;
-	}
-	return Last;
-}
-
-TreeNodeAdd FindMax(TreeNodeAdd head)
-{
-	TreeNodeAdd temp = head;
-	TreeNodeAdd Last = temp;
-	while (temp != NULL)
-	{
-		Last = temp;
-		temp = temp->rchild;
-	}
-	return Last;
-}
-
-TreeNodeAdd Delete(TreeNodeAdd head, int Element)
-{
-	if (head == NULL)
-	{
-		printf("没找到\n");
-		return NULL;
-	}
-	if (Element < head->num)
-	{
-		TreeNodeAdd Newhead = Delete(head->lchild, Element);
-		head->lchild = Newhead;
-		return head;
-	}
-	else if (Element > head->num)
-	{
-		TreeNodeAdd Newhead = Delete(head->rchild, Element);
-		head->rchild = Newhead;
-		return head;
-	}
-	else
-	{
-		if (head->lchild == NULL&&head->rchild == NULL)
-		{
-			free(head);
-			return NULL;
-		}
-		else
-		{
-			if (head->rchild != NULL)
-			{
-				TreeNodeAdd minest = FindMin(head->rchild);
-				int minrecord = minest->num;
-				TreeNodeAdd Newhead = Delete(head->rchild, minest->num);
-				head->rchild = Newhead;
-				head->num = minrecord;
-				return head;
-			}
-			if (head->lchild != NULL)
-			{
-				TreeNodeAdd maxest = FindMax(head->lchild);
-				int maxrecord = maxest->num;
-				TreeNodeAdd Newhead = Delete(head->lchild, maxest->num);
-				head->lchild = Newhead;
-				head->num = maxrecord;
-				return head;
-			}
-		}
-	}
-}
-
-vector <int> TreeElement;
-void PreOrderTraversal(TreeNodeAdd Tree)
-{
-	if (Tree == NULL)
+	if (Node.thisNum == -1)
 		return;
-	TreeElement.push_back(Tree->num);
-	PreOrderTraversal(Tree->lchild);
-	PreOrderTraversal(Tree->rchild);
+	PostOrderTravesal(Tree, FindNumTreeNode(Tree, Node.left));
+	PostOrderTravesal(Tree, FindNumTreeNode(Tree, Node.right));
+	printf("%d ", Node.thisNum);
 }
 
-
-//这是测试基本操作函数的程序
 int main()
 {
-	TreeNodeAdd Tree = NULL;
+	/*
+6
+Push 1
+Push 2
+Push 3
+Pop
+Pop
+Push 4
+Pop
+Pop
+Push 5
+Push 6
+Pop
+Pop
+*/
 	
-	while (1)
-	{
-		int num;
-		scanf("%d", &num);
-		if (num == -1)
-			break;
-		Tree = InsertElement(Tree, num);
-	}
-	//Delete(Tree, 4);
-	Delete(Tree, 12);
-
+	vector <TreeNode> Tree = CreateTree();
+	int root = FindRoot(Tree);
+	PostOrderTravesal(Tree,FindNumTreeNode(Tree,root));
 }
-
-
-
-
-//这是判断是否是同一个二叉搜索树的程序
-//int main()
-//{
-//	
-//	vector <int> FinalCo;
-//	while (1)
-//	{
-//		int stop;
-//		scanf("%d", &stop);
-//		if (stop == 0)
-//			break;
-//		int a[2];
-//		a[0] = stop;
-//		int num;
-//		scanf("%d", &num);
-//		a[1] = num;
-//		vector <int> initseq;
-//		for (int i = 0; i < a[0]; i++)
-//		{
-//			int num;
-//			scanf("%d", &num);
-//			initseq.push_back(num);
-//		}
-//
-//		vector <vector<int>> testseqs;
-//		for (int i = 0; i < a[1]; i++)
-//		{
-//			vector <int> seq;
-//			for (int j = 0; j < a[0]; j++)
-//			{
-//				int num;
-//				scanf("%d", &num);
-//				seq.push_back(num);
-//			}
-//			testseqs.push_back(seq);
-//		}
-//
-//		TreeNodeAdd InitTree = NULL;
-//		for (int i = 0; i < initseq.size(); i++)
-//			InitTree = InsertElement(InitTree, initseq[i]);
-//
-//		for (int i = 0; i < testseqs.size(); i++)
-//		{
-//			TreeNodeAdd testTree = NULL;
-//			for (int j = 0; j < testseqs[i].size(); j++)
-//				testTree = InsertElement(testTree, testseqs[i][j]);
-//
-//			TreeElement.clear();
-//			PreOrderTraversal(InitTree);
-//			vector <int> store = TreeElement;
-//			TreeElement.clear();
-//			PreOrderTraversal(testTree);
-//			int k;
-//			for (k = 0; k < store.size(); k++)
-//			{
-//				if (store[k] != TreeElement[k])
-//					break;
-//			}
-//			if (k >= store.size())
-//				//cout << "YES" << endl;
-//				FinalCo.push_back(1);
-//			else
-//				//cout << "NO" << endl;
-//				FinalCo.push_back(0);
-//		}
-//	}
-//	for (int i = 0; i < FinalCo.size(); i++)
-//	{
-//		if (FinalCo[i] == 1)
-//			cout << "Yes" << endl;
-//		else
-//			cout << "No" << endl;
-//	}
-//	system("pause");
-//
-//	
-//}

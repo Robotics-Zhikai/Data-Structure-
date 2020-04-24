@@ -1,346 +1,378 @@
-//����һ���ձ������������Ӳ�һ��ֻ�������������� n����
+﻿/*给定两棵树T1和T2。如果T1可以通过若干次左右孩子互换就变成T2，则我们称两棵树是“同构”的。例如图1给出的两棵树就是同构的，因为我们把其中一棵树的结点A、B、G的左右孩子互换后，就得到另外一棵树。而图2就不是同构的。
 
-#include<iostream>
-#include<stdio.h>
-#include<stdlib.h>
-#include<vector>
-#include<algorithm>
+
+图1
+
+
+
+图2
+
+现给定两棵树，请你判断它们是否是同构的。
+输入格式 :
+输入给出2棵二叉树树的信息。对于每棵树，首先在一行中给出一个非负整数N(≤10)，即该树的结点数（此时假设结点从0到N−1编号）；随后N行，第i行对应编号第i个结点，给出该结点中存储的1个英文大写字母、其左孩子结点的编号、右孩子结点的编号。如果孩子结点为空，则在相应位置上给出“ - ”。给出的数据间用一个空格分隔。注意：题目保证每个结点中存储的字母是不同的。
+
+输出格式 :
+如果两棵树是同构的，输出“Yes”，否则输出“No”。
+
+输入样例1（对应图1）：
+8
+A 1 2
+B 3 4
+C 5 -1
+D -1 -1
+E 6 -1
+G 7 -1
+F -1 -1
+H -1 -1
+8
+G -1 4
+B 7 6
+F -1 -1
+A 5 1
+H -1 -1
+C 0 -1
+D -1 -1
+E 2 -1
+
+
+
+输出样例1:
+Yes
+
+
+
+输入样例2（对应图2）：
+8
+B 5 7
+F -1 -1
+A 0 3
+C 6 -1
+H -1 -1
+D -1 -1
+G 4 -1
+E 1 -1
+8
+D 6 -1
+B 5 -1
+E -1 -1
+H -1 -1
+C 0 2
+G -1 3
+F -1 -1
+A 1 4
+
+
+
+输出样例2:
+No*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <vector>
 using namespace std;
-/*
 
-
-*/
-typedef struct Node * NodeAddress;
-struct Node //����n������һ���ڵ����һ���ڵ㼯��
-{
-	int NumData;
-	NodeAddress Next;
-};
-
-typedef struct TreeNode* TreeNodeAddress;
 struct TreeNode
 {
-	int TreeNodeNumData;
-	NodeAddress Next;
+	char Character;
+	int left;
+	int right;
+	int thisnum;
+	int Treeroot;
 };
 
-typedef struct TreeListNode * TreeNodeListAdd;
-struct TreeListNode
+vector <TreeNode> Tree;
+
+vector <TreeNode> CreateTree()
 {
-	TreeNodeAddress This;
-	TreeNodeListAdd Next;
-	int RootNum;
-};
-
-void AddNode2List(NodeAddress List,int NumData) //��������β����������
-{
-	NodeAddress temp = List->Next;
-	NodeAddress templast = List;
-	while (temp != NULL)
+	vector <TreeNode> Tree; //Tree的第一个节点的信息存储Treeroot的编号
+	TreeNode temp;
+	Tree.push_back(temp);
+	/*printf("输入数据\n");*/
+	int Allnum;
+	char nimabi;
+	scanf("%d%c", &Allnum,&nimabi);
+	for (int i = 0; i < Allnum; i++)
 	{
-		templast = temp;
-		temp = temp->Next;
+		scanf("%c %d %d%c", &temp.Character, &temp.left, &temp.right,&nimabi);
+		temp.thisnum = i;
+		Tree.push_back(temp);
 	}
-	NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
-	NewNode->NumData = NumData;
-	NewNode->Next = NULL;
-	templast->Next = NewNode;
-}
-
-TreeNodeListAdd CreateStorageTreeList()
-{
-	printf("������洢����������\n");
-	int NumAll;
-	scanf("%d", &NumAll);
-	TreeNodeListAdd TreeNodeListNew = (TreeNodeListAdd)malloc(sizeof(TreeNodeListAdd));
-	TreeNodeListAdd Result = TreeNodeListNew;
-	TreeNodeListNew->Next = NULL;
-	for (int i = 0; i < NumAll; i++)
+	vector <int> Storage;
+	for (auto i = Tree.begin()+1; i != Tree.end(); i++)
 	{
-		TreeNodeListAdd temp = (TreeNodeListAdd)malloc(sizeof(TreeNodeListAdd));
-		temp->This = (TreeNodeAddress)malloc(sizeof(TreeNode));
-
-		temp->This->TreeNodeNumData = i;
-
-		temp->This->Next = (NodeAddress)malloc(sizeof(Node));
-		temp->This->Next->Next = NULL;
-		int num;
-		scanf("%d", &num);
-		AddNode2List(temp->This->Next, num);
-		while (num != -1)
-		{
-			scanf("%d", &num);
-			AddNode2List(temp->This->Next, num);
-		}
-
-		TreeNodeListNew->Next = temp;
-		TreeNodeListNew = temp;
+		if(i->left!=-1)
+			Storage.push_back(i->left);
+		if(i->right!=-1)
+			Storage.push_back(i->right);
 	}
-	TreeNodeListNew->Next = NULL;
-
-	vector <int> StorageNumCode;
-	
-	TreeNodeListAdd Temp = Result->Next;
-	while (Temp != NULL)
+	for (int i = 0; i < Allnum; i++)
 	{
-		NodeAddress tempthis = Temp->This->Next;
-		while (tempthis != NULL)
-		{
-			StorageNumCode.push_back(tempthis->NumData);
-			tempthis = tempthis->Next;
-		}
-		Temp = Temp->Next;
-	}
-	sort(StorageNumCode.begin(), StorageNumCode.end());
-
-	int num = 0;
-	for (auto i = StorageNumCode.begin(); i != StorageNumCode.end(); i++)
-	{
-		if ((*i) == num)
-			num++; 
-	}
-	if (num == NumAll)
-	{
-		Result->RootNum = -99999;
-		printf("��û�и��ڵ�\n");
-	}
-	else
-		Result->RootNum = num;
-	return Result;
-}
-
-TreeNodeListAdd FindNumNodeAddress(TreeNodeListAdd List,int num)
-{
-	//int root = List->RootNum;
-	if (num == -1)
-		return NULL;
-	TreeNodeListAdd temp = List->Next;
-	while (temp != NULL)
-	{
-		if (temp->This->TreeNodeNumData == num)
-			return temp;
-		temp = temp->Next;
-	}
-	return NULL;
-}
-
-vector <NodeAddress> GetNodechildrenAdd(TreeNodeListAdd List,int NumNode)
-{
-	vector <NodeAddress> Result;
-	TreeNodeListAdd Add = FindNumNodeAddress(List, NumNode);
-	if (Add == NULL)
-		return Result;
-	NodeAddress temp = Add->This->Next->Next;
-	while (temp != NULL)
-	{
-		Result.push_back(temp);
-		temp = temp->Next;
-	}
-	return Result;
-}
-
-NodeAddress GetNodeFirstChildAdd(TreeNodeListAdd List, int NumNode)
-{
-	TreeNodeListAdd Add = FindNumNodeAddress(List, NumNode);
-	if (Add == NULL)
-		return NULL;
-	NodeAddress temp = Add->This->Next->Next;
-	if (temp->NumData == -1)
-		return NULL;
-	else
-		return temp;
-}
-
-void PostOrderTraversalOrdinaryStack(TreeNodeListAdd List)                    //����ǵݹ�����ǳ��ã��������⣬�Һ�������ǳ�����
-{
-	vector <NodeAddress> Stack; //��vector��ģ���ջ
-	TreeNodeListAdd temp = FindNumNodeAddress(List, List->RootNum);
-	if (temp == NULL)
-		return;
-	NodeAddress RootNode = (NodeAddress)malloc(sizeof(Node));
-	RootNode->NumData = List->RootNum;
-	RootNode->Next = NULL;
-	Stack.push_back(RootNode);
-
-	NodeAddress tempNodeAddress = temp->This->Next->Next;
-	while (Stack.empty() == 0)
-	{
-		while (tempNodeAddress != NULL)
-		{
-			Stack.push_back(tempNodeAddress);
-			tempNodeAddress = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
-		}
 		int flag = 0;
-		while (Stack.empty() == 0)
+		for (auto j = Storage.begin(); j != Storage.end(); j++)
 		{
-			NodeAddress PopElement = *(Stack.end() - 1);
-			Stack.pop_back();
-			printf("%d ", PopElement->NumData);
-			tempNodeAddress = PopElement->Next;
-			while ((tempNodeAddress!=NULL)&&(tempNodeAddress->NumData != -1))
+			if (i == *j)
 			{
-				Stack.push_back(tempNodeAddress);
-				NodeAddress tempthis = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
-				if (tempthis != NULL)
-				{
-					tempNodeAddress = tempthis;
-					flag = 1;
-					break;
-				}
-				else
-				{
-					PopElement = *(Stack.end() - 1);
-					Stack.pop_back();
-					printf("%d ", PopElement->NumData);
-				}
-
-				tempNodeAddress = tempNodeAddress->Next;
-			}
-			if (flag == 1)
+				flag = 1;
 				break;
-		}
-	}
-}
-
-void PreOrderTraversalOrdinaryStack(TreeNodeListAdd List)
-{
-	vector <NodeAddress> Stack; //��vector��ģ���ջ
-	TreeNodeListAdd temp = FindNumNodeAddress(List, List->RootNum);
-	if (temp == NULL)
-		return;
-	NodeAddress RootNode = (NodeAddress)malloc(sizeof(Node));
-	RootNode->NumData = List->RootNum;
-	RootNode->Next = NULL;
-	Stack.push_back(RootNode);
-	printf("%d ", RootNode->NumData);
-
-	NodeAddress tempNodeAddress = temp->This->Next->Next;
-	while (Stack.empty() == 0)
-	{
-		while (tempNodeAddress != NULL)
-		{
-			Stack.push_back(tempNodeAddress);
-			printf("%d ", tempNodeAddress->NumData);
-			tempNodeAddress = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
-		}
-		int flag = 0;
-		while (Stack.empty() == 0)
-		{
-			NodeAddress PopElement = *(Stack.end() - 1);
-			Stack.pop_back();
-			tempNodeAddress = PopElement->Next;
-			while ((tempNodeAddress != NULL) && (tempNodeAddress->NumData != -1))
-			{
-				Stack.push_back(tempNodeAddress);
-				printf("%d ", tempNodeAddress->NumData);
-				NodeAddress tempthis = GetNodeFirstChildAdd(List, tempNodeAddress->NumData);
-				if (tempthis != NULL)
-				{
-					tempNodeAddress = tempthis;
-					flag = 1;
-					break;
-				}
-				else
-				{
-					PopElement = *(Stack.end() - 1);
-					Stack.pop_back();
-				}
-
-				tempNodeAddress = tempNodeAddress->Next;
 			}
-			if (flag == 1)
-				break;
+		}
+		if (flag == 0)
+		{
+			Tree[0].Treeroot = i;
+			break;
 		}
 	}
-
+	return Tree;
 }
 
-
-void PreOrderTraversalOrdinary(TreeNodeListAdd List,int NumNode)//�õݹ鷨����
+int Isomorphic(vector <TreeNode> Tree1,TreeNode TreeNode1, vector <TreeNode> Tree2,TreeNode TreeNode2)
 {
-	if (NumNode == -1)
-		return;
-	printf("%d ",NumNode);
-	vector <NodeAddress> NodeList = GetNodechildrenAdd(List,NumNode);
-	for (auto i = NodeList.begin(); i != NodeList.end(); i++)
-	{
-		PreOrderTraversalOrdinary(List, (*i)->NumData);
-	}
-}
+	if (TreeNode1.left == -1 && TreeNode1.right == -1 && TreeNode2.left == -1 && TreeNode2.right == -1)
+		return 1;
+	if (TreeNode1.left == -1 && TreeNode1.right == -1 && (TreeNode2.left != -1 || TreeNode2.right != -1))
+		return 0;
+	if (TreeNode2.left == -1 && TreeNode2.right == -1 && (TreeNode1.left != -1 || TreeNode1.right != -1))
+		return 0;
 
-void PostOrderTraversalOrdinary(TreeNodeListAdd List, int NumNode)//����������ȷ����ӽڵ㣬����ʸ��ڵ�
-{
-	if (NumNode == -1)
-		return;
-	vector <NodeAddress> NodeList = GetNodechildrenAdd(List, NumNode);
-	for (auto i = NodeList.begin(); i != NodeList.end(); i++)
+	if (TreeNode1.left == -1 && TreeNode1.right != -1 && (TreeNode2.left == -1 && TreeNode2.right != -1))
 	{
-		PostOrderTraversalOrdinary(List, (*i)->NumData);
+		if (Tree1[TreeNode1.right+1].Character != Tree2[TreeNode2.right+1].Character)
+			return 0;
+		else
+			return Isomorphic(Tree1, Tree1[TreeNode1.right + 1], Tree2, Tree2[TreeNode2.right + 1]);
 	}
-	printf("%d ", NumNode);
+		
+	if (TreeNode1.left == -1 && TreeNode1.right != -1 && (TreeNode2.right == -1 && TreeNode2.left != -1))
+	{
+		if (Tree1[TreeNode1.right + 1].Character != Tree2[TreeNode2.left + 1].Character)
+			return 0;
+		else
+			return Isomorphic(Tree1, Tree1[TreeNode1.right + 1], Tree2, Tree2[TreeNode2.left + 1]);
+	}
+		
+	if (TreeNode1.left != -1 && TreeNode1.right == -1 && (TreeNode2.right == -1 && TreeNode2.left != -1))
+	{
+		if (Tree1[TreeNode1.left + 1].Character != Tree2[TreeNode2.left + 1].Character)
+			return 0;
+		else
+			return Isomorphic(Tree1, Tree1[TreeNode1.left + 1], Tree2, Tree2[TreeNode2.left + 1]);
+	}
+		
+	if (TreeNode1.left != -1 && TreeNode1.right == -1 && (TreeNode2.left == -1 && TreeNode2.right != -1))
+	{
+		if (Tree1[TreeNode1.left + 1].Character != Tree2[TreeNode2.right + 1].Character)
+			return 0;
+		else
+			return Isomorphic(Tree1, Tree1[TreeNode1.left + 1], Tree2, Tree2[TreeNode2.right + 1]);
+	}
+		
+	if (TreeNode1.left != -1 && TreeNode1.right != -1 && (TreeNode2.left != -1 && TreeNode2.right != -1))
+	{
+		char A1 = Tree1[TreeNode1.left + 1].Character;
+		char A2 = Tree1[TreeNode1.right + 1].Character;
+		char B1 = Tree2[TreeNode2.left + 1].Character;
+		char B2 = Tree2[TreeNode2.right + 1].Character;
+
+		if (A1 == B1&&A2 != B2)
+			return 0;
+		if (A1 == B2&&A2 != B1)
+			return 0;
+		if (A2 == B1&&A1 != B2)
+			return 0;
+		if (A2 == B2&&A1 != B1)
+			return 0;
+		int num = 0;
+		if (A1 == B1)
+			num = num + Isomorphic(Tree1, Tree1[TreeNode1.left + 1], Tree2, Tree2[TreeNode2.left + 1]);
+		if (A1 == B2)
+			num = num + Isomorphic(Tree1, Tree1[TreeNode1.left + 1], Tree2, Tree2[TreeNode2.right + 1]);
+		if(A2 == B1)
+			num = num + Isomorphic(Tree1, Tree1[TreeNode1.right + 1], Tree2, Tree2[TreeNode2.left + 1]);
+		if(A2 == B2)
+			num = num + Isomorphic(Tree1, Tree1[TreeNode1.right + 1], Tree2, Tree2[TreeNode2.right + 1]);
+		if (num == 2)
+			return 1;
+		else
+			return 0;
+	}
 }
 
 int main()
 {
+//输入样例1（对应图1）：
 	/*
-46
-1 2 3 -1 
-4 5 6 7 -1 
-8 -1 
-9 10 11 -1 
-12 13 -1 
-14 -1 
-15 -1 
-16 17 -1 
-18 19 -1 
-20 21 -1 
--1
-22 23 -1 
-24 25 26 27 -1 
--1
--1
--1
--1
--1
-28 29 30 31 32 -1 
--1 
--1
--1
--1
--1
--1
--1
-34 35 -1
--1
--1
--1
--1
--1
--1
-0 -1
--1 
-36 -1
-37 -1
-38 -1
-39 -1
-40 -1
-41 -1
-42 -1
-43 -1
-44 45 -1
--1 
--1 
+8
+A 1 2
+B 3 4
+C 5 -1
+D -1 -1
+E 6 -1
+G 7 -1
+F -1 -1
+H -1 -1
+8
+G -1 4
+B 7 6
+F -1 -1
+A 5 1
+H -1 -1
+C 0 -1
+D -1 -1
+E 2 -1
+
+
+8
+B 5 7
+F -1 -1
+A 0 3
+C 6 -1
+H -1 -1
+D -1 -1
+G 4 -1
+E 1 -1
+8
+D 6 -1
+B 5 -1
+E -1 -1
+H -1 -1
+C 0 2
+G -1 3
+F -1 -1
+A 1 4
 */
 
-
-	TreeNodeListAdd temp = CreateStorageTreeList();
-
-	PreOrderTraversalOrdinary(temp, temp->RootNum);
-	cout << endl;
-	PreOrderTraversalOrdinaryStack(temp);
-	cout << endl;
-
-	PostOrderTraversalOrdinary(temp, temp->RootNum);
-	cout << endl;
-	PostOrderTraversalOrdinaryStack(temp);
+	vector <TreeNode> Tree1;
+	Tree1 = CreateTree();
+	vector <TreeNode> Tree2;
+	Tree2 = CreateTree();
+	int Result = Isomorphic(Tree1, Tree1[Tree1[0].Treeroot+1],Tree2, Tree2[Tree2[0].Treeroot+1]);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//typedef struct TreeNode * TreeNodeAddress;
+//struct TreeNode
+//{
+//	int NumNode; //树的编号
+//	int left;
+//	int right;
+//};
+//
+//typedef struct ListNode * ListNodeAddress;
+//struct ListNode
+//{
+//	TreeNodeAddress TreeNodeAdd;
+//	int Root;//储存根节点编号
+//	ListNodeAddress Next;
+//};
+//
+////用一个线性表储存树结构,并找到根节点
+//ListNodeAddress CreateTree()
+//{
+//	ListNodeAddress Result = (ListNodeAddress)malloc(sizeof(ListNode));
+//	ListNodeAddress temp = Result;
+//	int num;
+//	int Allnum;
+//	scanf("%d", &Allnum);
+//	if (Allnum == 0)
+//		Result->Root = -1;
+//	for (int i = 0; i < Allnum; i++)
+//	{
+//		ListNodeAddress NewNode = (ListNodeAddress)malloc(sizeof(ListNode));
+//		temp->Next = NewNode;
+//		TreeNodeAddress NewTreeNode = (TreeNodeAddress)malloc(sizeof(TreeNode));
+//		NewNode->TreeNodeAdd = NewTreeNode;
+//		NewTreeNode->NumNode = i;
+//		scanf("%d", &num);
+//		NewTreeNode->left = num;
+//		scanf("%d", &num);
+//		NewTreeNode->right = num;
+//		//NewNode->TreeNodeAdd = 
+//		temp = temp->Next;
+//	}
+//	temp->Next = NULL;
+//
+//	typedef struct Nodetemp * NodetempAddress;
+//	struct Nodetemp
+//	{
+//		int num;
+//		int flag;
+//		NodetempAddress Next;
+//	};
+//	NodetempAddress tempListNode = (NodetempAddress)malloc(sizeof(Nodetemp));
+//	NodetempAddress temptemp = tempListNode;
+//	for (int i = 0; i < Allnum; i++)
+//	{
+//		temptemp->Next = (NodetempAddress)malloc(sizeof(Nodetemp));
+//		temptemp->Next->num = i;
+//		temptemp->Next->flag = 0;
+//		temptemp = temptemp->Next;
+//	}
+//	temptemp->Next = NULL;
+//
+//	temp = Result->Next;
+//	while (temp != NULL)
+//	{
+//		temptemp = tempListNode->Next;
+//		while (temptemp != NULL)
+//		{
+//			if (temp->TreeNodeAdd->left == temptemp->num)
+//			{
+//				temptemp->flag = 1;
+//				break;
+//			}
+//			temptemp = temptemp->Next;
+//		}
+//
+//		temptemp = tempListNode->Next;
+//		while (temptemp != NULL)
+//		{
+//			if (temp->TreeNodeAdd->right == temptemp->num)
+//			{
+//				temptemp->flag = 1;
+//				break;
+//			}
+//			temptemp = temptemp->Next;
+//		}
+//
+//		temp = temp->Next;
+//	}
+//
+//	temptemp = tempListNode->Next;
+//	while (temptemp != NULL)
+//	{
+//		if (temptemp->flag == 0)
+//		{
+//			Result->Root = temptemp->num;
+//			break;
+//		}
+//		temptemp = temptemp->Next;
+//	}
+//
+//	return Result;
+//}
+//
+//int main()
+//{
+//	CreateTree();
+//}

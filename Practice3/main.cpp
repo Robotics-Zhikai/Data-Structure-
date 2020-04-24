@@ -1,457 +1,398 @@
-/*Given a stack which can keep M numbers at most. Push N numbers in the order of 1, 2, 3, ..., N and pop randomly. You are supposed to tell if a given sequence of numbers is a possible pop sequence of the stack. For example, if M is 5 and N is 7, we can obtain 1, 2, 3, 4, 5, 6, 7 from the stack, but not 3, 2, 1, 7, 5, 6, 4.
+﻿/*
+02 - 线性结构3 Reversing Linked List(25分)
+Given a constant K and a singly linked list L, you are supposed to reverse the links of every K elements on L.For example, given L being 1→2→3→4→5→6, if K = 3, then you must output 3→2→1→6→5→4; if K = 4, you must output 4→3→2→1→5→6.
 
-Input Specification:
-Each input file contains one test case. For each case, the first line contains 3 numbers (all no more than 1000): M (the maximum capacity of the stack), N (the length of push sequence), and K (the number of pop sequences to be checked). Then K lines follow, each contains a pop sequence of N numbers. All the numbers in a line are separated by a space.
+Input Specification :
+Each input file contains one test case.For each case, the first line contains the address of the first node, a positive N(≤10
+	​5
+	​​) which is the total number of nodes, and a positive K(≤N) which is the length of the sublist to be reversed.The address of a node is a 5 - digit nonnegative integer, and NULL is represented by - 1.
 
-Output Specification:
-For each pop sequence, print in one line "YES" if it is indeed a possible pop sequence of the stack, or "NO" if not.
+	Then N lines follow, each describes a node in the format :
 
-Sample Input:
-5 7 5
-1 2 3 4 5 6 7
-3 2 1 7 5 6 4
-7 6 5 4 3 2 1
-5 6 4 3 7 2 1
-1 7 6 5 4 3 2
-
-      
-    
-Sample Output:
-YES
-NO
-NO
-YES
-NO*/
+Address Data Next
 
 
 
+where Address is the position of the node, Data is an integer, and Next is the position of the next node.
+
+Output Specification :
+For each case, output the resulting ordered linked list.Each node occupies a line, and is printed in the same format as in the input.
+
+Sample Input :
+00100 6 4
+00000 4 99999
+00100 1 12309
+68237 6 - 1
+33218 3 00000
+99999 5 68237
+12309 2 33218
 
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+
+Sample Output :
+00000 4 33218
+33218 3 12309
+12309 2 00100
+00100 1 99999
+99999 5 68237
+68237 6 - 1
+*/
+/*为了训练文件操作，输入输出数据都储存在txt中*/
+
+#include<iostream>
+#include<stdio.h>
+#include<stdlib.h>
 using namespace std;
 
 typedef struct Node * NodeAddress;
-typedef NodeAddress Stack;
-typedef struct StackInfo * StackInfoAddress;
-struct StackInfo
-{
-	NodeAddress top;
-	NodeAddress Next;
-};
-
 struct Node
 {
+	char Address[6];
 	int Data;
-	NodeAddress Next;
+	char Next[6];
+	NodeAddress NextNode;
 };
 
-StackInfoAddress CreatStack(int MaxSize)
+int ValidAddress(char*ch) //判断地址是否合理
 {
-	if (MaxSize == 0)
-	{
-		StackInfoAddress Result = (StackInfoAddress)malloc(sizeof(StackInfo));
-		Result->Next = NULL;
-		Result->top = NULL;
-		return Result;
-	}
-	StackInfoAddress Result = (StackInfoAddress)malloc(sizeof(StackInfo));
-	NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
-	Result->Next = NewNode;
-	Result->top = NewNode;
-	NewNode->Next = NULL;
-	NodeAddress Storage;
-	Storage = NewNode;
-	for (int i = 1; i < MaxSize; i++)
-	{
-		NodeAddress NewNode1 = (NodeAddress)malloc(sizeof(Node));
-		Storage->Next = NewNode1;
-		Storage = NewNode1;
-	}
-	Storage->Next = NULL;
-	return Result;
-}
-
-int IsEmpty(StackInfoAddress s)
-{
-	if ((s->Next == NULL) || (s->Next == s->top))
+	if (((ch[5] == '\0') && (ch[4] != '\0'))||(*ch=='-'&&*(ch+1)=='1'))
 		return 1;
 	else
 		return 0;
 }
 
-int IsFull(StackInfoAddress s)
+NodeAddress Read()
 {
-	if (IsEmpty(s))
-		return 0;
-	if (s->top == NULL)
-		return 1;
-	else
-		return 0;
-}
-
-void Push(StackInfoAddress s, int element)
-{
-	if (IsFull(s) == 1)
-		return;
-	else
+	char ch[7] = { 0 };
+	NodeAddress first = (NodeAddress)malloc(sizeof(Node));
+	first->NextNode = NULL;
+	NodeAddress temp = first;
+	int num = 0;
+	while (scanf("%s", ch)!=EOF) //假设格式还是对的，只是偶尔有些行出现地址错误的情况
 	{
-		s->top->Data = element;
-		s->top = s->top->Next;
-	}
-}
-
-int Pop(StackInfoAddress s)
-{
-	if (IsEmpty(s) == 1)
-	{
-		return -1;
-	}
-	NodeAddress temp = s->Next;
-	NodeAddress tempNext = temp->Next;
-
-	while (tempNext != NULL)
-	{
-		if (s->top == tempNext)
+		num++;
+		if (!ValidAddress(ch))
 		{
-			s->top = temp;
-			return s->top->Data;
+			scanf("%s", ch);
+			scanf("%s", ch);
+			continue;
 		}
-		tempNext = tempNext->Next;
-		temp = temp->Next;
-	}
-	s->top = temp;
-	return s->top->Data;
-}
-
-int GetTopStackData(StackInfoAddress stack) // �õ�ջ��Ԫ��ֵ
-{
-	if (IsEmpty(stack) == 1) //�޷��õ�ջ��Ԫ��ֵջΪ��
-		return -1;
-	NodeAddress temp;
-	temp = stack->Next;
-	while (temp != NULL)
-	{
-		if (temp->Next == stack->top)
-			return temp->Data;
-		temp = temp->Next;
-	}
-}
-
-NodeAddress ReadOneline(int maxnumN) //ͷ���ʲô��û��
-{
-	if (maxnumN == 0)
-		return NULL;
-	NodeAddress FirstNode = (NodeAddress)malloc(sizeof(Node));
-	NodeAddress storage = FirstNode;
-	for (int i = 0; i < maxnumN; i++)
-	{
-		NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
-		int num;
-		scanf("%d", &num);
-		NewNode->Data = num;
-		storage->Next = NewNode;
-		storage = NewNode;
-	}
-	storage->Next = NULL;
-	return FirstNode;
-}
-
-typedef struct linenode * linenodeAddress;
-struct linenode
-{
-	NodeAddress rownext;
-	linenodeAddress verticalnext;
-};
-
-linenodeAddress Readmatrix(int linenum,int maxnumN)
-{
-	if ((linenum == 0)||(maxnumN==0))
-		return NULL;
-	linenodeAddress First = (linenodeAddress)malloc(sizeof(linenode));
-	linenodeAddress Result = First;
-	First->rownext = ReadOneline(maxnumN);
-	First->verticalnext = NULL;
-	for (int i = 1; i < linenum; i++)
-	{
-		linenodeAddress NewlienNode = (linenodeAddress)malloc(sizeof(linenode));
-		NewlienNode->rownext = ReadOneline(maxnumN);
-		First->verticalnext = NewlienNode;
-		First = First->verticalnext;
-	}
-	First->verticalnext = NULL;
-	return Result;
-}
-
-NodeAddress DeleteNode(NodeAddress first, NodeAddress deleteNode)
-{
-	NodeAddress temp = first->Next;
-	NodeAddress NodeStorage = first;
-	while (temp != NULL)
-	{
-		if (temp == deleteNode)
+		NodeAddress newnode = (NodeAddress)malloc(sizeof(Node));
+		for (int i = 0; i < 6; i++)
 		{
-			NodeStorage->Next = temp->Next;
-			free(temp);
-			break;
+			newnode->Address[i] = ch[i];
 		}
-		NodeStorage = temp;
-		temp = temp->Next;
+		int data;
+		if (!scanf("%d", &data))
+		{
+			scanf("%s", ch);
+			scanf("%s", ch);
+			continue;
+		}
+		newnode->Data = data;
+		char ch1[6] = { 0 };
+		scanf("%s", ch1);
+		if (!ValidAddress(ch1))
+			continue;
+		for (int i = 0; i < 6; i++)
+		{
+			newnode->Next[i] = ch1[i];
+		}
+		newnode->NextNode = NULL;
+		temp->NextNode = newnode;
+		temp = newnode;
+		/*if (num == 10)
+			break;*/
 	}
 	return first;
 }
 
-NodeAddress GenerateDataOneLine(int maxnumN) //����1-maxnumN��ȫ���е�����һ��
+void disp(NodeAddress node)
 {
-	if (maxnumN == 0)
-	{
-		NodeAddress temp = (NodeAddress)malloc(sizeof(Node));
-		temp->Next = NULL;
-		return temp;
-	}
-	NodeAddress temp = (NodeAddress)malloc(sizeof(Node));
-	NodeAddress storage = temp;
-	for (int i = 1; i <= maxnumN; i++)
-	{
-		NodeAddress Newnode = (NodeAddress)malloc(sizeof(Node));
-		Newnode->Data = i;
-		Newnode->Next = NULL;
-		temp->Next = Newnode;
-		temp = temp->Next;
-	}
-	temp = storage->Next;
-	NodeAddress Result = (NodeAddress)malloc(sizeof(Node));
-	NodeAddress tempResult = Result;
-	int randamnum = rand() % maxnumN + 1;
-	int num = 0;
+	NodeAddress temp = node->NextNode;
 	while (temp != NULL)
 	{
-		num++;
-		if (num == randamnum)
-		{
-			NodeAddress Newnode = (NodeAddress)malloc(sizeof(Node));
-			Newnode->Data = temp->Data;
-			storage = DeleteNode(storage, temp);
-			temp = storage->Next;
-			Newnode->Next = NULL;
-			tempResult->Next = Newnode;
-			tempResult = tempResult->Next;
-			maxnumN--;
-			num = 0;
-			if (maxnumN == 0)
-				break;
-			randamnum = rand() % maxnumN + 1;
-			continue;
-		}
-		temp = temp->Next;
-	}
-	return Result;
-}
-
-void PrintData(int linenum,int maxnumN)
-{
-	NodeAddress dispfirst;
-	for (int i = 0; i < linenum; i++)
-	{
-		dispfirst = GenerateDataOneLine(maxnumN);
-		NodeAddress temp;
-		temp = dispfirst->Next;
-		while (temp != NULL)
-		{
-			printf("%d ", temp->Data);
-			temp = temp->Next;
-		}
+		printf("%s ", temp->Address);
+		printf("%d ", temp->Data);
+		printf("%s", temp->Next);
 		printf("\n");
+		temp = temp->NextNode;
 	}
 }
 
-typedef struct QueueInfo * QueueInfoAddress;
-struct QueueInfo
+void GenerateData(int N)
 {
-	NodeAddress Rear;
-	NodeAddress Front;
-	NodeAddress HeadNode;
-};
-
-QueueInfoAddress CreateQueue(int Maxsize)
-{
-	if (Maxsize == 0)
+	for (int i = 0; i < N; i++)
 	{
-		QueueInfoAddress Result;
-		Result->Front = NULL;
-		Result->Rear = NULL;
-		return Result;
+		printf("11111 32 22222\n");
 	}
+}
 
-	QueueInfoAddress Result = (QueueInfoAddress)malloc(sizeof(QueueInfo));
-	NodeAddress HeadNode = (NodeAddress)malloc(sizeof(Node));
-	NodeAddress temp = HeadNode;
-	int num = 0;
-	while (temp != NULL)
+int isequal(char * char1, char * char2) //对比两字符串是否相等 输入的长度应该相等
+{
+	int result = 1;
+	for (int i = 0; char1[i] != '\0'; i++)
 	{
-		num++;
-		NodeAddress NewNode = (NodeAddress)malloc(sizeof(Node));
-		temp->Next = NewNode;
-		temp = temp->Next;
-		if (num == Maxsize)
+		if (char1[i] != char2[i])
 		{
-			temp->Next = HeadNode->Next;
+			result = result * 0;
 			break;
 		}
 	}
-	Result->HeadNode = HeadNode;
-	Result->Front = HeadNode->Next;
-	Result->Rear = HeadNode;
-	return Result;
+	return result;
 }
 
-int IsEmptyQueue(QueueInfoAddress Queue)
+NodeAddress FindLocationData(NodeAddress Node1, char*Location) //在链表中找到特定地址下的数据的地址
 {
-	if ((Queue->Front == NULL) && (Queue->Rear == NULL))
-		return 1;
-	if (Queue->Rear == Queue->HeadNode)
-		return 1;
-	else
-		return 0;
-}
-
-int IsfullQueue(QueueInfoAddress Queue)
-{
-	if (IsEmptyQueue(Queue) == 1)
-		return 0;
-	if (Queue->Front == Queue->Rear)
-		return 1;
-}
-
-QueueInfoAddress PushQueue(QueueInfoAddress Queue,int data)
-{
-	if ((Queue->Front == NULL) && (Queue->Rear == NULL)) //˵���ǿն��� ��ȫû�ж��нṹ
-		return Queue;
-	if (IsfullQueue(Queue) == 1)
-		return Queue;
-	if (Queue->Rear == Queue->HeadNode)
+	if ((*Location == '-') && (*(Location + 1) == '1'))
+		return NULL;
+	NodeAddress temp = Node1->NextNode;
+	while (temp != NULL)
 	{
-		Queue->Front->Data = data;
-		Queue->Rear = Queue->HeadNode->Next;
-		Queue->Front = Queue->Front->Next;
+		if (isequal(temp->Address, Location))
+			return temp;
+		temp = temp->NextNode;
 	}
-	else
-	{
-		Queue->Front->Data = data;
-		Queue->Front = Queue->Front->Next;
-	}
-	return Queue;
+	return NULL;//没找到返回NULL
 }
 
-int PopQueue(QueueInfoAddress Queue)
+int Length(NodeAddress Node,char*firstlocation)
 {
-	if (IsEmptyQueue(Queue) == 1)
-		return -1;
-	if (Queue->Rear->Next == Queue->Front)
-	{
-		int num;
-		num = Queue->Rear->Data;
-		Queue->Front = Queue->HeadNode->Next;
-		Queue->Rear = Queue->HeadNode;
-		return num;
-	}
-	int num1 = Queue->Rear->Data;
-	Queue->Rear = Queue->Rear->Next;
-	return num1;
-}
-
-
-int CheckValidSequence(NodeAddress rowdata, StackInfoAddress Stack)
-{
-	if (rowdata->Next == NULL)
-		return -1;
+	NodeAddress temp = FindLocationData(Node, firstlocation);
 	int num = 0;
-	NodeAddress temp = rowdata->Next;
 	while (temp != NULL)
 	{
 		num++;
-		temp = temp->Next;
+		temp = FindLocationData(Node,temp->Next);
 	}
-	QueueInfoAddress Queue = CreateQueue(num);
-	
-	temp = rowdata->Next;
+	return num;
+}
+
+void Copychar2TOchar1(char * char1, char * char2)
+{
+	int i;
+	for (i = 0; char2[i] != '\0'; i++)
+	{
+		char1[i] = char2[i];
+	}
+	char1[i] = '\0';
+	return;
+}
+
+void ReverseList(NodeAddress Node,int K)
+{
+	if (K > Length(Node,Node->NextNode->Address))
+	{
+		printf("无法反转，K>N\n");
+		return ;
+	}
+	if (K == 0||K == 1)
+	{
+		printf("无需反转\n");
+		return ;
+	}
+	if (K < 0)
+	{
+		printf("K应该大于0\n");
+		return ;
+	}
+	int num = 0;
+	NodeAddress temp = Node->NextNode;
+	if (temp == NULL)
+		return;
+	NodeAddress midtemp = temp->NextNode;
+	if (midtemp == NULL)
+		return;
+	NodeAddress tempstorage = temp;
+	NodeAddress tempNextStorage = midtemp;
 	while (temp != NULL)
 	{
-		PushQueue(Queue, temp->Data);
-		temp = temp->Next;
-	}
-	for (int i = 1; i <= num; i++)
-	{
-		Push(Stack, i);
-		while (IsEmpty(Stack) == 0 && IsEmptyQueue(Queue) == 0&&( GetTopStackData(Stack) == Queue->Rear->Data))
+		NodeAddress midtempNextStorage = midtemp->NextNode;
+		midtemp->NextNode = temp;
+		if (num != 0)
 		{
-			Pop(Stack);
-			PopQueue(Queue);
+			temp->NextNode = tempNextStorage;
+			tempNextStorage = midtemp;
 		}
+		num++;
+		if (num == K / 2)
+		{
+			if (K % 2 == 0)
+			{
+				Node->NextNode = midtemp;
+				tempstorage->NextNode = midtempNextStorage;
+				break;
+			}
+			else
+			{
+				Node->NextNode = midtempNextStorage;
+				tempstorage->NextNode = midtempNextStorage->NextNode;
+				midtempNextStorage->NextNode = midtemp;
+				break;
+			}
+		}
+		temp = midtempNextStorage;
+		midtemp = temp->NextNode;
 	}
-	if (IsEmpty(Stack) == 1)
-		return 1;
-	else
-		return 0;
-
-
-
-
-
-
-
-	//�ƺ����ö�ջ���и�������
-	//temp = rowdata->Next;
-	//int num1 = 1;
-	//while (temp != NULL)
-	//{
-	//	for (int i = num1; i <= num; i++)
-	//	{
-	//		if (i != temp->Data)
-	//			Push(Stack, i);
-	//		else
-	//		{
-	//			Push(Stack, i);
-	//			PushQueue(Queue, temp->Data);
-	//			Pop(Stack);
-	//			PopQueue(Queue);
-	//			num1 = i + 1;
-	//			break;
-	//		}
-	//	}
-	//	temp = temp->Next;
-	//}
-	//if (IsEmpty(Stack))
-	//	return 1;
-	//else
-	//	return 0;
-
+	temp = Node->NextNode;
+	while (temp->NextNode != NULL)
+	{
+		Copychar2TOchar1(temp->Next, temp->NextNode->Address);
+		temp = temp->NextNode;
+	}
+	Copychar2TOchar1(temp->Next, "-1");
 }
+
+void SwapNodeData(NodeAddress swap1, NodeAddress swap2)
+{
+	int middata;
+	NodeAddress tempstorage = swap1;
+	NodeAddress temp = swap2;
+	middata = temp->Data;
+	temp->Data = tempstorage->Data;
+	tempstorage->Data = middata;
+	int i;
+	for (i = 0; i<6 ; i++)
+	{
+		middata = temp->Next[i];
+		temp->Next[i] = tempstorage->Next[i];
+		tempstorage->Next[i] = middata;
+
+		middata = temp->Address[i];
+		temp->Address[i] = tempstorage->Address[i];
+		tempstorage->Address[i] = middata;
+	}
+}
+
+void ArangeList(NodeAddress Node,char * BeginLocation) //对储存在顺序表中的数据进行顺序修整 链表只是一种实现无限存储的方式
+{
+	NodeAddress temp = Node->NextNode;
+	NodeAddress tempstorage = temp;
+	char * Location = BeginLocation;
+
+	while (temp != NULL)
+	{
+		if (isequal(temp->Address, Location))
+		{
+			if (temp == tempstorage)
+			{
+				Location = tempstorage->Next;
+				if (isequal("-1", Location))
+				{
+					tempstorage->NextNode = NULL;
+					break;
+				}
+				temp = tempstorage->NextNode;
+				tempstorage = tempstorage->NextNode;
+				continue;
+			}
+			Location = tempstorage->Next;
+			SwapNodeData(tempstorage, temp);
+			if (isequal("-1", Location))
+			{
+				tempstorage->NextNode = NULL;
+				break;
+			}
+			temp = tempstorage->NextNode;
+			tempstorage = tempstorage->NextNode;
+			continue;
+		}
+		temp = temp->NextNode;
+	}
+}
+
+void ReverseListMethod2(NodeAddress Node, int K,char*firstLocation)
+{
+	if (K > Length(Node, firstLocation))
+	{
+		printf("无法反转，K>N\n");
+		return;
+	}
+	if (K == 0 || K == 1)
+	{
+		printf("无需反转\n");
+		return;
+	}
+	if (K < 0)
+	{
+		printf("K应该大于0\n");
+		return;
+	}
+
+	NodeAddress temp = FindLocationData(Node, firstLocation); //这个用在数组里的话可以对应的转换成数组下标
+	if (temp == NULL)
+		return;
+	NodeAddress firstNodestorage = temp;
+	NodeAddress tempNext = FindLocationData(Node, temp->Next);
+	if (tempNext == NULL)
+		return;
+	NodeAddress tempNextNextStorage = FindLocationData(Node, tempNext->Next);
+
+	int num = 0;
+	while (1)
+	{
+		Copychar2TOchar1(tempNext->Next, temp->Address);
+		num = num + 1;
+		if (num ==(K-(K%2))/2 )
+		{
+			if (K % 2 == 0)
+			{
+				if (tempNextNextStorage == NULL)
+					Copychar2TOchar1(firstNodestorage->Next, "-1");
+				else
+					Copychar2TOchar1(firstNodestorage->Next, tempNextNextStorage->Address);
+				Copychar2TOchar1(firstLocation, tempNext->Address);
+				return;
+			}
+			else
+			{
+				NodeAddress tempNextNextNext = FindLocationData(Node, tempNextNextStorage->Next);
+				if (tempNextNextNext == NULL)
+					Copychar2TOchar1(firstNodestorage->Next, "-1");
+				else
+					Copychar2TOchar1(firstNodestorage->Next, tempNextNextNext->Address);
+				Copychar2TOchar1(tempNextNextStorage->Next, tempNext->Address);
+				Copychar2TOchar1(firstLocation, tempNextNextStorage->Address);
+				return;
+			}
+		}
+		temp = tempNextNextStorage;
+		NodeAddress tempNextstorage = tempNext;
+		tempNext = FindLocationData(Node, temp->Next);
+		Copychar2TOchar1(temp->Next, tempNextstorage->Address);
+		tempNextNextStorage = FindLocationData(Node, tempNext->Next);
+	}
+}
+
+void dispMethod2(NodeAddress Node,char*firstLocation)
+{
+	NodeAddress temp = FindLocationData(Node, firstLocation);
+	while (temp->Address!=NULL)
+	{
+		printf("%s ", temp->Address);
+		printf("%d ", temp->Data);
+		printf("%s\n", temp->Next);
+		temp = FindLocationData(Node, temp->Next);
+	}
+}
+
+#define ChOOSEFUNCTION 1
+#ifdef ChOOSEFUNCTION
 int main()
 {
-	int maxsize;
-	scanf("%d", &maxsize);
-	int maxnumN;
-	scanf("%d", &maxnumN);
-	int linenum;
-	scanf("%d", &linenum);
-	//printf("%d %d %d\n", maxsize, maxnumN, linenum);
-	//PrintData(linenum, maxnumN);
-	linenodeAddress StorageMatrix;
-	StorageMatrix = Readmatrix(linenum, maxnumN);
-
-	StackInfoAddress Stack = CreatStack(maxsize);
-
-	linenodeAddress tempVertical = StorageMatrix;
-	while (tempVertical != NULL)
-	{
-		Stack = CreatStack(maxsize);
-		NodeAddress temp = tempVertical->rownext;
-		if (CheckValidSequence(temp,  Stack) == 1)
-			printf("YES\n");
-		else
-			printf("NO\n");
-		tempVertical = tempVertical->verticalnext;
-	}
+	NodeAddress first;
+	first = Read(); //包括废数据的消去
+	ArangeList(first, "33128");
+	ReverseList(first, 1);
+	disp(first);//将处理后的数据弄到另一个文件里
+	//char string1[6] = "33218";
+	//ReverseListMethod2(first, 4 ,string1);
+	//dispMethod2(first, string1);
+	
 }
+#else
+int main()
+{
+	GenerateData(1000);
+}
+#endif
