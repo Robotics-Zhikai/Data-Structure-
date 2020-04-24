@@ -21,7 +21,7 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 20200423 Practice9 判断是否是同一颗二叉搜索树 二叉搜索树的插入、删除操作等
 
-20200424 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件。之后如果有需要，可以直接弄这两个文件夹。 inset还没有测试 其他都测试了 都是成功的
+20200424 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件。之后如果有需要，可以直接弄这两个文件夹。 insert还没有测试 其他都测试了 都是成功的
 
 更新SortAlgorithm文件夹，更新堆排序
 
@@ -29,6 +29,6 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/12.5w%E5%B8%8C%E5%B0%94%E5%A0%86.png)
 
-测试完毕所有堆相关的.cpp .h文件，可以直接用了。测试的同时，更新了SortAlgorithm文件夹，利用insert的堆函数，对比了用不同方式建立堆的时间复杂度n 和 nlogn
+更新：至此测试完毕所有堆相关的.cpp .h文件，可以直接用了。测试的同时，更新了SortAlgorithm文件夹，利用insert的堆函数，对比了用不同方式建立堆的时间复杂度n 和 nlogn。从下图可以看到，慢速与快速的时间差，就是nlogn与n的差别
 
-
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/%E6%B5%8B%E8%AF%95insert%E5%A0%86.png)
