@@ -21,9 +21,11 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 20200423 Practice9 判断是否是同一颗二叉搜索树 二叉搜索树的插入、删除操作等
 
-20200424 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件。
+20200424 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件。之后如果有需要，可以直接弄这两个文件夹。 inset还没有测试 其他都测试了 都是成功的
 
 更新SortAlgorithm文件夹，更新堆排序
 
+排序12.5W个元素 包括500个相同元素的运行时间对比
 
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/12.5w%E5%B8%8C%E5%B0%94%E5%A0%86.png)
 
