@@ -74,44 +74,64 @@ void testShellSort(vector<double> Data)
 	cout << "希尔排序算法用时" << endtime << "s" << endl;
 }
 
-void testHeapSortfaster(vector<double> Data)
+void testHeapSort(vector<double> Data)
 {
 	clock_t start, end;
 	RandomData test;
+	vector <double> Data1;
 	//vector<double> Data = test.GenerateRandomData(10000, 1, 100);
 	/*vector<double> Data;
 	Data.push_back(1); Data.push_back(2); Data.push_back(3); Data.push_back(4); Data.push_back(1);*/
 	cout << test.CheckSorted(Data);
 	start = clock();
-	Data = HeapSortfaster(Data);
+	Data1 = HeapSortfaster(Data);
 	end = clock();
-	cout << test.CheckSorted(Data);
+	cout << test.CheckSorted(Data1);
 	//test.PrintData(Data);
 	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
 	cout << "快速堆排序算法用时" << endtime << "s" << endl;
+
+	cout << test.CheckSorted(Data);
+	start = clock();
+	Data1 = HeapSortslow(Data);
+	end = clock();
+	cout << test.CheckSorted(Data1);
+	//test.PrintData(Data);
+	endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "慢速堆排序算法用时" << endtime << "s" << endl;
 }
 
-void testHeapSortslow(vector<double> Data)
+void testMergeSort(vector<double> Data)
 {
 	clock_t start, end;
 	RandomData test;
+	vector <double> Data1;
 	//vector<double> Data = test.GenerateRandomData(10000, 1, 100);
 	/*vector<double> Data;
 	Data.push_back(1); Data.push_back(2); Data.push_back(3); Data.push_back(4); Data.push_back(1);*/
 	cout << test.CheckSorted(Data);
 	start = clock();
-	Data = HeapSortslow(Data);
+	Data1 = MergeSortRecur(Data);
 	end = clock();
-	cout << test.CheckSorted(Data);
+	cout << test.CheckSorted(Data1);
 	//test.PrintData(Data);
 	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
-	cout << "慢速堆排序算法用时" << endtime << "s" << endl;
+	cout << "递归实现的归并排序算法用时" << endtime << "s" << endl;
+
+	cout << test.CheckSorted(Data);
+	start = clock();
+	Data1 = MergeSortNotRecur(Data);
+	end = clock();
+	cout << test.CheckSorted(Data1);
+	//test.PrintData(Data);
+	endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "非递归实现的归并排序算法用时" << endtime << "s" << endl;
 }
 
 int main()
 { 
 	RandomData test;
-	vector<double> Data = test.GenerateRandomData(95000, 1, 100);
+	vector<double> Data = test.GenerateRandomData(5000, 1, 100);
 	for (int i = 0; i < 500; i++)
 	{
 		Data.push_back(43.2);
@@ -120,9 +140,8 @@ int main()
 	//testBubbleSort(Data);
 	//testInsertionSort(Data);
 	testShellSort(Data);
-	testHeapSortfaster(Data);
-	testHeapSortslow(Data);
-
+	testHeapSort(Data);
+	testMergeSort(Data);
 	system("pause");
 
 

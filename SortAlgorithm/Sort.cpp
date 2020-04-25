@@ -347,3 +347,158 @@ vector <double> HeapSortslow(vector<double> Data)
 	return result;
 }
 
+void Merge(vector <double> & Data, vector <double> & tmp,int Left, int Right)
+//都是引用，不开辟很大的空间
+{
+	if (Right - Left == 1)
+	{
+		if (Data[Right] < Data[Left])
+		{
+			double mid = Data[Right];
+			Data[Right] = Data[Left];
+			Data[Left] = mid;
+		}
+		return;
+	}
+	else if (Right == Left)
+		return;
+	int split1Left = Left;
+	int split1Right = Left + ceil(double((Right- Left + 1) / 2.0)) - 1;
+	int split2Left = split1Right + 1;
+	int split2Right = Right;
+
+	Merge(Data, tmp, Left, split1Right);
+	Merge(Data, tmp, split2Left, split2Right);
+	
+	int split1 = split1Left;
+	int split2 = split2Left;
+	int tmpzz = 0;
+	while (split1 <= split1Right && split2 <= split2Right)
+	{
+		if (Data[split2] < Data[split1])
+		{
+			tmp[Left + tmpzz] = Data[split2];
+			split2++;
+			tmpzz++;
+		}
+		else if (Data[split2] > Data[split1])
+		{
+			tmp[Left + tmpzz] = Data[split1];
+			split1++;
+			tmpzz++;
+		}
+		else
+		{
+			tmp[Left + tmpzz] = Data[split1];
+			split1++;
+			tmpzz++;
+			tmp[Left + tmpzz] = Data[split2];
+			split2++;
+			tmpzz++;
+		}	
+	}
+	while (split1 <= split1Right)
+	{
+		tmp[Left + tmpzz] = Data[split1];
+		tmpzz++;
+		split1++;
+	}
+	while (split2 <= split2Right)
+	{
+		tmp[Left + tmpzz] = Data[split2];
+		tmpzz++;
+		split2++;
+	}
+	tmpzz--;
+	while (tmpzz >= 0) //需要把融合后的一段序列返回到Data中
+	{
+		Data[Left + tmpzz] = tmp[Left + tmpzz];
+		tmpzz--;
+	}
+	return;
+}
+
+vector <double> MergeSortRecur(vector <double> Data)
+//递归的归并排序
+//归并排序
+//排序复杂度nlogn
+{
+	if (Data.size() <= 1)
+		return Data;
+	vector <double> tmp = Data;
+	Merge(Data, tmp, 0, Data.size() - 1);
+	return Data;
+}
+
+vector <double> MergeSortNotRecur(vector <double> Data)
+//非递归的归并排序
+//nlogn
+{
+	vector <double> tmp = Data;
+
+	int OutIndex;
+	int interval = 2;
+	for (int i = 0; ;)
+	{
+		int Left = i;
+		int Right = i + interval - 1;
+		int split1Left = Left;
+		int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+		int split2Left = split1Right + 1;
+		int split2Right = Right;
+
+		int split1 = split1Left;
+		int split2 = split2Left;
+		int tmpzz = 0;
+		while (split1 <= split1Right && split2 <= split2Right)
+		{
+			if (Data[split2] < Data[split1])
+			{
+				tmp[Left + tmpzz] = Data[split2];
+				split2++;
+				tmpzz++;
+			}
+			else if (Data[split2] > Data[split1])
+			{
+				tmp[Left + tmpzz] = Data[split1];
+				split1++;
+				tmpzz++;
+			}
+			else
+			{
+				tmp[Left + tmpzz] = Data[split1];
+				split1++;
+				tmpzz++;
+				tmp[Left + tmpzz] = Data[split2];
+				split2++;
+				tmpzz++;
+			}
+		}
+		while (split1 <= split1Right)
+		{
+			tmp[Left + tmpzz] = Data[split1];
+			tmpzz++;
+			split1++;
+		}
+		while (split2 <= split2Right)
+		{
+			tmp[Left + tmpzz] = Data[split2];
+			tmpzz++;
+			split2++;
+		}
+		tmpzz--;
+		while (tmpzz >= 0) //需要把融合后的一段序列返回到Data中
+		{
+			Data[Left + tmpzz] = tmp[Left + tmpzz];
+			tmpzz--;
+		}
+		i = i + interval;
+		if (i >= Data.size())
+		{
+			OutIndex = Right;
+		}
+	}
+
+	return Data;
+}
+

@@ -24,4 +24,6 @@ vector <double> InsertionSort(vector<double> Data);
 vector <double> ShellSort(vector<double> Data);
 vector <double> HeapSortfaster(vector<double> Data);
 vector <double> HeapSortslow(vector<double> Data);
+vector <double> MergeSortRecur(vector <double> Data);
+vector <double> MergeSortNotRecur(vector <double> Data);
 #endif
