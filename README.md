@@ -37,9 +37,13 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 20200426 归并排序的非递归实现
 
-123456个随机元素，包括500个相同元素的运行时间对比 5.png
+123456个随机元素，包括500个相同元素的运行时间对比 
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/5.png)
 
 发现非递归实现比递归实现更慢
 
-但当排序4086个元素时，非递归实现更快，对比代码可以发现，非递归相对于递归实现主要区别在于当组数不满足2的整数次幂时，非递归方式需要将多余的与最后一个序列进行融合，这就是很耗费时间的地方，而当4096个元素时，正好没有多余的，也就让非递归比递归快了。 6.png
+但当排序4086个元素时，非递归实现更快，对比代码可以发现，非递归相对于递归实现主要区别在于当组数不满足2的整数次幂时，非递归方式需要将多余的与最后一个序列进行融合，这就是很耗费时间的地方，而当4096个元素时，正好没有多余的，也就让非递归比递归快了。 
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/6.png)
 
