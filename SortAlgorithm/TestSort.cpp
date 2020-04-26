@@ -131,16 +131,16 @@ void testMergeSort(vector<double> Data)
 int main()
 { 
 	RandomData test;
-	vector<double> Data = test.GenerateRandomData(5000, 1, 100);
-	for (int i = 0; i < 500; i++)
+	vector<double> Data = test.GenerateRandomData(4096, 1, 100);
+	/*for (int i = 0; i < 500; i++)
 	{
 		Data.push_back(43.2);
-	}
+	}*/
 	testCPPSTDSort(Data);
 	//testBubbleSort(Data);
 	//testInsertionSort(Data);
-	testShellSort(Data);
-	testHeapSort(Data);
+	//testShellSort(Data);
+	//testHeapSort(Data);
 	testMergeSort(Data);
 	system("pause");
 

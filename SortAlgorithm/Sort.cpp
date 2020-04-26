@@ -347,6 +347,63 @@ vector <double> HeapSortslow(vector<double> Data)
 	return result;
 }
 
+void TwoSplitMerge(vector<double> & Data, vector<double> & tmp, int split1Left, int split1Right, int split2Left, int split2Right)
+{
+	//if (Left == Right)
+	//	return;
+
+	//int split1Left = Left;
+	//int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+	//int split2Left = split1Right + 1;
+	//int split2Right = Right;
+
+	int split1 = split1Left;
+	int split2 = split2Left;
+	int tmpzz = 0;
+	while (split1 <= split1Right && split2 <= split2Right)
+	{
+		if (Data[split2] < Data[split1])
+		{
+			tmp[split1Left + tmpzz] = Data[split2];
+			split2++;
+			tmpzz++;
+		}
+		else if (Data[split2] > Data[split1])
+		{
+			tmp[split1Left + tmpzz] = Data[split1];
+			split1++;
+			tmpzz++;
+		}
+		else
+		{
+			tmp[split1Left + tmpzz] = Data[split1];
+			split1++;
+			tmpzz++;
+			tmp[split1Left + tmpzz] = Data[split2];
+			split2++;
+			tmpzz++;
+		}
+	}
+	while (split1 <= split1Right)
+	{
+		tmp[split1Left + tmpzz] = Data[split1];
+		tmpzz++;
+		split1++;
+	}
+	while (split2 <= split2Right)
+	{
+		tmp[split1Left + tmpzz] = Data[split2];
+		tmpzz++;
+		split2++;
+	}
+	tmpzz--;
+	while (tmpzz >= 0) //需要把融合后的一段序列返回到Data中
+	{
+		Data[split1Left + tmpzz] = tmp[split1Left + tmpzz];
+		tmpzz--;
+	}
+}
+
 void Merge(vector <double> & Data, vector <double> & tmp,int Left, int Right)
 //都是引用，不开辟很大的空间
 {
@@ -370,51 +427,7 @@ void Merge(vector <double> & Data, vector <double> & tmp,int Left, int Right)
 	Merge(Data, tmp, Left, split1Right);
 	Merge(Data, tmp, split2Left, split2Right);
 	
-	int split1 = split1Left;
-	int split2 = split2Left;
-	int tmpzz = 0;
-	while (split1 <= split1Right && split2 <= split2Right)
-	{
-		if (Data[split2] < Data[split1])
-		{
-			tmp[Left + tmpzz] = Data[split2];
-			split2++;
-			tmpzz++;
-		}
-		else if (Data[split2] > Data[split1])
-		{
-			tmp[Left + tmpzz] = Data[split1];
-			split1++;
-			tmpzz++;
-		}
-		else
-		{
-			tmp[Left + tmpzz] = Data[split1];
-			split1++;
-			tmpzz++;
-			tmp[Left + tmpzz] = Data[split2];
-			split2++;
-			tmpzz++;
-		}	
-	}
-	while (split1 <= split1Right)
-	{
-		tmp[Left + tmpzz] = Data[split1];
-		tmpzz++;
-		split1++;
-	}
-	while (split2 <= split2Right)
-	{
-		tmp[Left + tmpzz] = Data[split2];
-		tmpzz++;
-		split2++;
-	}
-	tmpzz--;
-	while (tmpzz >= 0) //需要把融合后的一段序列返回到Data中
-	{
-		Data[Left + tmpzz] = tmp[Left + tmpzz];
-		tmpzz--;
-	}
+	TwoSplitMerge(Data, tmp, split1Left, split1Right, split2Left, split2Right);
 	return;
 }
 
@@ -430,75 +443,111 @@ vector <double> MergeSortRecur(vector <double> Data)
 	return Data;
 }
 
-vector <double> MergeSortNotRecur(vector <double> Data)
-//非递归的归并排序
-//nlogn
+vector <int> Splitnum(int num)
+//将任何数分解为2的整数次方
 {
-	vector <double> tmp = Data;
-
-	int OutIndex;
-	int interval = 2;
-	for (int i = 0; ;)
+	vector <int> result;
+	if (num <= 0)
+		return result;
+	int sum = 0;
+	int numtmp = num;
+	while (numtmp>0)
 	{
-		int Left = i;
-		int Right = i + interval - 1;
-		int split1Left = Left;
-		int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
-		int split2Left = split1Right + 1;
-		int split2Right = Right;
-
-		int split1 = split1Left;
-		int split2 = split2Left;
-		int tmpzz = 0;
-		while (split1 <= split1Right && split2 <= split2Right)
-		{
-			if (Data[split2] < Data[split1])
-			{
-				tmp[Left + tmpzz] = Data[split2];
-				split2++;
-				tmpzz++;
-			}
-			else if (Data[split2] > Data[split1])
-			{
-				tmp[Left + tmpzz] = Data[split1];
-				split1++;
-				tmpzz++;
-			}
-			else
-			{
-				tmp[Left + tmpzz] = Data[split1];
-				split1++;
-				tmpzz++;
-				tmp[Left + tmpzz] = Data[split2];
-				split2++;
-				tmpzz++;
-			}
-		}
-		while (split1 <= split1Right)
-		{
-			tmp[Left + tmpzz] = Data[split1];
-			tmpzz++;
-			split1++;
-		}
-		while (split2 <= split2Right)
-		{
-			tmp[Left + tmpzz] = Data[split2];
-			tmpzz++;
-			split2++;
-		}
-		tmpzz--;
-		while (tmpzz >= 0) //需要把融合后的一段序列返回到Data中
-		{
-			Data[Left + tmpzz] = tmp[Left + tmpzz];
-			tmpzz--;
-		}
-		i = i + interval;
-		if (i >= Data.size())
-		{
-			OutIndex = Right;
-		}
+		int tmp = pow(2, floor(log2(numtmp)));
+		result.push_back(tmp);
+		sum = sum + tmp;
+		numtmp = num - sum;
 	}
+	return result;
+}
 
+//实际上根本不用注释掉的这个这么复杂，只需要如保留下来的代码一样，每次都把多余的融合到最后一个序列中即可。
+//void SubSplitMergeSort(vector <double> & Data, vector <double> & tmp ,int subLeft, int subRight)
+////将位于Left 和 Right中间的子序列用归并排序
+////subRight- subLeft +1 必须保证是2的整数次幂
+//{
+//	int interval = 2;
+//
+//	while (1)
+//	{
+//		int i;
+//		for (i = subLeft;i<subRight- subLeft +1; i = i + interval)
+//		{
+//			int Left = i;
+//			int Right = i + interval - 1;
+//			int split1Left = Left;
+//			int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+//			int split2Left = split1Right + 1;
+//			int split2Right = Right;
+//			TwoSplitMerge(Data, tmp, split1Left, split1Right, split2Left, split2Right);
+//		}
+//		interval = interval * 2;
+//		if (interval>subRight - subLeft + 1)
+//			break;
+//	}
+//}
+//vector <double> MergeSortNotRecur(vector <double> Data)
+////非递归的归并排序
+////nlogn
+//{
+//	vector <double> tmp = Data;
+//	vector <int> splitnum;
+//	splitnum = Splitnum(Data.size() );//将任意个数的待排序列转化为2的整数次幂构成的序列，序列和为待排序列
+//
+//	int sum = 0;
+//	for (int i = 0; i < splitnum.size(); i++)
+//	{
+//		SubSplitMergeSort(Data, tmp, sum, sum + splitnum[i] - 1);
+//		sum += splitnum[i];
+//	}
+//
+//	vector<int> newsplitnum = Splitnum(splitnum.size());
+//	for (int i = 0; i < newsplitnum.size(); i++)
+//	{
+//
+//	}
+//
+//	
+//
+//	return Data;
+//}
+
+vector <double> MergeSortNotRecur(vector <double> Data)
+{
+	if (Data.size() <= 1)
+		return Data;
+	vector <double> tmp = Data;
+	int interval = 2;
+	int Left;
+	int Right;
+	int split1Left;
+	int split1Right;
+	int split2Left;
+	int split2Right;
+	int i;
+	while (1)
+	{
+		for (i = 0; i<Data.size(); )
+		{
+			Left = i;
+			Right = i + interval - 1;
+			if (Right >= Data.size())
+				break;
+			split1Left = Left;
+			split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+			split2Left = split1Right + 1;
+			split2Right = Right;
+			TwoSplitMerge(Data, tmp, split1Left, split1Right, split2Left, split2Right);
+			i = Right + 1;
+		}
+		if (i < Data.size())
+		{
+			TwoSplitMerge(Data, tmp, i- interval, i-1, i, Data.size()-1);
+		}
+		interval = interval * 2;
+		if (interval>Data.size())
+			break;
+	}
 	return Data;
 }
 
