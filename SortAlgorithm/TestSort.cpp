@@ -32,7 +32,7 @@ void testInsertionSort(vector<double> Data)
 	Data.push_back(1); Data.push_back(2); Data.push_back(3); Data.push_back(4); Data.push_back(1);*/
 	cout << test.CheckSorted(Data);
 	start = clock();
-	Data = InsertionSort(Data);
+	Data = InsertionSort(Data,0,Data.size()-1);
 	end = clock();
 	cout << test.CheckSorted(Data);
 	//test.PrintData(Data);
@@ -111,7 +111,7 @@ void testMergeSort(vector<double> Data)
 	Data.push_back(1); Data.push_back(2); Data.push_back(3); Data.push_back(4); Data.push_back(1);*/
 	cout << test.CheckSorted(Data);
 	start = clock();
-	Data1 = MergeSortRecur(Data);
+	Data1 = MergeSortRecur(Data,0,Data.size()-1);
 	end = clock();
 	cout << test.CheckSorted(Data1);
 	//test.PrintData(Data);
@@ -120,7 +120,7 @@ void testMergeSort(vector<double> Data)
 
 	cout << test.CheckSorted(Data);
 	start = clock();
-	Data1 = MergeSortNotRecur(Data);
+	Data1 = MergeSortNotRecur(Data, 0, Data.size() - 1);
 	end = clock();
 	cout << test.CheckSorted(Data1);
 	//test.PrintData(Data);
@@ -128,20 +128,61 @@ void testMergeSort(vector<double> Data)
 	cout << "非递归实现的归并排序算法用时" << endtime << "s" << endl;
 }
 
+void testQuickSort(vector<double> Data)
+{
+	clock_t start, end;
+	RandomData test;
+	vector <double> Data1;
+	int cutoff;
+	int cishu;
+	double endtime;
+
+	cout << test.CheckSorted(Data);
+	start = clock();
+	cutoff = 800;
+	cishu = 1;
+	Data1 = QuickSort(Data,0,Data.size()-1, cutoff, cishu);
+	end = clock();
+	cout << test.CheckSorted(Data1);
+	endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "快速排序算法用时" << endtime << "s" << " cutoff："<<cutoff<<" cishu："<<cishu<<endl;
+
+	cout << test.CheckSorted(Data);
+	start = clock();
+	cutoff = 800;
+	cishu = 2;
+	Data1 = QuickSort(Data, 0, Data.size() - 1, cutoff, cishu);
+	end = clock();
+	cout << test.CheckSorted(Data1);
+	endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "快速排序算法用时" << endtime << "s" << " cutoff：" << cutoff << " cishu：" << cishu << endl;
+	//cout << test.CheckSorted(Data);
+	//start = clock();
+	//Data1 = MergeSortNotRecur(Data);
+	//end = clock();
+	//cout << test.CheckSorted(Data1);
+	////test.PrintData(Data);
+	//endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	//cout << "非递归实现的归并排序算法用时" << endtime << "s" << endl;
+}
+
 int main()
 { 
 	RandomData test;
-	vector<double> Data = test.GenerateRandomData(4096, 1, 100);
+
+	vector<double> Data = test.GenerateRandomData(150000, -10, 10);
+	cout << "排序元素个数:" << Data.size() << endl;
 	/*for (int i = 0; i < 500; i++)
 	{
 		Data.push_back(43.2);
 	}*/
 	testCPPSTDSort(Data);
-	//testBubbleSort(Data);
-	//testInsertionSort(Data);
-	//testShellSort(Data);
-	//testHeapSort(Data);
+	/*testBubbleSort(Data);
+	testInsertionSort(Data);*/
+	testShellSort(Data);
+	testHeapSort(Data);
 	testMergeSort(Data);
+	testQuickSort(Data);
 	system("pause");
 
 

@@ -21,7 +21,7 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 20200423 Practice9 判断是否是同一颗二叉搜索树 二叉搜索树的插入、删除操作等
 
-20200424 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件。之后如果有需要，可以直接弄这两个文件夹。 insert还没有测试 其他都测试了 都是成功的
+20200424 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件 堆的操作主要是插入删除，需要有一系列的调整，使得根部始终为最大或最小。之后如果有需要，可以直接弄这两个文件夹。 insert还没有测试 其他都测试了 都是成功的
 
 更新SortAlgorithm文件夹，更新堆排序
 
@@ -46,4 +46,20 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 但当排序4086个元素时，非递归实现更快，对比代码可以发现，非递归相对于递归实现主要区别在于当组数不满足2的整数次幂时，非递归方式需要将多余的与最后一个序列进行融合，这就是很耗费时间的地方，而当4096个元素时，正好没有多余的，也就让非递归比递归快了。 
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/6.png)
+
+20200427 实现快速排序，小于阈值时用递归的归并排序。修改插入排序、归并排序的入口参数，改为可以给定确定的范围排序。快速排序的入口参数有cutoff和cishu，前者决定调用归并排序的时机，后者决定快速排序采样的个数，2^cishu+1。下面给出一些测试案例：
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/7.png)
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/8.png)
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/9.png)
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/10.png)
+
+可以看到离C++的algorithm库的sort实现还是有一定的距离。
+
+
+
+
 

@@ -81,7 +81,7 @@ vector<double> BubbleSort(vector<double> Data)
 	return Data;
 }
 
-vector <double> InsertionSort(vector<double> Data)
+vector <double> InsertionSort(vector<double> Data,int Left,int Right)
 //插入排序，类比打扑克摸牌整理
 //O(n^2)
 {
@@ -89,7 +89,7 @@ vector <double> InsertionSort(vector<double> Data)
 		return Data;
 	RandomData test;
 	vector <double> Sorted;
-	for (int i = 0; i < Data.size(); i++)
+	for (int i = Left; i < Right + 1; i++)
 	{
 
 		if (Sorted.empty()==1)
@@ -131,7 +131,13 @@ vector <double> InsertionSort(vector<double> Data)
 			}
 		}
 	}
-	return Sorted;
+	int indexnum = 0;
+	for (int i = Left; i < Right + 1; i++)
+	{
+		Data[i] = Sorted[indexnum];
+		indexnum++;
+	}
+	return Data;
 }
 
 vector <double> ShellSort(vector<double> Data)
@@ -180,7 +186,7 @@ vector <double> ShellSort(vector<double> Data)
 				subdataindex.push_back(index_j);
 				index_j = index_j + Interval;
 			}
-			subdata = InsertionSort(subdata);
+			subdata = InsertionSort(subdata,0,subdata.size()-1);
 			for (int k = 0; k < subdata.size(); k++)
 				Data[subdataindex[k]] = subdata[k];
 		}
@@ -406,6 +412,7 @@ void TwoSplitMerge(vector<double> & Data, vector<double> & tmp, int split1Left, 
 
 void Merge(vector <double> & Data, vector <double> & tmp,int Left, int Right)
 //都是引用，不开辟很大的空间
+//tmp 是用来存储中间序列的
 {
 	if (Right - Left == 1)
 	{
@@ -431,7 +438,7 @@ void Merge(vector <double> & Data, vector <double> & tmp,int Left, int Right)
 	return;
 }
 
-vector <double> MergeSortRecur(vector <double> Data)
+vector <double> MergeSortRecur(vector <double> Data,int Left,int Right)
 //递归的归并排序
 //归并排序
 //排序复杂度nlogn
@@ -439,7 +446,7 @@ vector <double> MergeSortRecur(vector <double> Data)
 	if (Data.size() <= 1)
 		return Data;
 	vector <double> tmp = Data;
-	Merge(Data, tmp, 0, Data.size() - 1);
+	Merge(Data, tmp, Left, Right);
 	return Data;
 }
 
@@ -512,9 +519,9 @@ vector <int> Splitnum(int num)
 //	return Data;
 //}
 
-vector <double> MergeSortNotRecur(vector <double> Data)
+vector <double> MergeSortNotRecur(vector <double> Data,int L,int R)
 {
-	if (Data.size() <= 1)
+	if (R-L+1 <= 1)
 		return Data;
 	vector <double> tmp = Data;
 	int interval = 2;
@@ -527,7 +534,7 @@ vector <double> MergeSortNotRecur(vector <double> Data)
 	int i;
 	while (1)
 	{
-		for (i = 0; i<Data.size(); )
+		for (i = L; i<R+1; )
 		{
 			Left = i;
 			Right = i + interval - 1;
@@ -540,14 +547,139 @@ vector <double> MergeSortNotRecur(vector <double> Data)
 			TwoSplitMerge(Data, tmp, split1Left, split1Right, split2Left, split2Right);
 			i = Right + 1;
 		}
-		if (i < Data.size())
+		if (i < R+1)
 		{
-			TwoSplitMerge(Data, tmp, i- interval, i-1, i, Data.size()-1);
+			TwoSplitMerge(Data, tmp, i- interval, i-1, i, R);
 		}
 		interval = interval * 2;
-		if (interval>Data.size())
+		if (interval>R-L+1)
 			break;
 	}
 	return Data;
 }
 
+int Rec = 0;
+vector <double> Recordmid;
+int MediumRec(int Left, int Right,int splitnum)
+{
+	Rec++;
+	if (Rec == splitnum)
+	{
+		Rec--;
+		Recordmid.push_back(ceil(double((Left + Right) / 2.0)));
+		Recordmid.push_back(Left);
+		Recordmid.push_back(Right);
+		return ceil(double((Left + Right) / 2.0));
+	}
+	MediumRec(Left, ceil(double((Left + Right) / 2.0)), splitnum);
+	MediumRec(ceil(double((Left + Right) / 2.0)), Right, splitnum);
+	Rec--;
+}
+
+void Mediann(vector<double> & Data, int Left, int Right,int n)
+//把Left 到 Right 分成n-1份，n是奇数
+{
+	vector <double> Index;
+	Rec = 0;
+	Recordmid.clear();
+	MediumRec(Left, Right, log2(n-1));
+	Index = Recordmid;
+	Index = InsertionSort(Index,0,Index.size()-1);
+	auto i = Index.begin()+1;
+	while (i != Index.end()) //去除重复元素
+	{
+		if (*i == *(i - 1))
+		{
+			i = Index.erase(i);
+		}
+		else
+			i++;
+	}
+	vector <double> value;
+	for (int i = 0; i < Index.size(); i++)
+		value.push_back(Data[Index[i]]);
+	value = InsertionSort(value, 0, value.size() - 1);
+	for (int i = 0; i < Index.size(); i++)
+		Data[Index[i]] = value[i];
+
+	double tmpmidd = Data[Index[(Index.size()-1)/2]];
+	Data[Index[(Index.size() - 1) / 2]] = Data[Right - 1];
+	Data[Right - 1] = tmpmidd;
+}
+
+void Median3(vector<double> & Data, int Left, int Right)
+{
+	int mid = ceil(double((Left + Right) / 2.0));
+	if (Data[Left] > Data[mid])
+	{
+		double tmpmid = Data[Left];
+		Data[Left] = Data[mid];
+		Data[mid] = tmpmid;
+	}
+	if (Data[Right] < Data[mid])
+	{
+		double tmpmid = Data[Right];
+		Data[Right] = Data[mid];
+		Data[mid] = tmpmid;
+	}
+	if (Data[Left] > Data[mid])
+	{
+		double tmpmid = Data[Left];
+		Data[Left] = Data[mid];
+		Data[mid] = tmpmid;
+	}
+	if (Right - Left + 1 >= 3)
+	{
+		double tmpmidd = Data[mid];
+		Data[mid] = Data[Right - 1];
+		Data[Right - 1] = tmpmidd; 
+	}
+	return;
+}
+
+void Quick_Sort(vector <double> & Data, int Left, int Right,int cutoff,int cishu)
+//QuickSort的递归
+//暂时先设置阈值为10
+{
+	if (Right - Left + 1 < cutoff)
+		Data = MergeSortRecur(Data, Left, Right);
+	else
+	{
+		//Median3(Data, Left, Right);//这个相当于采样函数，在一堆随机的点中采样，尽最大可能每次均分
+		Mediann(Data, Left, Right, pow(2 , cishu) + 1); //用这个更广泛的采样函数代替上边的这个函数
+		int less = Left + 1;
+		int more = Right - 2;
+		while (1)
+		{
+			if (less <= more)
+//这个地方容易出错 如果把等号去了的话，当less==more时，就退出了，没有判断less位置处与Right-1位置的相对大小就break了
+//会造成该数值放的位置可能不对。
+			{
+				while (Data[less] < Data[Right - 1])
+					less++;
+				while (Data[more] > Data[Right - 1])
+					more--;
+			}
+			if (less>more)
+				break;
+			double tmpmid = Data[less];
+			Data[less] = Data[more];
+			Data[more] = tmpmid;
+			less++;
+			more--;
+		}
+		double tmpmid1 = Data[less];
+		Data[less] = Data[Right - 1];
+		Data[Right - 1] = tmpmid1;
+		Quick_Sort(Data, Left, less - 1, cutoff, cishu);
+		Quick_Sort(Data, less + 1, Right, cutoff, cishu);
+	}
+}
+
+vector <double> QuickSort(vector <double> Data,int Left,int Right,int Cutoff,int cishu)
+//Cutoff 是用其他排序的阈值，用来解决小规模递归消耗大的问题Cutoff>0
+//cishu 是采样函数采样的个数，cishu>=1
+{
+	Quick_Sort(Data, Left, Right, Cutoff, cishu);
+	return Data;
+}
