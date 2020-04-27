@@ -59,6 +59,10 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 
 可以看到离C++的algorithm库的sort实现还是有一定的距离。
 
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/10.png)
+
+暂时不知是何原因，快速排序在面对这样的数据时速度不如归并排序。
+
 
 
 
