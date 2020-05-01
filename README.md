@@ -75,6 +75,9 @@ https://www.icourse163.org/learn/PKU-1002525003?tid=1002695005#/learn/announce
 
 20200501 新建DivideAndConquer文件夹，存放分治策略相关算法。新建Note文件夹，存放学习笔记。
 
+DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂度，用分治策略递归实现是O(logn)的复杂度。测试1.000000001的50051000001次方效果如下所示，可以看到，math库的powl和我自己写的logn运行时间是差不多的。据此可感受logn对于n的差距！！封装了一个Number类，可以按照常规的如n=2.1;n^3进行运算。
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/12.png)
 
 
 
