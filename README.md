@@ -1,9 +1,19 @@
 # Data-Structure
 This Repository store the basic data structure code practice;
 
-Mooc zju Data Structure Programming exercises after class.Yue chen etc.;
+数据结构与算法设计，数据结构与算法是无法割裂开的！
 
-Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
+Mooc zju Data Structure Programming exercises after class.Yue chen etc.;浙江大学MOOC 
+
+https://www.icourse163.org/learn/ZJU-93001?tid=1450069451#/learn/announce
+
+Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;清华大学MOOC
+
+https://next.xuetangx.com/course/THU08091002048/1515966
+
+北京大学算法设计与分析MOOC课程
+
+https://www.icourse163.org/learn/PKU-1002525003?tid=1002695005#/learn/announce
 
 20200416 创建SortAlgorithm文件夹 冒泡排序 排序检测 
 
@@ -62,6 +72,8 @@ Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/11.png)
 
 暂时不知是何原因，快速排序在面对这样的数据时速度不如归并排序。
+
+20200501 新建DivideAndConquer文件夹，存放分治策略相关算法。新建Note文件夹，存放学习笔记。
 
 
 
