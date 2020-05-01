@@ -3,15 +3,15 @@ This Repository store the basic data structure code practice;
 
 数据结构与算法设计，数据结构与算法是无法割裂开的！
 
-Mooc zju Data Structure Programming exercises after class.Yue chen etc.;浙江大学MOOC 
+Mooc zju Data Structure Programming exercises after class.Yue chen etc.;浙江大学MOOC 陈越
 
 https://www.icourse163.org/learn/ZJU-93001?tid=1450069451#/learn/announce
 
-Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;清华大学MOOC
+Mooc Tsinghua Data Structure Programming exercises after class.Junhui deng.;清华大学MOOC 邓俊辉
 
 https://next.xuetangx.com/course/THU08091002048/1515966
 
-北京大学算法设计与分析MOOC课程
+北京大学算法设计与分析MOOC课程 屈婉玲
 
 https://www.icourse163.org/learn/PKU-1002525003?tid=1002695005#/learn/announce
 
