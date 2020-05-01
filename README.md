@@ -15,11 +15,11 @@ https://next.xuetangx.com/course/THU08091002048/1515966
 
 https://www.icourse163.org/learn/PKU-1002525003?tid=1002695005#/learn/announce
 
-##20200416 
+## 20200416 
 
 创建SortAlgorithm文件夹 冒泡排序 排序检测 
 
-##20200422 
+## 20200422 
 
 编写插入排序算法 构建检测类RandomData 与C++algorithm标准库的sort算法进行比较，发现冒泡、插入是标准库算法运行时间的1000倍
 
@@ -33,11 +33,11 @@ https://www.icourse163.org/learn/PKU-1002525003?tid=1002695005#/learn/announce
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/C%2B%2B%E5%B8%8C%E5%B0%94.png)
 
-##20200423 
+## 20200423 
 
 Practice9 判断是否是同一颗二叉搜索树 二叉搜索树的插入、删除操作等
 
-##20200424 
+## 20200424 
 
 Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 堆排序调用了这两个文件 堆的操作主要是插入删除，需要有一系列的调整，使得根部始终为最大或最小。之后如果有需要，可以直接弄这两个文件夹。 insert还没有测试 其他都测试了 都是成功的
 
@@ -51,11 +51,11 @@ Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 �
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/%E6%B5%8B%E8%AF%95insert%E5%A0%86.png)
 
-##20200425 
+## 20200425 
 
 归并排序的递归实现
 
-##20200426 
+## 20200426 
 
 归并排序的非递归实现
 
@@ -69,7 +69,7 @@ Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 �
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/6.png)
 
-##20200427 
+## 20200427 
 
 实现快速排序，小于阈值时用递归的归并排序。修改插入排序、归并排序的入口参数，改为可以给定确定的范围排序。快速排序的入口参数有cutoff和cishu，前者决定调用归并排序的时机，后者决定快速排序采样的个数，2^cishu+1。下面给出一些测试案例：
 
@@ -87,7 +87,7 @@ Practice10 堆的各种基本操作 封成了类，储存在.cpp .h 文件中 �
 
 暂时不知是何原因，快速排序在面对这样的数据时速度不如归并排序。
 
-##20200501 
+## 20200501 
 
 新建DivideAndConquer文件夹，存放分治策略相关算法。新建Note文件夹，存放学习笔记。
 
