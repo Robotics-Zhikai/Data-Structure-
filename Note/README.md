@@ -1,4 +1,5 @@
 存放学习过程的笔记。学习材料的PDF都是公开的，可以到MOOC的相应链接处下载。
+ipad坏了一次，所有笔记都丢了，看来备份工作还是很重要的！
 
 https://www.icourse163.org/learn/ZJU-93001?tid=1450069451#/learn/announce
 

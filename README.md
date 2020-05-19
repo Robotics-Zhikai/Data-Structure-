@@ -95,6 +95,7 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/12.png)
 
+## 20200519
+看来文件分级还是挺重要的，不分级查找时n的复杂度 分级logn的复杂度
 
-
-
+新建Graph文件夹，存储图相关的数据结构练习
