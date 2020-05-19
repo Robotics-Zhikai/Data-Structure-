@@ -98,4 +98,6 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 ## 20200519
 看来文件分级还是挺重要的，不分级查找时n的复杂度 分级logn的复杂度
 
-新建Graph文件夹，存储图相关的数据结构练习
+新建Graph文件夹，存储图相关的数据结构练习。
+
+添加Graph/Practice1,并添加代码。visualization的OpenGL可视化函数的头文件有修改。
