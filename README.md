@@ -104,9 +104,13 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 
 ## 20200520
 更新Graph/Practice1
+
 修改visualization.h visualization.cpp 更新了函数名，并新添了一个绘制带箭头直线的功能，可以调整箭头在直线的位置，也可以调整箭头的长度，夹角，粗度。
+
 更新了ConvexHull.cpp，添加了Point的几个重载函数，可以做除法加法，norm取模
+
 更新了Graph.cpp Graph.h，创建存储图的邻接矩阵的数据结构，创建图的可视化函数
+
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/13.png)
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/14.png)
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/15.png)
