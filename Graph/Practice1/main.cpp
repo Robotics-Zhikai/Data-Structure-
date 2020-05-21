@@ -49,8 +49,16 @@ void Test_Graph()
 	OpenGLplot();
 
 	GraphAdjMat test;
-	test = RandomCreateGraphInAdjmat(50,0,10, 0, 10);
+	test = RandomCreateGraphInAdjmat(40,0,10, 0, 10);
+
+	GraphAdjList trans;
+	trans = TransferMat2List(test);
+	GraphAdjMat test1;
+	test1 = TransferList2Mat(trans);
+	
 	test.Visualize(5.0f,1.0f);
+	//trans.Visualize(5.0f, 1.0f);
+	//test1.Visualize(5.0f, 1.0f);
 	CloseGLplot();
 }
 void main()
