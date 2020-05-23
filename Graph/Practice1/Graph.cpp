@@ -58,11 +58,10 @@ void GraphAdjMat::InsertNode(GraphNode node)
 	GraphAdjMat::NodesInfo.push_back(node);
 }
 
-void GraphAdjMat::InsertEdge(GraphNode node1, GraphNode node2, float value)
+void GraphAdjMat::UpdateEdge(GraphNode node1, GraphNode node2, float value)
+//更新两节点间的权值，可以把本来有的边弄成brokenedge 也可以把本来是brokenedge的边弄成有权值
 //进这个函数之前应该保证没有重复的节点
 {
-	if (value == BrokenEdge)
-		return;
 	if (node1 == node2)
 		return;
 	int node1Index = -1;
@@ -79,6 +78,7 @@ void GraphAdjMat::InsertEdge(GraphNode node1, GraphNode node2, float value)
 		cout << "不存在这样的节点" << endl;
 		return;
 	}
+	
 	GraphAdjMat::GraphInfo[node1Index][node2Index] = value;
 }
 
@@ -204,3 +204,48 @@ void GraphAdjList::InsertNode(GraphNode node)
 	tmp.ThisNode = node;
 	GraphAdjList::List.push_back(tmp);
 }
+
+void GraphAdjList::UpdateEdge(GraphNode node1, GraphNode node2, float value)
+//进这个函数之前应该保证没有重复的节点
+{
+	if (node1 == node2)
+		return;
+	int node1Index = -1;
+	int	node2Index = -1;
+	for (int i = 0; i < GraphAdjList::List.size(); i++)
+	{
+		if (node1 == GraphAdjList::List[i].ThisNode)
+			node1Index = i;
+		else if (node2 == GraphAdjList::List[i].ThisNode)
+			node2Index = i;
+	}
+	if (node1Index == -1 || node2Index == -1) //说明不存在这样的节点
+	{
+		cout << "不存在这样的节点" << endl;
+		return;
+	}
+
+	int tmpnode2Index = -1;
+	for (int i = 0; i < GraphAdjList::List[node1Index].out.size(); i++)
+	{
+		if (node2 == *(GraphAdjList::List[node1Index].out[i].location))
+			tmpnode2Index = i;
+	}
+	if (tmpnode2Index == -1)
+	{
+		if (value == BrokenEdge)
+			return;
+		else
+		{
+			info tmpinfo;
+			tmpinfo.location = &(GraphAdjList::List[node2Index].ThisNode);
+			tmpinfo.Value = value;
+			GraphAdjList::List[node1Index].out.push_back(tmpinfo);
+		}
+	}
+	else
+	{
+		GraphAdjList::List[node1Index].out[tmpnode2Index].Value = value;
+	}
+}
+

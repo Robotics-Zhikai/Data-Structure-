@@ -18,7 +18,21 @@ public:
 
 	void Visualize(float NodeSize, float LineWeight);
 	void InsertNode(GraphNode node);
-	void InsertEdge(GraphNode node1, GraphNode node2, float value);//插入有向边，权值为value
+	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
+
+	void operator = (GraphAdjMat test)
+	{
+		this->GraphInfo = test.GraphInfo;
+		this->NodesInfo = test.NodesInfo;
+	}
+
+	void operator = (GraphAdjList test)
+	{
+		GraphAdjMat result;
+		result = TransferList2Mat(test);
+		this->operator=(result);
+	}
+	
 };
 
 struct info
@@ -40,7 +54,19 @@ public:
 	vector <GraphAdjListNode> List;
 	void Visualize(float NodeSize, float LineWeight);
 	void InsertNode(GraphNode node);
-	void InsertEdge(GraphNode node1, GraphNode node2, float value);//插入有向边，权值为value
+	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
+
+	void operator = (GraphAdjList test)
+	{
+		this->List = test.List;
+	}
+
+	void operator = (GraphAdjMat test)
+	{
+		GraphAdjList result;
+		result = TransferMat2List(test);
+		this->operator=(result);
+	}
 };
 
 GraphAdjMat RandomCreateGraphInAdjmat(int NumOfNodes, float RangeXmin, float RangeXmax, float RangeYmin, float RangeYmax);
