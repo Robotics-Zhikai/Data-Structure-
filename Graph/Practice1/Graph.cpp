@@ -83,6 +83,39 @@ void GraphAdjMat::UpdateEdge(GraphNode node1, GraphNode node2, float value)
 }
 
 
+void DFSGraphAdjMat(vector <int> & isvisited,int & Num,const vector < vector <float> > & GraphInfo, vector <int> & DFSSequence)
+{
+	DFSSequence.push_back(Num);
+	isvisited[Num] = 1;
+	for (int i = 0; i < isvisited.size(); i++)
+	{
+		if ((GraphInfo[Num][i] != BrokenEdge) && (isvisited[i] != 1))
+		{
+			DFSGraphAdjMat(isvisited, i, GraphInfo, DFSSequence);
+		}
+	}
+}
+vector <GraphNode> GraphAdjMat::DFS(GraphNode BeginNode)
+{
+	vector <int> DFSSequence;
+	vector <GraphNode> result;
+	DFSSequence.clear();
+	int BeginNum = 0;
+	for (BeginNum = 0; BeginNum < GraphAdjMat::NodesInfo.size(); BeginNum++)
+	{
+		if (GraphAdjMat::NodesInfo[BeginNum] == BeginNode)
+			break;
+	}
+	if (BeginNum >= GraphAdjMat::NodesInfo.size()) //判断不存在初始节点
+		return result;
+	DFSGraphAdjMat(GraphAdjMat::Isvisited, BeginNum, GraphAdjMat::GraphInfo, DFSSequence);
+	for (int i = 0; i < DFSSequence.size(); i++)
+	{
+		result.push_back(GraphAdjMat::NodesInfo[DFSSequence[i]]);
+	}
+	return result;
+}
+
 
 
 //两种格式相互转换，对于表明是BrokenEdge的权值，就进行丢弃，不在邻接表中显示
