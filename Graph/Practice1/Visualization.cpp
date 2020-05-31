@@ -11,6 +11,10 @@ vector<Point> GLplotLineArrowData;
 vector<float> GLplotLineArrowWidth;//对应的直线的宽度
 vector<int> GLplotLineArrowType;//线的种类 
 
+vector <Point> GLplotHollowSquareData;
+vector <float> GLplotHollowSquareSize;//对应的空心框的大小
+vector <int> GLplotHollowSquareType;//线的种类
+
 int numplotLineType = 0;
 
 vector <double> ScalePointsx(vector <double> PointsX)
@@ -86,6 +90,7 @@ void Display(void)
 	MergePoints(AllPoints, GLplotPointsData);
 	MergePoints(AllPoints, GLplotSequenceLineData);
 	MergePoints(AllPoints, GLplotLineArrowData);
+	MergePoints(AllPoints, GLplotHollowSquareData);
 	//若要添加新的Buffer，在这里加,一定要注意顺序统一
 
 	//
@@ -96,6 +101,7 @@ void Display(void)
 	Numplotdata.push_back(GLplotPointsData.size());
 	Numplotdata.push_back(GLplotSequenceLineData.size());
 	Numplotdata.push_back(GLplotLineArrowData.size());
+	Numplotdata.push_back(GLplotHollowSquareData.size());
 	//若要添加新的Buffer，在这里加
 
 	//
@@ -114,6 +120,7 @@ void Display(void)
 	GLplotPointsData = tmpvector[0];
 	GLplotSequenceLineData = tmpvector[1];
 	GLplotLineArrowData = tmpvector[2];
+	GLplotHollowSquareData = tmpvector[3];
 	//若要添加新的Buffer，在这里加
 
 	//
@@ -121,7 +128,7 @@ void Display(void)
 
 	float Size;
 	int Curenti = 0;
-	if (GLplotPointsize.empty() == 0)
+	if (GLplotPointsData.empty() == 0)
 	{
 		Size = GLplotPointsize[0];
 		while (1)
@@ -146,7 +153,7 @@ void Display(void)
 		}
 	}
 
-	if (GLplotSequenceLineWidth.empty() == 0)
+	if (GLplotSequenceLineData.empty() == 0)
 		//这个是画所有点首尾相接的直线
 	{
 		int linetype = GLplotSequenceLineType[0];
@@ -217,6 +224,37 @@ void Display(void)
 		}
 	}
 
+	if (GLplotHollowSquareData.empty() == 0)
+	{
+		for (int i = 0; i < GLplotHollowSquareData.size(); i++)
+		{
+			float size = GLplotHollowSquareSize[i];
+			float linewidth = 1;
+			glLineWidth(linewidth);
+			glBegin(GL_LINES);
+				glVertex2d(GLplotHollowSquareData[i].Point_X - size / 2.0, GLplotHollowSquareData[i].Point_Y - size / 2.0);
+				glVertex2d(GLplotHollowSquareData[i].Point_X + size / 2.0, GLplotHollowSquareData[i].Point_Y - size / 2.0);
+			glEnd();
+
+			//glLineWidth(linewidth);
+			glBegin(GL_LINES);
+				glVertex2d(GLplotHollowSquareData[i].Point_X - size / 2.0, GLplotHollowSquareData[i].Point_Y - size / 2.0);
+				glVertex2d(GLplotHollowSquareData[i].Point_X - size / 2.0, GLplotHollowSquareData[i].Point_Y + size / 2.0);
+			glEnd();
+
+			//glLineWidth(linewidth);
+			glBegin(GL_LINES);
+				glVertex2d(GLplotHollowSquareData[i].Point_X + size / 2.0, GLplotHollowSquareData[i].Point_Y - size / 2.0);
+				glVertex2d(GLplotHollowSquareData[i].Point_X + size / 2.0, GLplotHollowSquareData[i].Point_Y + size / 2.0);
+			glEnd();
+
+			//glLineWidth(linewidth);
+			glBegin(GL_LINES);
+				glVertex2d(GLplotHollowSquareData[i].Point_X - size / 2.0, GLplotHollowSquareData[i].Point_Y + size / 2.0);
+				glVertex2d(GLplotHollowSquareData[i].Point_X + size / 2.0, GLplotHollowSquareData[i].Point_Y + size / 2.0);
+			glEnd();
+		}
+	}
 	glFlush();
 
 	//GLfloat x;
@@ -288,6 +326,7 @@ void AddBufferPoints(vector<Point> Points, float sizepoint)
 	for (int i = 0; i < Points.size(); i++)
 		GLplotPointsData.push_back(Points[i]);
 
+	//numplotLineType = 0;
 	numplotLineType = numplotLineType + 1;
 	for (int i = 0; i < Points.size(); i++)
 		GLplotPointsize.push_back(sizepoint);
@@ -343,6 +382,7 @@ void AddBufferSequenceLine(vector<Point> Points, float LineWidth)
 	for (int i = 0; i < Points.size(); i++)
 		GLplotSequenceLineData.push_back(Points[i]);
 
+	numplotLineType = 0;
 	numplotLineType = numplotLineType + 1;
 	for (int i = 0; i < Points.size(); i++)
 	{
@@ -356,6 +396,7 @@ void AddBufferLinesArrows(vector<Point> Points, float LineWidth)
 	for (int i = 0; i < Points.size(); i++)
 		GLplotLineArrowData.push_back(Points[i]);
 
+	numplotLineType = 0;
 	numplotLineType = numplotLineType + 1;
 	for (int i = 0; i < Points.size(); i++)
 	{
@@ -364,3 +405,12 @@ void AddBufferLinesArrows(vector<Point> Points, float LineWidth)
 	}
 }
 
+void AddBufferHollowSquare(vector<Point> Points, float SquareSize)
+{
+	for (int i = 0; i < Points.size(); i++)
+	{
+		GLplotHollowSquareData.push_back(Points[i]);
+		GLplotHollowSquareSize.push_back(SquareSize);
+		GLplotHollowSquareType.push_back(1);
+	}
+}

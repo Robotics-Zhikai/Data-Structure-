@@ -5,8 +5,8 @@ GraphAdjMat RandomCreateGraphInAdjmat(int NumOfNodes,float RangeXmin, float Rang
 {
 	GraphAdjMat result;
 	result.NodesInfo = GenerateRandomPoint(NumOfNodes, RangeXmin, RangeXmax, RangeYmin, RangeYmax);
-	//srand((int)time(0));  // 产生随机种子  把0换成NULL也行
-	srand(0);
+	srand((int)time(0));  // 产生随机种子  把0换成NULL也行
+	//srand(0);
 
 	for (int i = 0; i < result.NodesInfo.size(); i++)
 	{
@@ -17,9 +17,9 @@ GraphAdjMat RandomCreateGraphInAdjmat(int NumOfNodes,float RangeXmin, float Rang
 			if (j != i)
 			{
 				float a = 0;
-				float b = 0.51;
+				float b = 1;
 				float randomnum = a + (rand() / double(RAND_MAX))*(b - a);
-				if (randomnum < 0.5)
+				if (randomnum < 0.98)
 					randomnum = 0;
 				else
 					randomnum = 1;
@@ -33,7 +33,7 @@ GraphAdjMat RandomCreateGraphInAdjmat(int NumOfNodes,float RangeXmin, float Rang
 }
 //
 
-void GraphAdjMat::Visualize(float NodeSize, float LineWeight)
+void GraphAdjMat::MapVisualize(float NodeSize, float LineWeight)
 //这个函数不一定最后调用
 //O(n^2)
 {
@@ -51,6 +51,11 @@ void GraphAdjMat::Visualize(float NodeSize, float LineWeight)
 			}
 		}
 	}
+}
+
+void GraphAdjMat::SearchVisualize(vector <GraphNode> sequence, float SquareSize)
+{
+	AddBufferHollowSquare(sequence, SquareSize);
 }
 
 void GraphAdjMat::InsertNode(GraphNode node)
@@ -108,6 +113,11 @@ vector <GraphNode> GraphAdjMat::DFS(GraphNode BeginNode)
 	}
 	if (BeginNum >= GraphAdjMat::NodesInfo.size()) //判断不存在初始节点
 		return result;
+	GraphAdjMat::Isvisited.clear();
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		GraphAdjMat::Isvisited.push_back(0);
+	}
 	DFSGraphAdjMat(GraphAdjMat::Isvisited, BeginNum, GraphAdjMat::GraphInfo, DFSSequence);
 	for (int i = 0; i < DFSSequence.size(); i++)
 	{
@@ -203,7 +213,7 @@ GraphAdjMat TransferList2Mat(GraphAdjList GraphList)
 
 
 
-void GraphAdjList::Visualize(float NodeSize, float LineWeight)
+void GraphAdjList::MapVisualize(float NodeSize, float LineWeight)
 //O(n+E) E为边数 当边过多的时候，反而不如邻接矩阵的形式
 {
 	vector <Point> tmp; 

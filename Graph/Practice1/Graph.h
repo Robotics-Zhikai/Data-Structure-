@@ -23,10 +23,11 @@ public:
 	vector < vector <float> > GraphInfo; //储存边的信息,可以二值化表示连通与否，也可以定量化表示权值
 	vector <int> Isvisited; //储存是否访问过某一节点
 		 
-	void Visualize(float NodeSize, float LineWeight);
+	void MapVisualize(float NodeSize, float LineWeight);
 	void InsertNode(GraphNode node);
 	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
 	vector <GraphNode> DFS(GraphNode BeginNode);
+	void SearchVisualize(vector <GraphNode> sequence,float SquareSize); //对遍历结果进行可视化，加框
 
 	GraphAdjMat()
 	{
@@ -35,11 +36,11 @@ public:
 			Isvisited.push_back(0);
 		}
 	}
-	void operator = (GraphAdjMat test)
-	{
-		this->GraphInfo = test.GraphInfo;
-		this->NodesInfo = test.NodesInfo;
-	}
+	//void operator = (GraphAdjMat test)
+	//{
+	//	this->GraphInfo = test.GraphInfo;
+	//	this->NodesInfo = test.NodesInfo;
+	//}
 
 	//void operator = (GraphAdjList test) //这个不知道为啥出错了
 	//{
@@ -69,7 +70,7 @@ public:
 	vector <GraphAdjListNode> List;
 	vector <int> Isvisited; //储存是否访问过某一节点
 
-	void Visualize(float NodeSize, float LineWeight);
+	void MapVisualize(float NodeSize, float LineWeight);
 	void InsertNode(GraphNode node);
 	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
 
@@ -81,10 +82,10 @@ public:
 		}
 	}
 
-	void operator = (GraphAdjList test)
-	{
-		this->List = test.List;
-	}
+	//void operator = (GraphAdjList test)
+	//{
+	//	this->List = test.List;
+	//}
 
 	//void operator = (GraphAdjMat test)
 	//{
