@@ -2,6 +2,9 @@
 #define GRAPH_H
 
 #include "Visualization.h"
+#include <queue>
+#include <stack>
+#include <algorithm>
 
 //在这里可以定义当认为不是边时的权值
 #define BrokenEdge 0
@@ -26,8 +29,10 @@ public:
 	void MapVisualize(float NodeSize, float LineWeight);
 	void InsertNode(GraphNode node);
 	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
-	vector <GraphNode> DFS(GraphNode BeginNode);
+	vector <GraphNode> DFS(GraphNode BeginNode);//DFS递归遍历
+	vector <GraphNode> DFSNotRecur(GraphNode BeginNode);//DFS的非递归遍历
 	void SearchVisualize(vector <GraphNode> sequence,float SquareSize); //对遍历结果进行可视化，加框
+	vector <GraphNode> BFS(GraphNode BeginNode);
 
 	GraphAdjMat()
 	{

@@ -49,15 +49,23 @@ void Test_Graph()
 	OpenGLplot();
 
 	GraphAdjMat test;
-	test = RandomCreateGraphInAdjmat(50,0,10, 0, 10);
+	test = RandomCreateGraphInAdjmat(85,0,10, 0, 10);
 
 	GraphAdjList trans;
 	trans = TransferMat2List(test);
 	GraphAdjMat test1;
 	test1 = TransferList2Mat(trans);
-	vector <Point> DFSSequence = test1.DFS(test1.NodesInfo[1]);
+	int index = 10;
+	vector <Point> BFSSequence = test1.BFS(test1.NodesInfo[index]);
+	vector <Point> DFSSequence = test1.DFS(test1.NodesInfo[index]);
+	vector <Point> DFSNotRecurSequence = test1.DFSNotRecur(test1.NodesInfo[index]);
+
+
 	test1.MapVisualize(5.0f, 1.0f);
-	test1.SearchVisualize(DFSSequence, 0.03);
+
+	test1.SearchVisualize(BFSSequence, 0.03);
+	test1.SearchVisualize(DFSSequence, 0.05);
+	test1.SearchVisualize(DFSNotRecurSequence, 0.07);
 	
 	//trans.Visualize(5.0f, 1.0f);
 	//test1.Visualize(5.0f, 1.0f);

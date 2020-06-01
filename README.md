@@ -132,3 +132,7 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 
 ## 20200601
 编写空心框可视化函数，用于DFS显示；删除等号运算符重载函数，否则在调用GraphAdjList TransferMat2List(GraphAdjMat Mat)等带有赋值的函数时会出现错误。C++在赋值时不光有值的赋值，还有其他操作，最好不要自己定义赋值重载函数。
+
+实现mat格式的DFS递归非递归，BFS非递归遍历。测试时BFS、DFS、DFSNotrecur同时测试，用已经实现的空心框可视化函数对正确性进行检验，正常情况下所有遍历的最小连通子集里的所有节点都有三个框，见下图：
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/16.png)

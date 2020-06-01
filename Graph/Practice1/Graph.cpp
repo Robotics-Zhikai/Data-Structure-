@@ -5,8 +5,8 @@ GraphAdjMat RandomCreateGraphInAdjmat(int NumOfNodes,float RangeXmin, float Rang
 {
 	GraphAdjMat result;
 	result.NodesInfo = GenerateRandomPoint(NumOfNodes, RangeXmin, RangeXmax, RangeYmin, RangeYmax);
-	srand((int)time(0));  // 产生随机种子  把0换成NULL也行
-	//srand(0);
+	//srand((int)time(0));  // 产生随机种子  把0换成NULL也行
+	srand(0);
 
 	for (int i = 0; i < result.NodesInfo.size(); i++)
 	{
@@ -87,14 +87,60 @@ void GraphAdjMat::UpdateEdge(GraphNode node1, GraphNode node2, float value)
 	GraphAdjMat::GraphInfo[node1Index][node2Index] = value;
 }
 
+vector <GraphNode> GraphAdjMat::DFSNotRecur(GraphNode BeginNode)
+{
+	vector <GraphNode> result;
+	int Beginnum = -1;
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		if (BeginNode == GraphAdjMat::NodesInfo[i])
+		{
+			Beginnum = i;
+			break;
+		}
+	}
+	if (Beginnum == -1)
+		return result;
+
+	GraphAdjMat::Isvisited.clear();
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		GraphAdjMat::Isvisited.push_back(0);
+	}
+
+	vector <int> DFSindex;
+	GraphAdjMat::Isvisited[Beginnum] = 1;
+	stack <int> DFSstack;
+	DFSstack.push(Beginnum);
+	while (DFSstack.empty() == 0)
+	{
+		int popindex = DFSstack.top();
+		DFSindex.push_back(popindex);
+		DFSstack.pop();
+		for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+		{
+			if ((GraphAdjMat::GraphInfo[popindex][i] != BrokenEdge) && (GraphAdjMat::Isvisited[i] == 0))
+			{
+				DFSstack.push(i);
+				GraphAdjMat::Isvisited[i] = 1;
+			}
+		}
+	}
+
+	for (int i = 0; i < DFSindex.size(); i++)
+	{
+		result.push_back(GraphAdjMat::NodesInfo[DFSindex[i]]);
+	}
+	return result;
+}
 
 void DFSGraphAdjMat(vector <int> & isvisited,int & Num,const vector < vector <float> > & GraphInfo, vector <int> & DFSSequence)
 {
-	DFSSequence.push_back(Num);
 	isvisited[Num] = 1;
+	DFSSequence.push_back(Num);
 	for (int i = 0; i < isvisited.size(); i++)
 	{
-		if ((GraphInfo[Num][i] != BrokenEdge) && (isvisited[i] != 1))
+		if ((isvisited[i] != 1)&&(GraphInfo[Num][i] != BrokenEdge))
 		{
 			DFSGraphAdjMat(isvisited, i, GraphInfo, DFSSequence);
 		}
@@ -126,6 +172,50 @@ vector <GraphNode> GraphAdjMat::DFS(GraphNode BeginNode)
 	return result;
 }
 
+vector <GraphNode> GraphAdjMat::BFS(GraphNode BeginNode)
+{
+	vector <GraphNode> result;
+	int Beginnum = -1;
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		if (BeginNode == GraphAdjMat::NodesInfo[i])
+		{
+			Beginnum = i;
+			break;
+		}
+	}
+	if (Beginnum == -1)
+		return result;
+
+	GraphAdjMat::Isvisited.clear();
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		GraphAdjMat::Isvisited.push_back(0);
+	}
+
+	queue <int> Nodeindex;
+	Nodeindex.push(Beginnum);
+	GraphAdjMat::Isvisited[Beginnum] = 1;
+	vector <int> BFSindex;
+	while (Nodeindex.empty() == 0)
+	{
+		int popindex = Nodeindex.front();
+		BFSindex.push_back(popindex);
+		Nodeindex.pop();
+		for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+		{
+			if ((GraphAdjMat::GraphInfo[popindex][i] != BrokenEdge) && (GraphAdjMat::Isvisited[i] == 0))
+			{
+				Nodeindex.push(i);
+				GraphAdjMat::Isvisited[i] = 1;
+			}
+		}
+	}
+
+	for (int i = 0; i < BFSindex.size(); i++)
+		result.push_back(GraphAdjMat::NodesInfo[BFSindex[i]]);
+	return result;
+}
 
 
 //两种格式相互转换，对于表明是BrokenEdge的权值，就进行丢弃，不在邻接表中显示
