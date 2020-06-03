@@ -139,3 +139,8 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 
 ## 20200603
 实现领接表形式的遍历算法，修改领接表的元素结构为新的更广的地址，这样可以在实现遍历算法时减少复杂度。
+
+## 20200604 
+完成同样的BFS DFS，领接表形式更快。测试485个节点的图，取相同的一点进行遍历，有如下结果：
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/17.png)

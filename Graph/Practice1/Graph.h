@@ -58,7 +58,7 @@ public:
 
 struct info
 {
-	GraphAdjListNode * location; //点的位置
+	int locationindex; //点的位置
 	float Value; //相连的权值
 };
 struct GraphAdjListNode
@@ -79,7 +79,7 @@ public:
 	void InsertNode(GraphNode node);
 	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
 	vector <GraphNode> DFS(GraphNode BeginNode);//DFS递归遍历
-	vector <GraphAdjListNode> DFSNotRecur(GraphNode BeginNode);//DFS的非递归遍历
+	vector <GraphNode> DFSNotRecur(GraphNode BeginNode);//DFS的非递归遍历
 	void SearchVisualize(vector <GraphNode> sequence, float SquareSize); //对遍历结果进行可视化，加框
 	vector <GraphNode> BFS(GraphNode BeginNode);
 

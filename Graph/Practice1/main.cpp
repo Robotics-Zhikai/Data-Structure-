@@ -48,17 +48,32 @@ void Test_Graph()
 {
 	OpenGLplot();
 
+	clock_t start, end;
+
 	GraphAdjMat test;
-	test = RandomCreateGraphInAdjmat(85,0,10, 0, 10);
+	test = RandomCreateGraphInAdjmat(585,0,10, 0, 10);
 
 	GraphAdjList trans;
 	trans = TransferMat2List(test);
 	GraphAdjMat test1;
 	test1 = TransferList2Mat(trans);
 	int index = 10;
+
+	start = clock();
 	vector <Point> BFSSequence = test1.BFS(test1.NodesInfo[index]);
 	vector <Point> DFSSequence = test1.DFS(test1.NodesInfo[index]);
 	vector <Point> DFSNotRecurSequence = test1.DFSNotRecur(test1.NodesInfo[index]);
+	end = clock();
+	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "零阶矩阵存储形式用时" << endtime << "s" << endl;
+
+	start = clock();
+	vector <Point> BFSSequencelist = trans.BFS(test1.NodesInfo[index]);
+	vector <Point> DFSSequencelist = trans.DFS(test1.NodesInfo[index]);
+	vector <Point> DFSNotRecurSequencelist = trans.DFSNotRecur(test1.NodesInfo[index]);
+	end = clock();
+	endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "零阶表存储形式用时" << endtime << "s" << endl;
 
 
 	test1.MapVisualize(5.0f, 1.0f);
