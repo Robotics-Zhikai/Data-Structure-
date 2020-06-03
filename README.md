@@ -136,3 +136,6 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 实现mat格式的DFS递归非递归，BFS非递归遍历。测试时BFS、DFS、DFSNotrecur同时测试，用已经实现的空心框可视化函数对正确性进行检验，正常情况下所有遍历的最小连通子集里的所有节点都有三个框，见下图：
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/16.png)
+
+## 20200603
+实现领接表形式的遍历算法，修改领接表的元素结构为新的更广的地址，这样可以在实现遍历算法时减少复杂度。

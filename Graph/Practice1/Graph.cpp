@@ -240,7 +240,7 @@ GraphAdjList TransferMat2List(GraphAdjMat Mat)
 		{
 			if ((i != j)&&(Mat.GraphInfo[i][j]!= BrokenEdge))
 			{
-				tmpinfo.location = &(Result.List[j].ThisNode);
+				tmpinfo.location = &(Result.List[j]);
 				tmpinfo.Value = Mat.GraphInfo[i][j];
 				outtmp.push_back(tmpinfo);
 			}
@@ -257,7 +257,7 @@ GraphAdjList TransferMat2List(GraphAdjMat Mat)
 		{
 			if ((i != j) && (Mat.GraphInfo[j][i] != BrokenEdge))
 			{
-				tmpinfo.location = &(Result.List[j].ThisNode);
+				tmpinfo.location = &(Result.List[j]);
 				tmpinfo.Value = Mat.GraphInfo[j][i];
 				intmp.push_back(tmpinfo);
 			}
@@ -289,7 +289,7 @@ GraphAdjMat TransferList2Mat(GraphAdjList GraphList)
 		{
 			for (int k = 0; k < result.NodesInfo.size(); k++)
 			{
-				if (result.NodesInfo[k] == *(GraphList.List[i].out[j].location))
+				if (result.NodesInfo[k] == GraphList.List[i].out[j].location->ThisNode)
 				{
 					result.GraphInfo[i][k] = GraphList.List[i].out[j].Value;
 					break;
@@ -317,14 +317,14 @@ void GraphAdjList::MapVisualize(float NodeSize, float LineWeight)
 		{
 			vector <Point> tmpthis;
 			tmpthis.push_back(GraphAdjList::List[i].ThisNode);
-			tmpthis.push_back(*(GraphAdjList::List[i].out[j].location));//i指向j
+			tmpthis.push_back(GraphAdjList::List[i].out[j].location->ThisNode);//i指向j
 			AddBufferLinesArrows(tmpthis, LineWeight);
 		}
 
 		for (int j = 0; j < GraphAdjList::List[i].in.size(); j++)
 		{
 			vector <Point> tmpthis;
-			tmpthis.push_back(*(GraphAdjList::List[i].in[j].location));
+			tmpthis.push_back(GraphAdjList::List[i].in[j].location->ThisNode);
 			tmpthis.push_back(GraphAdjList::List[i].ThisNode);
 			AddBufferLinesArrows(tmpthis, LineWeight);
 		}
@@ -361,7 +361,7 @@ void GraphAdjList::UpdateEdge(GraphNode node1, GraphNode node2, float value)
 	int tmpnode2Index = -1;
 	for (int i = 0; i < GraphAdjList::List[node1Index].out.size(); i++)
 	{
-		if (node2 == *(GraphAdjList::List[node1Index].out[i].location))
+		if (node2 == GraphAdjList::List[node1Index].out[i].location->ThisNode)
 			tmpnode2Index = i;
 	}
 	if (tmpnode2Index == -1)
@@ -371,7 +371,7 @@ void GraphAdjList::UpdateEdge(GraphNode node1, GraphNode node2, float value)
 		else
 		{
 			info tmpinfo;
-			tmpinfo.location = &(GraphAdjList::List[node2Index].ThisNode);
+			tmpinfo.location = &(GraphAdjList::List[node2Index]);
 			tmpinfo.Value = value;
 			GraphAdjList::List[node1Index].out.push_back(tmpinfo);
 		}
@@ -382,3 +382,136 @@ void GraphAdjList::UpdateEdge(GraphNode node1, GraphNode node2, float value)
 	}
 }
 
+vector <GraphAdjListNode> GraphAdjList::DFSNotRecur(GraphNode BeginNode)
+{
+	vector <GraphAdjListNode> result;
+	int Beginnum = -1;
+	for (int i = 0; i < GraphAdjList::List.size(); i++)
+	{
+		if (BeginNode == GraphAdjList::List[i].ThisNode)
+		{
+			Beginnum = i;
+			break;
+		}
+	}
+	if (Beginnum == -1)
+		return result;
+
+	GraphAdjList::Isvisited.clear();
+	for (int i = 0; i < GraphAdjList::List.size(); i++)
+	{
+		GraphAdjList::Isvisited.push_back(0);
+	}
+
+	vector <int> DFSindex;
+	GraphAdjList::Isvisited[Beginnum] = 1;
+	stack <GraphAdjListNode> DFSstack;
+	DFSstack.push(GraphAdjList::List[Beginnum]);
+	while (DFSstack.empty() == 0)
+	{
+		int popindex = DFSstack.top();
+		DFSindex.push_back(popindex);
+		DFSstack.pop();
+
+
+
+
+		for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+		{
+			if ((GraphAdjMat::GraphInfo[popindex][i] != BrokenEdge) && (GraphAdjMat::Isvisited[i] == 0))
+			{
+				DFSstack.push(i);
+				GraphAdjMat::Isvisited[i] = 1;
+			}
+		}
+	}
+
+	for (int i = 0; i < DFSindex.size(); i++)
+	{
+		result.push_back(GraphAdjMat::NodesInfo[DFSindex[i]]);
+	}
+	return result;
+}
+
+void DFSGraphAdjList(vector <int> & isvisited, int & Num, const vector < vector <float> > & GraphInfo, vector <int> & DFSSequence)
+{
+	isvisited[Num] = 1;
+	DFSSequence.push_back(Num);
+	for (int i = 0; i < isvisited.size(); i++)
+	{
+		if ((isvisited[i] != 1) && (GraphInfo[Num][i] != BrokenEdge))
+		{
+			DFSGraphAdjMat(isvisited, i, GraphInfo, DFSSequence);
+		}
+	}
+}
+vector <GraphNode> GraphAdjList::DFS(GraphNode BeginNode)
+{
+	vector <int> DFSSequence;
+	vector <GraphNode> result;
+	DFSSequence.clear();
+	int BeginNum = 0;
+	for (BeginNum = 0; BeginNum < GraphAdjMat::NodesInfo.size(); BeginNum++)
+	{
+		if (GraphAdjMat::NodesInfo[BeginNum] == BeginNode)
+			break;
+	}
+	if (BeginNum >= GraphAdjMat::NodesInfo.size()) //判断不存在初始节点
+		return result;
+	GraphAdjMat::Isvisited.clear();
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		GraphAdjMat::Isvisited.push_back(0);
+	}
+	DFSGraphAdjMat(GraphAdjMat::Isvisited, BeginNum, GraphAdjMat::GraphInfo, DFSSequence);
+	for (int i = 0; i < DFSSequence.size(); i++)
+	{
+		result.push_back(GraphAdjMat::NodesInfo[DFSSequence[i]]);
+	}
+	return result;
+}
+
+vector <GraphNode> GraphAdjList::BFS(GraphNode BeginNode)
+{
+	vector <GraphNode> result;
+	int Beginnum = -1;
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		if (BeginNode == GraphAdjMat::NodesInfo[i])
+		{
+			Beginnum = i;
+			break;
+		}
+	}
+	if (Beginnum == -1)
+		return result;
+
+	GraphAdjMat::Isvisited.clear();
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		GraphAdjMat::Isvisited.push_back(0);
+	}
+
+	queue <int> Nodeindex;
+	Nodeindex.push(Beginnum);
+	GraphAdjMat::Isvisited[Beginnum] = 1;
+	vector <int> BFSindex;
+	while (Nodeindex.empty() == 0)
+	{
+		int popindex = Nodeindex.front();
+		BFSindex.push_back(popindex);
+		Nodeindex.pop();
+		for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+		{
+			if ((GraphAdjMat::GraphInfo[popindex][i] != BrokenEdge) && (GraphAdjMat::Isvisited[i] == 0))
+			{
+				Nodeindex.push(i);
+				GraphAdjMat::Isvisited[i] = 1;
+			}
+		}
+	}
+
+	for (int i = 0; i < BFSindex.size(); i++)
+		result.push_back(GraphAdjMat::NodesInfo[BFSindex[i]]);
+	return result;
+}
