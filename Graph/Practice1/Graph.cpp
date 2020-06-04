@@ -60,7 +60,42 @@ void GraphAdjMat::SearchVisualize(vector <GraphNode> sequence, float SquareSize)
 
 void GraphAdjMat::InsertNode(GraphNode node)
 {
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		if (node == GraphAdjMat::NodesInfo[i])
+		{
+			return;
+		}	
+	}
+
 	GraphAdjMat::NodesInfo.push_back(node);
+
+	vector <float> tmp;
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+		tmp.push_back(BrokenEdge);
+	GraphAdjMat::GraphInfo.push_back(tmp);
+}
+
+void GraphAdjMat::DeleteNode(GraphNode node)
+//»¹Î´²âÊÔ
+{
+	int record = -1;
+	for (int i = 0; i < GraphAdjMat::NodesInfo.size(); i++)
+	{
+		if (node == GraphAdjMat::NodesInfo[i])
+		{
+			record = i;
+			break;
+		}
+	}
+	if (record == -1)
+		return;
+	GraphAdjMat::NodesInfo.erase(GraphAdjMat::NodesInfo.begin() + record);
+	GraphAdjMat::GraphInfo.erase(GraphAdjMat::GraphInfo.begin() + record);
+	for (int i = 0; i < GraphAdjMat::GraphInfo.size(); i++)
+	{
+		GraphAdjMat::GraphInfo[i].erase(GraphAdjMat::GraphInfo[i].begin() + record);
+	}
 }
 
 void GraphAdjMat::UpdateEdge(GraphNode node1, GraphNode node2, float value)
@@ -338,6 +373,14 @@ void GraphAdjList::SearchVisualize(vector <GraphNode> sequence, float SquareSize
 
 void GraphAdjList::InsertNode(GraphNode node)
 {
+	for (int i = 0; i < GraphAdjList::List.size(); i++)
+	{
+		if (node == GraphAdjList::List[i].ThisNode)
+		{
+			return;
+		}
+	}
+
 	GraphAdjListNode tmp;
 	tmp.ThisNode = node;
 	GraphAdjList::List.push_back(tmp);
@@ -379,11 +422,40 @@ void GraphAdjList::UpdateEdge(GraphNode node1, GraphNode node2, float value)
 			tmpinfo.locationindex = node2Index;
 			tmpinfo.Value = value;
 			GraphAdjList::List[node1Index].out.push_back(tmpinfo);
+
+			tmpinfo.locationindex = node1Index;
+			tmpinfo.Value = value;
+			GraphAdjList::List[node2Index].in.push_back(tmpinfo);
 		}
 	}
 	else
 	{
-		GraphAdjList::List[node1Index].out[tmpnode2Index].Value = value;
+		if (value == BrokenEdge)
+		{
+			GraphAdjList::List[node1Index].out.erase(GraphAdjList::List[node1Index].out.begin() + tmpnode2Index);
+
+			for (int i = 0; i < GraphAdjList::List[node2Index].in.size(); i++)
+			{
+				if (GraphAdjList::List[node2Index].in[i].locationindex == GraphAdjList::List[node1Index].out[tmpnode2Index].locationindex)
+				{
+					GraphAdjList::List[node2Index].in.erase(GraphAdjList::List[node2Index].in.begin() + i);
+					break;
+				}
+			}
+		}
+		else
+		{
+			GraphAdjList::List[node1Index].out[tmpnode2Index].Value = value;
+
+			for (int i = 0; i < GraphAdjList::List[node2Index].in.size(); i++)
+			{
+				if (GraphAdjList::List[node2Index].in[i].locationindex == GraphAdjList::List[node1Index].out[tmpnode2Index].locationindex)
+				{
+					GraphAdjList::List[node2Index].in[i].Value = value;
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -520,4 +592,40 @@ vector <GraphNode> GraphAdjList::BFS(GraphNode BeginNode)
 	for (int i = 0; i < BFSindex.size(); i++)
 		result.push_back(GraphAdjList::List[BFSindex[i]].ThisNode);
 	return result;
+}
+
+void GraphAdjList::DeleteNode(GraphNode node)
+//»¹Î´²âÊÔ
+{
+	int record = -1;
+	for (int i = 0; i < GraphAdjList::List.size(); i++)
+	{
+		if (node == GraphAdjList::List[i].ThisNode)
+		{
+			record = i;
+			break;
+		}
+	}
+	if (record == -1)
+		return;
+
+	for (int i = 0; i < GraphAdjList::List[record].out.size(); i++)
+	{
+		for (int j = 0; j < GraphAdjList::List[GraphAdjList::List[record].out[i].locationindex].in.size(); j++)
+		{
+			if (GraphAdjList::List[GraphAdjList::List[record].out[i].locationindex].in[j].locationindex == GraphAdjList::List[record].out[i].locationindex)
+				GraphAdjList::List[GraphAdjList::List[record].out[i].locationindex].in.erase(GraphAdjList::List[GraphAdjList::List[record].out[i].locationindex].in.begin() + j);
+		}
+	}
+
+	for (int i = 0; i < GraphAdjList::List[record].in.size(); i++)
+	{
+		for (int j = 0; j < GraphAdjList::List[GraphAdjList::List[record].in[i].locationindex].out.size(); j++)
+		{
+			if (GraphAdjList::List[GraphAdjList::List[record].in[i].locationindex].out[j].locationindex == GraphAdjList::List[record].in[i].locationindex)
+				GraphAdjList::List[GraphAdjList::List[record].in[i].locationindex].out.erase(GraphAdjList::List[GraphAdjList::List[record].in[i].locationindex].out.begin() + j);
+		}
+	}
+
+	GraphAdjList::List.erase(GraphAdjList::List.begin() + record);
 }

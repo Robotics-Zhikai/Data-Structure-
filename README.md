@@ -144,3 +144,5 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 完成同样的BFS DFS，领接表形式更快。测试485个节点的图，取相同的一点进行遍历，有如下结果：
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/17.png)
+
+更新update value函数，更新insert node 函数，添加deletenode函数 用到了容器的erase函数

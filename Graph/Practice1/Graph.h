@@ -28,6 +28,7 @@ public:
 		 
 	void MapVisualize(float NodeSize, float LineWeight);
 	void InsertNode(GraphNode node);
+	void DeleteNode(GraphNode node);
 	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
 	vector <GraphNode> DFS(GraphNode BeginNode);//DFS递归遍历
 	vector <GraphNode> DFSNotRecur(GraphNode BeginNode);//DFS的非递归遍历
@@ -77,6 +78,7 @@ public:
 
 	void MapVisualize(float NodeSize, float LineWeight);
 	void InsertNode(GraphNode node);
+	void DeleteNode(GraphNode node);
 	void UpdateEdge(GraphNode node1, GraphNode node2, float value);//更新有向边，权值为value
 	vector <GraphNode> DFS(GraphNode BeginNode);//DFS递归遍历
 	vector <GraphNode> DFSNotRecur(GraphNode BeginNode);//DFS的非递归遍历
