@@ -145,4 +145,4 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 
 ![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/17.png)
 
-更新update value函数，更新insert node 函数，添加deletenode函数 用到了容器的erase函数
+更新update value函数，更新insert node 函数，添加deletenode函数 用到了容器的erase函数。
