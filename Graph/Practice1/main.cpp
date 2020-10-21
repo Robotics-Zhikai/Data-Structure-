@@ -1,5 +1,6 @@
 #include "Visualization.h"
 #include "Graph.h"
+#include "ConvexHull.h"
 
 void Test_GetConvexHull_GS()//GrahamScanÀ„∑®
 {
@@ -51,7 +52,7 @@ void Test_Graph()
 	clock_t start, end;
 
 	GraphAdjMat test;
-	test = RandomCreateGraphInAdjmat(585,0,10, 0, 10);
+	test = RandomCreateGraphInAdjmat(485,0,10, 0, 10);
 
 	GraphAdjList trans;
 	trans = TransferMat2List(test);

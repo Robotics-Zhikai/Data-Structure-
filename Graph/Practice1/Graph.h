@@ -5,6 +5,9 @@
 #include <queue>
 #include <stack>
 #include <algorithm>
+#include <iostream>
+#include "ConvexHull.h"
+using namespace std;
 
 //在这里可以定义当认为不是边时的权值
 #define BrokenEdge 0

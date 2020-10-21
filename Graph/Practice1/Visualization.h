@@ -6,7 +6,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <vector>
-#include "ConvexHull.h"
+#include "CustomizeDataType.h"
+
 using namespace std;
 
 #define PI 3.14159265
@@ -36,7 +37,11 @@ void CloseGLplot();
 
 void AddBufferPoints(vector<Point> Points, float sizepoint);
 void AddBufferSequenceLine(vector<Point> Points, float LineWidth);
-void AddBufferLinesArrows(vector<Point> Points, float LineWidth);
+
+void AddBufferLinesArrows(Segment seg, float LineWidth);
+void AddBufferLinesArrows(vector<Point> seg, float LineWidth);
+
 void AddBufferHollowSquare(vector<Point> Points, float SquareSize);
+void AddBufferSegment(Segment seg, float LineWidth);
 
 #endif
