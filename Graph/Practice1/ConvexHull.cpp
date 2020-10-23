@@ -1942,3 +1942,5 @@ vector <Point> GetCHDivideMerge(vector <Point> Points)
 	//return DivideAndMergeCH(Points, 0, Points.size() - 1);//这个还需要有时间有机会重新思考
 	return DivideAndMergeCHNew(Points, 0, Points.size() - 1);//暂时先用这个简化版的能大体看出思路的方法来做
 }
+
+//测试同步更新1023

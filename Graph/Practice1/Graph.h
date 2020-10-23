@@ -163,5 +163,3 @@ GraphAdjMat RandomCreateGraphInAdjmat(int NumOfNodes, float RangeXmin, float Ran
 
 
 #endif 
-
-

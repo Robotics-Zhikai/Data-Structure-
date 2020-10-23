@@ -479,3 +479,5 @@ void AddBufferSegment(Segment seg, float LineWidth)
 		GLplotSegmentType.push_back(numplotLineType);
 	}
 }
+
+//测试同步更新1023
