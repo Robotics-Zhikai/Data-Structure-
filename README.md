@@ -152,3 +152,10 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 
 ## 20201022
 开始继续维护这个仓库，修改了普遍采用的函数的兼容性问题。
+
+## 20201023
+主要基于邻接表的数据结构，实现了图的Dijkstra算法和路径的可视化，连通性、出入度的计算、最短路径的计算等。开始着手要写basic-wheel的更新脚本，涉及到文件的树状遍历。
+
+某一节点到某一节点的最短路径的可视化：
+
+![image](https://github.com/Robotics-Zhikai/Data-Structure-/blob/master/image/18.png)

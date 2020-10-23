@@ -52,13 +52,13 @@ void Test_Graph()
 	clock_t start, end;
 
 	GraphAdjMat test;
-	test = RandomCreateGraphInAdjmat(485,0,10, 0, 10);
+	test = RandomCreateGraphInAdjmat(65,0,10, 0, 10);
 
 	GraphAdjList trans;
 	trans = TransferMat2List(test);
 	GraphAdjMat test1;
 	test1 = TransferList2Mat(trans);
-	int index = 10;
+	int index = 0;
 
 	start = clock();
 	vector <Point> BFSSequence = test1.BFS(test1.NodesInfo[index]);
@@ -66,7 +66,7 @@ void Test_Graph()
 	vector <Point> DFSNotRecurSequence = test1.DFSNotRecur(test1.NodesInfo[index]);
 	end = clock();
 	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
-	cout << "零阶矩阵存储形式用时" << endtime << "s" << endl;
+	cout << "邻接矩阵存储形式用时" << endtime << "s" << endl;
 
 	start = clock();
 	vector <Point> BFSSequencelist = trans.BFS(test1.NodesInfo[index]);
@@ -74,19 +74,38 @@ void Test_Graph()
 	vector <Point> DFSNotRecurSequencelist = trans.DFSNotRecur(test1.NodesInfo[index]);
 	end = clock();
 	endtime = (double)(end - start) / CLOCKS_PER_SEC;
-	cout << "零阶表存储形式用时" << endtime << "s" << endl;
+	cout << "邻接表存储形式用时" << endtime << "s" << endl;
+
+	///////////////////////////////////////////////////////////////
+	//进行算法的实验
+	float pathdist;
+	vector <GraphNode> Path = trans.FindShortestPath(trans.List[0].ThisNode, trans.List[20].ThisNode, pathdist);
+
+
+
+
+
+
 
 
 	test1.MapVisualize(5.0f, 1.0f);
 
-	test1.SearchVisualize(BFSSequence, 0.03);
-	test1.SearchVisualize(DFSSequence, 0.05);
-	test1.SearchVisualize(DFSNotRecurSequence, 0.07);
+	//test1.SearchVisualize(BFSSequence, 0.03);
+	//test1.SearchVisualize(DFSSequence, 0.05);
+	//test1.SearchVisualize(DFSNotRecurSequence, 0.07);
+
+	trans.PathVisualize(Path, 0.04, 5);
+
+	//trans.SearchVisualize(BFSSequencelist, 0.09);
+	//trans.SearchVisualize(DFSSequencelist, 0.11);
+	//trans.SearchVisualize(DFSNotRecurSequencelist, 0.13);
+
 	
 	//trans.Visualize(5.0f, 1.0f);
 	//test1.Visualize(5.0f, 1.0f);
 	CloseGLplot();
 }
+
 void main()
 {
 	

@@ -1,6 +1,6 @@
 #ifndef CUSTOMIZEDATATYPE_H
 #define CUSTOMIZEDATATYPE_H
-//定制化数据
+//定制化数据 
 
 #include <math.h>
 #include <vector>
