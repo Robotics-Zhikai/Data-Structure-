@@ -5,7 +5,7 @@ vector<Point> GenerateRandomPoint(int pointsNum, float RangeXmin, float RangeXma
 {
 	vector<Point> Points;
 	//srand((int)time(0));  // 产生随机种子  把0换成NULL也行
-	srand(0);
+	//srand(0);
 	for (int i = 0; i < pointsNum; i++)
 	{
 		Point Pointtemp;

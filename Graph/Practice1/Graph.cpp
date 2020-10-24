@@ -252,10 +252,6 @@ vector <GraphNode> GraphAdjMat::BFS(GraphNode BeginNode)
 	return result;
 }
 
-
-
-
-
 //两种格式相互转换，对于表明是BrokenEdge的权值，就进行丢弃，不在邻接表中显示
 GraphAdjList TransferMat2List(GraphAdjMat Mat)
 //将邻接矩阵的格式转化为邻接表的格式
@@ -302,6 +298,8 @@ GraphAdjList TransferMat2List(GraphAdjMat Mat)
 		}
 		Result.List[i].in = intmp;
 	}
+	Result.updateEdgeNum(Result.CountEdgesNum());
+	Result.updateNodeNum(Result.CountNodesNum());
 	return Result;
 }
 
@@ -338,10 +336,63 @@ GraphAdjMat TransferList2Mat(GraphAdjList GraphList)
 	return result;
 }
 
+int GraphAdjList::CountEdgesNum()
+{
+	int Count = 0;
+	for (int i = 0; i < GraphAdjList::List.size(); i++)
+	{
+		Count += List[i].out.size();
+	}
+	return Count;
+}
+
+int GraphAdjList::CountNodesNum()
+{
+	return GraphAdjList::List.size();
+}
+
+float GraphAdjList::RandomGenerateEdgeValue(float lower, float upper)
+{
+	if (lower == upper && upper == BrokenEdge)
+		return BrokenEdge + 1; //随便生成一个不是brokenedge的边
+
+	float GeneratedValue = BrokenEdge;
+	while (GeneratedValue == BrokenEdge)
+	{
+		GeneratedValue = RandGenerateFLOAT_a2b(lower, upper);
+	}
+	return GeneratedValue;
+}
 
 void GraphAdjList::RandomGenerateGraph(int NumOfNodes, int NumOfEdges, float RangeXmin, float RangeXmax, float RangeYmin, float RangeYmax)
 {
+	if (NumOfEdges > NumOfNodes*(NumOfNodes - 1))
+		NumOfEdges = NumOfNodes*(NumOfNodes - 1);
 	//20201023写在这里了
+	GraphAdjList::NodeNum = 0;
+	GraphAdjList::EdgeNum = 0;
+		
+	while (GraphAdjList::NodeNum != NumOfNodes)
+	{
+		vector<GraphNode> Point = GenerateRandomPoint(1, RangeXmin, RangeXmax, RangeYmin, RangeYmax);
+		GraphAdjList::InsertNode(Point[0]);
+	}
+	
+	if (NumOfNodes == 1)
+		return;
+
+	while (GraphAdjList::EdgeNum != NumOfEdges)
+	{
+		int randbegin = 0;
+		int randend = 0;
+		while (randbegin == randend)
+		{
+			randbegin = RandGenerateINT_a2b(0, NumOfNodes - 1);
+			randend = RandGenerateINT_a2b(0, NumOfNodes - 1);
+		}
+		float randedge = GraphAdjList::RandomGenerateEdgeValue(0, 12);
+		GraphAdjList::UpdateEdge(randbegin, randend, randedge);
+	}
 }
 
 void GraphAdjList::MapVisualize(float NodeSize, float LineWeight)
@@ -402,6 +453,7 @@ void GraphAdjList::InsertNode(GraphNode node)
 	GraphAdjListNode tmp;
 	tmp.ThisNode = node;
 	GraphAdjList::List.push_back(tmp);
+	GraphAdjList::NodeNum++;
 }
 
 void GraphAdjList::UpdateEdge(GraphNode node1, GraphNode node2, float value)
@@ -443,7 +495,7 @@ void GraphAdjList::UpdateEdge(int node1Index, int node2Index, float value)
 		{
 			if (value == BrokenEdge)
 				return;
-			else
+			else // 没有边加了一个边
 			{
 				info tmpinfo;
 				tmpinfo.locationindex = node2Index;
@@ -453,11 +505,13 @@ void GraphAdjList::UpdateEdge(int node1Index, int node2Index, float value)
 				tmpinfo.locationindex = node1Index;
 				tmpinfo.Value = value;
 				GraphAdjList::List[node2Index].in.push_back(tmpinfo);
+
+				GraphAdjList::EdgeNum++;
 			}
 		}
 		else
 		{
-			if (value == BrokenEdge)
+			if (value == BrokenEdge) //有边然后删了一个边
 			{
 				GraphAdjList::List[node1Index].out.erase(GraphAdjList::List[node1Index].out.begin() + tmpnode2Index);
 
@@ -469,8 +523,10 @@ void GraphAdjList::UpdateEdge(int node1Index, int node2Index, float value)
 						break;
 					}
 				}
+
+				GraphAdjList::EdgeNum--;
 			}
-			else //如果发现两个节点没有边，那么就增加边并更新权值
+			else //发现两个节点有边，更新权值
 			{
 				GraphAdjList::List[node1Index].out[tmpnode2Index].Value = value;
 
@@ -703,6 +759,7 @@ void GraphAdjList::DeleteNode(GraphNode node)
 	}
 
 	GraphAdjList::List.erase(GraphAdjList::List.begin() + record);
+	GraphAdjList::NodeNum--;
 }
 
 float GraphAdjList::GetConnectEdgeValue(GraphNode Node1, GraphNode Node2)
@@ -722,6 +779,96 @@ float GraphAdjList::GetConnectEdgeValue(int Node1index, int Node2index)
 	}
 	else
 		return BrokenEdge;
+}
+
+vector <int> GetPathFromFloydResultRecur(const MatrixXd & PathMat, int beginindex, int endindex)
+{
+	vector<int> subPath1,subPath2;
+	if (beginindex == endindex)
+	{
+		subPath1.push_back(beginindex);
+		return subPath1;
+	}
+	else if (PathMat(beginindex, endindex) == beginindex) //说明二者可以直达
+	{
+		subPath1.push_back(beginindex);
+		subPath1.push_back(endindex);
+		return subPath1;
+	}
+	else if (PathMat(beginindex, endindex) == -1 || beginindex==-1 || endindex == -1) //说明二者之间没有可达路径
+	{
+		return subPath1;
+	}
+
+	subPath1 = GetPathFromFloydResultRecur(PathMat,beginindex, PathMat(beginindex,endindex));
+	subPath2 = GetPathFromFloydResultRecur(PathMat, PathMat(beginindex, endindex), endindex);
+	for (int i = 0; i < subPath2.size(); i++)
+	{
+		subPath1.push_back(subPath2[i]);
+	}//这个是带有重复点的，需要去除重复点
+	return subPath1;
+}
+
+vector <int> GraphAdjList::GetPathFromFloydResult(const MatrixXd & PathMat, int beginindex, int endindex)
+{
+	vector <int> Path = GetPathFromFloydResultRecur(PathMat, beginindex, endindex);
+	vector <int> result;
+
+	if (Path.size() >= 1)
+		result.push_back(Path[0]);
+	for (int i = 1; i < Path.size(); i++)
+	{
+		//这个1026开始写吧
+	}
+}
+
+vector <MatrixXd> GraphAdjList::Floyd()
+//多源最短路径问题，用的是动态规划
+{
+	int n = GraphAdjList::List.size();
+	vector <MatrixXd> result;
+
+	MatrixXd DistMat(n,n);
+	MatrixXd PathMat(n,n);
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			DistMat(i, j) = PositiveInfEdgeValue;
+			PathMat(i, j) = -1;
+		}
+	}
+	for (int i = 0; i < n; i++)
+	{
+		DistMat(i, i) = 0;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < GraphAdjList::GetOutDegree(i); j++)
+		{
+			DistMat(i, GraphAdjList::List[i].out[j].locationindex) = GraphAdjList::List[i].out[j].Value;
+			PathMat(i, GraphAdjList::List[i].out[j].locationindex) = i;
+			//当可以直连时，中间点就为端点本身
+		}
+	}
+
+	for (int k = 0; k < n; k++)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (DistMat(i, k) + DistMat(k, j) < DistMat(i, j))
+				{
+					DistMat(i, j) = DistMat(i, k) + DistMat(k, j);
+					PathMat(i, j) = k;
+				}
+			}
+		}
+	}
+	result.push_back(DistMat);
+	result.push_back(PathMat);
+	return result;
 }
 
 MatrixXd GraphAdjList::Dijkstra(GraphNode BeginNode)

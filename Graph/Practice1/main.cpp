@@ -54,8 +54,11 @@ void Test_Graph()
 	GraphAdjMat test;
 	test = RandomCreateGraphInAdjmat(65,0,10, 0, 10);
 
+
+
 	GraphAdjList trans;
-	trans = TransferMat2List(test);
+	trans.RandomGenerateGraph(165, 180, 0, 10, 0, 10);
+	//trans = TransferMat2List(test);
 	GraphAdjMat test1;
 	test1 = TransferList2Mat(trans);
 	int index = 0;
@@ -79,7 +82,7 @@ void Test_Graph()
 	///////////////////////////////////////////////////////////////
 	//进行算法的实验
 	float pathdist;
-	vector <GraphNode> Path = trans.FindShortestPath(trans.List[0].ThisNode, trans.List[20].ThisNode, pathdist);
+	vector <GraphNode> Path = trans.FindShortestPath(trans.List[0].ThisNode, (*(trans.List.end()-1)).ThisNode, pathdist);
 
 
 
@@ -108,7 +111,20 @@ void Test_Graph()
 
 void main()
 {
-	
+	vector<int> test1;
+	vector<int> test2;
+
+	test1.push_back(0);
+	test1.push_back(1);
+
+	test2.push_back(0);
+	test2.push_back(1);
+	test2.push_back(2);
+	test2.push_back(3);
+
+	test1 = test2;
+
+	test2.push_back(100);
 	//Test_GetConvexHull_GS();
 	Test_Graph();
 }

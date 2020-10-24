@@ -85,6 +85,7 @@ public:
 	vector <int> Isvisited; //储存是否访问过某一节点
 
 	void RandomGenerateGraph(int NumOfNodes,int NumOfEdges, float RangeXmin, float RangeXmax, float RangeYmin, float RangeYmax);
+	float RandomGenerateEdgeValue(float lower,float upper);
 
 	void MapVisualize(float NodeSize, float LineWeight);
 	void PathVisualize(vector <GraphNode> Path,float SquareSize, float PathEdgeSize); //可视化路径
@@ -107,6 +108,8 @@ public:
 	vector <GraphNode> BFS(GraphNode BeginNode);
 	vector <int> BFS(int BeginIndex);
 
+	vector <int> GetPathFromFloydResult(const MatrixXd & PathMat,int beginindex,int endindex);//从Floyd算法得到的结果返回任意两点之间的最短路径序列
+	vector <MatrixXd> Floyd();//多源最短路径算法 得到非负图的任意两节点之间的最短路径 [DistMat,PathMat]
 	MatrixXd Dijkstra(GraphNode BeginNode);
 	MatrixXd Dijkstra(int BeginIndex);
 
@@ -125,12 +128,46 @@ public:
 	int GetOutDegree(int NodeIndex); //得到节点Node的出度
 	int GetInDegree(int NodeIndex); //得到节点Node的入度
 
+	int CountEdgesNum();
+	int CountNodesNum();
+
+	int readNodeNum()
+	{
+		return NodeNum;
+	}
+	int readEdgeNum()
+	{
+		return EdgeNum;
+	}
+	void updateNodeNum(int num)
+	{
+		if (num < 0)
+			num = 0;
+		NodeNum = num;
+	}
+	void updateEdgeNum(int num)
+	{
+		if (num < 0)
+			num = 0;
+		EdgeNum = num;
+	}
+
 	GraphAdjList()
 	{
 		for (int i = 0; i < List.size(); i++)
 		{
 			Isvisited.push_back(0);
 		}
+		NodeNum = 0;
+		EdgeNum = 0;
+	}
+
+	void operator = (GraphAdjList test)
+	{
+		this->List = test.List;
+		this->Isvisited = test.Isvisited;
+		this->EdgeNum = test.readEdgeNum();
+		this->NodeNum = test.readNodeNum();
 	}
 
 
@@ -146,7 +183,8 @@ public:
 	//	this->operator=(result);
 	//}
 private:
-	
+	int NodeNum; // 储存图中有多少节点 这个变量需要保证仅有个别函数能够调用更新
+	int EdgeNum; // 储存图中有多少边 这个变量需要保证仅有个别函数能够调用更新
 };
 
 GraphAdjMat RandomCreateGraphInAdjmat(int NumOfNodes, float RangeXmin, float RangeXmax, float RangeYmin, float RangeYmax);

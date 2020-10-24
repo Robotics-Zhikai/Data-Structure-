@@ -172,6 +172,8 @@ private:
 	Point R;
 };
 
+int RandGenerateINT_a2b(int a, int b); //生成[a,b]的随机整数
+float RandGenerateFLOAT_a2b(float a, float b); // 生成[a,b]的随机浮点数
 
 
 #endif
