@@ -786,12 +786,12 @@ vector <int> GetPathFromFloydResultRecur(const MatrixXd & PathMat, int begininde
 	vector<int> subPath1,subPath2;
 	if (beginindex == endindex)
 	{
-		subPath1.push_back(beginindex);
+		//subPath1.push_back(beginindex);
 		return subPath1;
 	}
 	else if (PathMat(beginindex, endindex) == beginindex) //说明二者可以直达
 	{
-		subPath1.push_back(beginindex);
+		//subPath1.push_back(beginindex);
 		subPath1.push_back(endindex);
 		return subPath1;
 	}
@@ -805,21 +805,22 @@ vector <int> GetPathFromFloydResultRecur(const MatrixXd & PathMat, int begininde
 	for (int i = 0; i < subPath2.size(); i++)
 	{
 		subPath1.push_back(subPath2[i]);
-	}//这个是带有重复点的，需要去除重复点
+	}//这个应该是没有重复点的，出去之后把一开始的点加入就行
 	return subPath1;
 }
 
 vector <int> GraphAdjList::GetPathFromFloydResult(const MatrixXd & PathMat, int beginindex, int endindex)
 {
-	vector <int> Path = GetPathFromFloydResultRecur(PathMat, beginindex, endindex);
 	vector <int> result;
+	if (beginindex <0 || endindex <0) //说明索引出错，没有对应的索引
+		return result;
+	vector <int> Path = GetPathFromFloydResultRecur(PathMat, beginindex, endindex);
+	
+	result.push_back(beginindex);
+	for (int i = 0; i < Path.size(); i++)
+		result.push_back(Path[i]);
 
-	if (Path.size() >= 1)
-		result.push_back(Path[0]);
-	for (int i = 1; i < Path.size(); i++)
-	{
-		//这个1026开始写吧
-	}
+	return result;
 }
 
 vector <MatrixXd> GraphAdjList::Floyd()
@@ -901,7 +902,7 @@ MatrixXd GraphAdjList::Dijkstra(int BeginIndex)
 		DistMatrix(0, GraphAdjList::List[BeginIndex].out[i].locationindex) = GraphAdjList::List[BeginIndex].out[i].Value;
 		DistMatrix(1, GraphAdjList::List[BeginIndex].out[i].locationindex) = BeginIndex;
 	}
-
+	
 	int CurrentIndex = BeginIndex;
 	GraphAdjList::Isvisited[CurrentIndex] = 1;
 	while (1)
@@ -939,12 +940,145 @@ MatrixXd GraphAdjList::Dijkstra(int BeginIndex)
 	return DistMatrix;
 }
 
+MatrixXd GraphAdjList::DijkstraHeap(int BeginIndex)
+{
+	GraphAdjList::ResetIsvisited(0);
+	MatrixXd DistMatrix(2, GraphAdjList::List.size());
+	for (int i = 0; i < GraphAdjList::List.size(); i++)
+	{
+		if (i == BeginIndex)
+		{
+			DistMatrix(0, i) = 0;
+			DistMatrix(1, i) = -1;
+		}
+		else
+		{
+			DistMatrix(0, i) = PositiveInfEdgeValue;
+			DistMatrix(1, i) = -2; //不知道前继节点索引是多少
+								   //也就是说当前继没有节点时值为-2
+		}
+	}
+	for (int i = 0; i < GraphAdjList::GetOutDegree(BeginIndex); i++)
+	{
+		DistMatrix(0, GraphAdjList::List[BeginIndex].out[i].locationindex) = GraphAdjList::List[BeginIndex].out[i].Value;
+		DistMatrix(1, GraphAdjList::List[BeginIndex].out[i].locationindex) = BeginIndex;
+	}
+
+	class Nodedist
+	{
+	public:
+		float value;
+		int lastindex;
+
+		Nodedist(float value1,int lastindex1)
+		{
+			this->value = value1;
+			this->lastindex = lastindex1;
+		}
+		Nodedist()
+		{
+		}
+		bool operator < (Nodedist test)
+		{
+			if (this->value < test.value)
+				return 1;
+			else
+				return 0;
+		}
+		bool operator > (Nodedist test)
+		{
+			if (this->value > test.value)
+				return 1;
+			else
+				return 0;
+		}
+		bool operator == (Nodedist test)
+		{
+			if (this->value == test.value)
+				return 1;
+			else
+				return 0;
+		}
+		bool operator >= (Nodedist test)
+		{
+			return !(operator < (test));
+		}
+		bool operator <= (Nodedist test)
+		{
+			return !(operator > (test));
+		}
+		bool operator != (Nodedist test)
+		{
+			return !(operator == (test));
+		}
+
+	};
+
+	vector<Nodedist> Distseq;
+	for (int i = 0; i < DistMatrix.cols(); i++)
+	{
+		Nodedist tmpnode(DistMatrix(0, i), DistMatrix(1,i));
+		Distseq.push_back(tmpnode);
+	}
+	HeapOperate<Nodedist> HeapDistseq(2,Distseq.size()); //声明为最小堆
+	HeapDistseq.inputSeqData2heap(Distseq); //将线性序列的Distseq转化为最小堆
+	
+	int CurrentIndex = BeginIndex;
+	GraphAdjList::Isvisited[CurrentIndex] = 1;
+
+	HeapDistseq.erase_origin_node(CurrentIndex);//只要isvisited置1一个，就删除对应的节点
+
+	while (1)
+	{
+		
+		
+		float min = PositiveInfEdgeValue;
+		int LocateMin = -1;
+		for (int i = 0; i < DistMatrix.cols(); i++)
+		{
+			if (GraphAdjList::Isvisited[i] == 0)
+			{
+				if (DistMatrix(0, i) < min)
+				{
+					min = DistMatrix(0, i);
+					LocateMin = i;
+				}
+			}
+		}
+		if (LocateMin == -1)//此时说明没有访问过的节点与begin的距离都是PositiveInfEdgeValue;要不所有节点全部都访问过了
+			break;
+
+		CurrentIndex = LocateMin;
+		GraphAdjList::Isvisited[CurrentIndex] = 1;
+		for (int i = 0; i < GraphAdjList::GetOutDegree(CurrentIndex); i++)
+		{
+			int IndexNode = GraphAdjList::List[CurrentIndex].out[i].locationindex;
+			float NewValue = DistMatrix(0, CurrentIndex) + GraphAdjList::List[CurrentIndex].out[i].Value;
+			if (DistMatrix(0, IndexNode) > NewValue)
+			{
+				DistMatrix(0, IndexNode) = NewValue;
+				DistMatrix(1, IndexNode) = CurrentIndex;
+			}
+		}
+	}
+
+	return DistMatrix;
+}
+
 vector<int> GraphAdjList::FindShortestPath(int BeginIndex, int EndIndex,float & PathDist)
 //值得指出的是，不能利用PathDist是否等于Inf来判断Begin到End是否有通路，因为完全有可能通路存在但是权值累积和大于定义的inf
 {
+	vector <int> Path;
+
+	if (BeginIndex == EndIndex)
+	{
+		Path.push_back(BeginIndex);
+		return Path;
+	}
+
 	MatrixXd Distmat = GraphAdjList::Dijkstra(BeginIndex);
 	PathDist = Distmat(0, EndIndex);
-	vector <int> Path;
+	
 	vector <int> InversePath;
 	
 	int CurrentIndex = Distmat(1,EndIndex);

@@ -8,6 +8,7 @@
 #include <iostream>
 #include "ConvexHull.h"
 #include <Eigen/Dense>
+#include "Heap.h"
 
 using namespace Eigen;
 using namespace std;
@@ -112,6 +113,7 @@ public:
 	vector <MatrixXd> Floyd();//多源最短路径算法 得到非负图的任意两节点之间的最短路径 [DistMat,PathMat]
 	MatrixXd Dijkstra(GraphNode BeginNode);
 	MatrixXd Dijkstra(int BeginIndex);
+	MatrixXd DijkstraHeap(int BeginIndex); //用堆的形式优化Dijkstra算法
 
 	bool IsConnectPath(int Beginindex, int Endindex);//从beginindex到endindex是否有一条可连通的路,这条路不一定是最短路
 	vector<int> FindShortestPath(int BeginIndex, int EndIndex, float & PathDist);

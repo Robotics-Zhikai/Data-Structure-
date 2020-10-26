@@ -57,7 +57,7 @@ void Test_Graph()
 
 
 	GraphAdjList trans;
-	trans.RandomGenerateGraph(165, 180, 0, 10, 0, 10);
+	trans.RandomGenerateGraph(65, 180, 0, 10, 0, 10);
 	//trans = TransferMat2List(test);
 	GraphAdjMat test1;
 	test1 = TransferList2Mat(trans);
@@ -81,10 +81,17 @@ void Test_Graph()
 
 	///////////////////////////////////////////////////////////////
 	//进行算法的实验
+	int beginindex = 10;
+	int endindex = 10;
 	float pathdist;
+	vector<int> Pathint;
 	vector <GraphNode> Path = trans.FindShortestPath(trans.List[0].ThisNode, (*(trans.List.end()-1)).ThisNode, pathdist);
+	Pathint = trans.FindShortestPath(beginindex, endindex, pathdist);
 
+	vector<MatrixXd> tmp = trans.Floyd();
+	vector <int> Paththis = trans.GetPathFromFloydResult(tmp[1], beginindex, endindex);
 
+	trans.DijkstraHeap(beginindex);
 
 
 
@@ -111,6 +118,7 @@ void Test_Graph()
 
 void main()
 {
+	//vector<vector<int>> IndexBeforAfter(2);
 	vector<int> test1;
 	vector<int> test2;
 
