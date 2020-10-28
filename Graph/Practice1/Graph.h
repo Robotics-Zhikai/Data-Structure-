@@ -113,11 +113,12 @@ public:
 	vector <MatrixXd> Floyd();//多源最短路径算法 得到非负图的任意两节点之间的最短路径 [DistMat,PathMat]
 	MatrixXd Dijkstra(GraphNode BeginNode);
 	MatrixXd Dijkstra(int BeginIndex);
-	MatrixXd DijkstraHeap(int BeginIndex); //用堆的形式优化Dijkstra算法
+	MatrixXd DijkstraHeap(int BeginIndex); //用堆的形式优化Dijkstra算法 但是没有看到堆具有更好的效果，可能是稀疏图不太好找到通路
 
 	bool IsConnectPath(int Beginindex, int Endindex);//从beginindex到endindex是否有一条可连通的路,这条路不一定是最短路
 	vector<int> FindShortestPath(int BeginIndex, int EndIndex, float & PathDist);
 	//得到从起始索引到终止索引的最短路径，并返回PathDist即经历的路径的权重和
+	vector<int> FindShortestPathHeap(int BeginIndex, int EndIndex, float & PathDist);//对上边最短路径求解进行堆优化
 	vector<GraphNode> FindShortestPath(GraphNode BeginNode, GraphNode EndNode, float & PathDist);
 
 	int IsNodeInMap(GraphNode Node); //判断Node是否在实例化的图里，不管图全连通与否

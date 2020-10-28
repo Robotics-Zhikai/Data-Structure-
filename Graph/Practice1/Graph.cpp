@@ -940,6 +940,56 @@ MatrixXd GraphAdjList::Dijkstra(int BeginIndex)
 	return DistMatrix;
 }
 
+class Nodedist
+{
+public:
+	float value;
+	int lastindex;
+
+	Nodedist(float value1, int lastindex1)
+	{
+		this->value = value1;
+		this->lastindex = lastindex1;
+	}
+	Nodedist()
+	{
+	}
+	bool operator < (Nodedist test)
+	{
+		if (this->value < test.value)
+			return 1;
+		else
+			return 0;
+	}
+	bool operator > (Nodedist test)
+	{
+		if (this->value > test.value)
+			return 1;
+		else
+			return 0;
+	}
+	bool operator == (Nodedist test)
+	{
+		if (this->value == test.value)
+			return 1;
+		else
+			return 0;
+	}
+	bool operator >= (Nodedist test)
+	{
+		return !(operator < (test));
+	}
+	bool operator <= (Nodedist test)
+	{
+		return !(operator > (test));
+	}
+	bool operator != (Nodedist test)
+	{
+		return !(operator == (test));
+	}
+
+};
+
 MatrixXd GraphAdjList::DijkstraHeap(int BeginIndex)
 {
 	GraphAdjList::ResetIsvisited(0);
@@ -964,56 +1014,7 @@ MatrixXd GraphAdjList::DijkstraHeap(int BeginIndex)
 		DistMatrix(1, GraphAdjList::List[BeginIndex].out[i].locationindex) = BeginIndex;
 	}
 
-	class Nodedist
-	{
-	public:
-		float value;
-		int lastindex;
-
-		Nodedist(float value1,int lastindex1)
-		{
-			this->value = value1;
-			this->lastindex = lastindex1;
-		}
-		Nodedist()
-		{
-		}
-		bool operator < (Nodedist test)
-		{
-			if (this->value < test.value)
-				return 1;
-			else
-				return 0;
-		}
-		bool operator > (Nodedist test)
-		{
-			if (this->value > test.value)
-				return 1;
-			else
-				return 0;
-		}
-		bool operator == (Nodedist test)
-		{
-			if (this->value == test.value)
-				return 1;
-			else
-				return 0;
-		}
-		bool operator >= (Nodedist test)
-		{
-			return !(operator < (test));
-		}
-		bool operator <= (Nodedist test)
-		{
-			return !(operator > (test));
-		}
-		bool operator != (Nodedist test)
-		{
-			return !(operator == (test));
-		}
-
-	};
-
+	
 	vector<Nodedist> Distseq;
 	for (int i = 0; i < DistMatrix.cols(); i++)
 	{
@@ -1025,37 +1026,45 @@ MatrixXd GraphAdjList::DijkstraHeap(int BeginIndex)
 	
 	int CurrentIndex = BeginIndex;
 	GraphAdjList::Isvisited[CurrentIndex] = 1;
-
 	HeapDistseq.erase_origin_node(CurrentIndex);//只要isvisited置1一个，就删除对应的节点
 
-	while (1)
+	while (!HeapDistseq.isempty())
 	{
-		
-		
-		float min = PositiveInfEdgeValue;
-		int LocateMin = -1;
-		for (int i = 0; i < DistMatrix.cols(); i++)
-		{
-			if (GraphAdjList::Isvisited[i] == 0)
-			{
-				if (DistMatrix(0, i) < min)
-				{
-					min = DistMatrix(0, i);
-					LocateMin = i;
-				}
-			}
-		}
-		if (LocateMin == -1)//此时说明没有访问过的节点与begin的距离都是PositiveInfEdgeValue;要不所有节点全部都访问过了
+		float min = (HeapDistseq.read_current_node_value(0)).value;
+		int LocateMin = HeapDistseq.read_map2origin(0);
+		if (min == PositiveInfEdgeValue) //说明最小的距离都是正无穷了，说明已经没有连通的节点可以访问了
 			break;
+
+		//float min1 = PositiveInfEdgeValue;
+		//int LocateMin1 = -1;
+		//for (int i = 0; i < DistMatrix.cols(); i++)
+		//{
+		//	if (GraphAdjList::Isvisited[i] == 0)
+		//	{
+		//		if (DistMatrix(0, i) < min1)
+		//		{
+		//			min1 = DistMatrix(0, i);
+		//			LocateMin1 = i;
+		//		}
+		//	}
+		//}
+		//if (LocateMin1 == -1)//此时说明没有访问过的节点与begin的距离都是PositiveInfEdgeValue;要不所有节点全部都访问过了
+		//	break;
 
 		CurrentIndex = LocateMin;
 		GraphAdjList::Isvisited[CurrentIndex] = 1;
+		HeapDistseq.erase_origin_node(CurrentIndex);//只要isvisited置1一个，就删除对应的节点
 		for (int i = 0; i < GraphAdjList::GetOutDegree(CurrentIndex); i++)
 		{
 			int IndexNode = GraphAdjList::List[CurrentIndex].out[i].locationindex;
 			float NewValue = DistMatrix(0, CurrentIndex) + GraphAdjList::List[CurrentIndex].out[i].Value;
 			if (DistMatrix(0, IndexNode) > NewValue)
 			{
+				Nodedist tmp;
+				tmp.value = NewValue;
+				tmp.lastindex = CurrentIndex;
+				HeapDistseq.update_origin_node(IndexNode, tmp);
+
 				DistMatrix(0, IndexNode) = NewValue;
 				DistMatrix(1, IndexNode) = CurrentIndex;
 			}
@@ -1063,6 +1072,53 @@ MatrixXd GraphAdjList::DijkstraHeap(int BeginIndex)
 	}
 
 	return DistMatrix;
+}
+
+vector<int> GetPathFromMatrixXd(MatrixXd Distmat,int BeginIndex,int EndIndex,float & PathDist)
+//从Dijkstra得到的Matrixxd中得到beginindex到endindex的路径
+{
+	vector <int> Path;
+	PathDist = Distmat(0, EndIndex);
+
+	vector <int> InversePath;
+
+	int CurrentIndex = Distmat(1, EndIndex);
+	while (CurrentIndex != -2 && CurrentIndex != BeginIndex) //将路径逆序装到vector中
+	{
+		InversePath.push_back(CurrentIndex);
+		CurrentIndex = Distmat(1, CurrentIndex);
+	}
+
+	if (CurrentIndex != BeginIndex)
+	{
+		Path.push_back(BeginIndex);// 说明此时初始节点到末节点没有可行路径
+	}
+	else
+	{
+		Path.push_back(BeginIndex);
+		while (InversePath.empty() != 1)
+		{
+			Path.push_back(*(InversePath.end() - 1));
+			InversePath.pop_back();
+		}
+		Path.push_back(EndIndex);
+	}
+	return Path;
+}
+
+vector<int> GraphAdjList::FindShortestPathHeap(int BeginIndex, int EndIndex, float & PathDist)
+{
+	vector <int> Path;
+
+	if (BeginIndex == EndIndex)
+	{
+		Path.push_back(BeginIndex);
+		return Path;
+	}
+
+	MatrixXd Distmat = GraphAdjList::DijkstraHeap(BeginIndex);
+	Path = GetPathFromMatrixXd(Distmat, BeginIndex, EndIndex, PathDist);
+	return Path;
 }
 
 vector<int> GraphAdjList::FindShortestPath(int BeginIndex, int EndIndex,float & PathDist)
@@ -1077,31 +1133,7 @@ vector<int> GraphAdjList::FindShortestPath(int BeginIndex, int EndIndex,float & 
 	}
 
 	MatrixXd Distmat = GraphAdjList::Dijkstra(BeginIndex);
-	PathDist = Distmat(0, EndIndex);
-	
-	vector <int> InversePath;
-	
-	int CurrentIndex = Distmat(1,EndIndex);
-	while (CurrentIndex != -2 && CurrentIndex!=BeginIndex) //将路径逆序装到vector中
-	{
-		InversePath.push_back(CurrentIndex);
-		CurrentIndex = Distmat(1, CurrentIndex);
-	}
-	
-	if (CurrentIndex != BeginIndex)
-	{
-		Path.push_back(BeginIndex);// 说明此时初始节点到末节点没有可行路径
-	}
-	else
-	{
-		Path.push_back(BeginIndex);
-		while (InversePath.empty() != 1)
-		{
-			Path.push_back(*(InversePath.end()-1));
-			InversePath.pop_back();
-		}
-		Path.push_back(EndIndex);
-	}
+	Path = GetPathFromMatrixXd(Distmat, BeginIndex, EndIndex, PathDist);
 	return Path;
 }
 
