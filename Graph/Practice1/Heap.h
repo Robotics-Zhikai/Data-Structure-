@@ -124,6 +124,7 @@ public:
 
 	void error(string msg);
 
+	//int test();
 private:
 	int GetfatherIndex(int Currentindex); // 得到在当前Data下index索引的父亲节点
 	int GetlchildIndex(int Currentindex);
@@ -160,6 +161,14 @@ private:
 	//vector <ContainIndexElemenType> DataContainIndex;
 };
 
+//template <class ElemenType>
+//int HeapOperate<ElemenType>::test()
+//{
+//	int num;
+//	num = 1 + ElemenType::points;
+//	return num; 
+//	//不可以调用模板类里边的某一特定成员函数 
+//}
 
 template <class ElemenType>
 void HeapOperate<ElemenType>::inputSeqData2heap(vector <ElemenType> RandomElements) //将随便的一串序列转化为堆的结构
@@ -263,7 +272,10 @@ template <class ElemenType>
 template <class Ele> bool HeapOperate<ElemenType>::CheckindexValid(vector<Ele> checkdata, int index)
 {
 	if (index < 0 || index >= checkdata.size())
-		return 0;
+	{
+		//throw out_of_range("Heap.h中HeapOperate<ElemenType>::CheckindexValid");
+		return 0; //这个还不能写throw 因为有些函数用到了这个返回0的检测功能 如update 某一位置的Data并进行堆调整
+	}
 	else
 		return 1;
 }

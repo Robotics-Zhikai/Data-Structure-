@@ -435,6 +435,12 @@ void GraphAdjList::PathVisualize(vector <GraphNode> Path, float SquareSize, floa
 	}
 }
 
+void GraphAdjList::PrimTreeVisualize(vector<vector<int>> PrimTreeNodes, float SquareSize, float PathEdgeSize)
+{
+	//2020.11.5写到这里 思考到底怎么该既能实现可视化 又能添加如模板
+
+}
+
 void GraphAdjList::sequenceHollowVisualize(vector <GraphNode> sequence, float SquareSize)
 {
 	AddBufferHollowSquare(sequence, SquareSize);
@@ -575,7 +581,11 @@ int GraphAdjList::GetOutDegree(int NodeIndex)
 bool GraphAdjList::CheckIndexValid(int num)
 {
 	if (num < 0 || num >= GraphAdjList::List.size())
-		return 0;
+	{
+		//throw out_of_range("索引超出GraphAdjList::List的最大值");
+		//throw exception();
+		return 0; //这里还不能用到throw 因为有可能有的函数用到了返回0的功能 只能是在具体的位置throw了
+	}
 	else
 		return 1;
 }
@@ -1072,6 +1082,81 @@ MatrixXd GraphAdjList::DijkstraHeap(int BeginIndex)
 	}
 
 	return DistMatrix;
+}
+
+vector<vector<int>> GraphAdjList::Prim(int BeginIndex)
+{
+	if (GraphAdjList::CheckIndexValid(BeginIndex))
+	{
+		vector <int> LastIndex(List.size(),-1);
+		vector <float> Reward(List.size(),PositiveInfEdgeValue); //收入到树中的节点reward应为0
+		ResetIsvisited(0);
+		Reward[BeginIndex] = 0;
+		for (int i = 0; i < GetOutDegree(BeginIndex); i++)
+		{
+			Reward[List[BeginIndex].out[i].locationindex] = List[BeginIndex].out[i].Value;
+			LastIndex[List[BeginIndex].out[i].locationindex] = BeginIndex;
+		}
+
+		Isvisited[BeginIndex] = 1;
+		Reward[BeginIndex] = 0;
+		while (1)
+		{
+			float min = PositiveInfEdgeValue;
+			int minindex = -1;
+
+			for (int i = 0; i < Reward.size(); i++)
+			{
+				if (Isvisited[i] == 0)
+				{
+					if (Reward[i] < min)
+					{
+						min = Reward[i];
+						minindex = i;
+					}
+				}
+			}
+
+			if (minindex == -1) //说明在没有访问过的节点集合中都是正无穷 也就是说与初始节点连通的点都访问过了
+				break;
+
+			Isvisited[minindex] = 1;
+			Reward[minindex] = 0;
+			for (int i = 0; i < GetOutDegree(minindex); i++)
+			{
+				int outindex = List[minindex].out[i].locationindex;
+				float outvalue = List[minindex].out[i].Value;
+				if (Isvisited[outindex] == 0 && outvalue < Reward[outindex])
+				{
+					Reward[outindex] = outvalue;
+					LastIndex[outindex] = minindex;
+				}
+			}
+		}
+
+		vector <vector<int>> PrimTreeNodes; //把所有最小生成树的节点索引存入
+		for (int i = 0; i < Reward.size(); i++)
+		{
+			if (Reward[i] == 0)
+			{
+				vector<int> thisnode(2);
+				thisnode[0] = i; // 存储当前节点索引
+				thisnode[1] = LastIndex[i]; //存储父节点索引
+				
+				PrimTreeNodes.push_back(thisnode);
+			}
+		}
+		if (PrimTreeNodes.size() < List.size())
+			cout << "图不是全连通的，只输出与初始节点" << BeginIndex << "连通的子图的最小生成树" << endl;
+		else if (PrimTreeNodes.size() > List.size())
+			throw exception(); //这样的话程序就出错了
+
+		return PrimTreeNodes;
+	}
+	else
+	{
+		throw out_of_range("GraphAdjList::Prim索引超出范围");
+	}
 }
 
 vector<int> GetPathFromMatrixXd(MatrixXd Distmat,int BeginIndex,int EndIndex,float & PathDist)

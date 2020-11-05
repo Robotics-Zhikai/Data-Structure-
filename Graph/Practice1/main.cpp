@@ -1,6 +1,7 @@
 #include "Visualization.h"
 #include "Graph.h"
 #include "ConvexHull.h"
+#include "Heap.h"
 
 void Test_GetConvexHull_GS()//GrahamScan算法
 {
@@ -57,7 +58,7 @@ void Test_Graph()
 
 
 	GraphAdjList trans;
-	trans.RandomGenerateGraph(55, 12380, 0, 10, 0, 10);
+	trans.RandomGenerateGraph(55, 150, 0, 10, 0, 10);
 	//trans = TransferMat2List(test);
 	GraphAdjMat test1;
 	test1 = TransferList2Mat(trans);
@@ -102,7 +103,7 @@ void Test_Graph()
 	vector<MatrixXd> tmp = trans.Floyd();
 	vector <int> Paththis = trans.GetPathFromFloydResult(tmp[1], beginindex, endindex);
 
-	
+	vector <vector<int> > PrimTreeNodes = trans.Prim(10);
 
 
 
@@ -129,21 +130,38 @@ void Test_Graph()
 
 void main()
 {
-	//vector<vector<int>> IndexBeforAfter(2);
-	vector<int> test1;
-	vector<int> test2;
+	try
+	{
+		
+		/*HeapOperate<containint> testHeapOperate;
+		testHeapOperate.test();*/
 
-	test1.push_back(0);
-	test1.push_back(1);
+		vector<int> test(10, -1);
+		//vector<vector<int>> IndexBeforAfter(2);
+		vector<int> test1;
+		vector<int> test2;
 
-	test2.push_back(0);
-	test2.push_back(1);
-	test2.push_back(2);
-	test2.push_back(3);
+		test1.push_back(0);
+		test1.push_back(1);
 
-	test1 = test2;
+		test2.push_back(0);
+		test2.push_back(1);
+		test2.push_back(2);
+		test2.push_back(3);
 
-	test2.push_back(100);
-	//Test_GetConvexHull_GS();
-	Test_Graph();
+		test1 = test2;
+
+		test2.push_back(100);
+		//Test_GetConvexHull_GS();
+		Test_Graph();
+	}
+	catch (out_of_range msg)
+	{
+		cout << "error:"<<msg.what() << endl;
+	}
+	catch (...)
+	{
+		cout << "error:"<<"其他未定义错误" << endl;
+	}
+	system("pause");
 }

@@ -167,3 +167,5 @@ DivideAndConquer 实现了幂乘算法，常规的幂乘算法是O(n)的复杂�
 在Graph/Practice中改进Heap的实现，运用了模板，实现算法与数据的分离。并利用Heap对Dijkstra进行了改进。
 ## 20201028
 完成图的部分算法和template Heap模板类
+## 20201105
+实现prim最小生成树算法 思考如何在模板中调用“<类型>” 类型中的成员数据 这样可以把graph的可视化和相关算法分开

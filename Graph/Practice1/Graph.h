@@ -91,6 +91,8 @@ public:
 	void MapVisualize(float NodeSize, float LineWeight);
 	void PathVisualize(vector <GraphNode> Path,float SquareSize, float PathEdgeSize); //可视化路径
 	void sequenceHollowVisualize(vector <GraphNode> sequence, float SquareSize); //对sequence进行可视化，加框
+	void PrimTreeVisualize(vector<vector<int>> PrimTreeNodes, float SquareSize, float PathEdgeSize);
+		//primtree的可视化 暂时还没有定义更广泛的树的数据结构，因此就先限定为primtree的可视化
 
 	void InsertNode(GraphNode node);
 	void DeleteNode(GraphNode node);
@@ -114,6 +116,7 @@ public:
 	MatrixXd Dijkstra(GraphNode BeginNode);
 	MatrixXd Dijkstra(int BeginIndex);
 	MatrixXd DijkstraHeap(int BeginIndex); //用堆的形式优化Dijkstra算法 但是没有看到堆具有更好的效果，可能是稀疏图不太好找到通路
+	vector<vector<int>> Prim(int BeginIndex);//最小生成树算法 
 
 	bool IsConnectPath(int Beginindex, int Endindex);//从beginindex到endindex是否有一条可连通的路,这条路不一定是最短路
 	vector<int> FindShortestPath(int BeginIndex, int EndIndex, float & PathDist);
