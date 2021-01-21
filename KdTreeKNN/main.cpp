@@ -15,7 +15,6 @@ public:
 	int Cat; //Àà±ğ
 };
 
-//template<typename Ty>
 class node:public Category
 {
 public:
@@ -26,6 +25,7 @@ public:
 	size_t CompType = 0; //±ê¼ÇÊÇÄÄÖÖCompare
 	size_t readDimension()const { return Data.size(); }
 
+	//ÖØÔØoperatorÒÔ±ãÄÜÓÃµ½±ê×¼¿â Í¨¹ıÉèÖÃCompTypeÀ´È·¶¨±È½Ï´óĞ¡µÄÎ¬¶È
 	bool operator>(const node& in)
 	{
 		if (Compare(in, CompType) == 1)
@@ -75,14 +75,11 @@ public:
 		return odist;
 	}
 
-	
-
 	vector<double> Data; // Ö»ÄÜÊÇvector<double>
 	int lchild = -1;
 	int rchild = -1;
 	int father = -1;
 private:
-
 	int Compare(const node& node2, size_t bit) //´óÓÚnode2·µ»Ø1 Ğ¡ÓÚnode2·µ»Ø-1 µÈÓÚnode2·µ»Ø0
 	{
 		if (Data.size() != node2.Data.size())
@@ -100,7 +97,6 @@ private:
 			return -1;
 	}
 };
-
 ostream &operator<<(ostream &output, const node &D)
 {
 	output << "±¾nodeÀà±ğÎª£º" << D.Cat << endl;
@@ -161,8 +157,9 @@ public:
 		KdTreeDataflow = dataflow;
 	}
 
+	//ËÑË÷¾àÀëÊäÈë×î½üµÄk¸ö½ÚµãµÄË÷Òı
 	vector<valueindex> Search_NearkIndex(unsigned int k,node& input)const
-		//ËÑË÷¾àÀëÊäÈë×î½üµÄk¸ö½ÚµãµÄË÷Òı
+		
 	{
 		if (k<=0 || k>KdTreeDataflow.size())
 			throw exception("k<=0 || k>KdTreeDataflow.size()");
@@ -187,15 +184,15 @@ private:
 	template<typename Tytopk>
 	void push_topk(vector<Tytopk>& recorddist, Tytopk disttmp,unsigned int k)const
 	{
-		if (recorddist.size() < k)
+		if (recorddist.size() < k) //Èç¹û»¹Ã»Âú£¬ÔòÒ»Ö±¼ÓÈë¶Ñ
 		{
 			recorddist.push_back(disttmp);
 			push_heap(recorddist.begin(), recorddist.end());
 		}
 		else
 		{
-			if (disttmp < recorddist[0])
-			{
+			if (disttmp < recorddist[0])//Èç¹û¶ÑÂúÁËÖ®ºóÔÙ½øÈëĞÂµÄÊı¾İ£¬ÔòÅĞ¶Ï¸ÃÊı¾İÊÇ·ñĞ¡ÓÚ¶Ñ¶¥Êı¾İ
+			{							//Èç¹ûĞ¡ÓÚÔò°Ñ¶Ñ¶¥Êı¾İµ¯³ö£¬°ÑĞÂÊı¾İÍÆÈë¡£·ñÔòºöÂÔ¸ÃÊı¾İ
 				pop_heap(recorddist.begin(), recorddist.end());
 				recorddist.pop_back();
 				recorddist.push_back(disttmp);
@@ -206,12 +203,12 @@ private:
 
 	void Search_node(vector<bool>& recorded,unsigned int k,vector<valueindex>& recorddist,int CurrentIndex, node& input,int depth)const
 	{
-		static int flagDownTree = 1;
+		static int flagDownTree = 1; //ÉèÖÃÎª1Ê±Ö÷Òª¹¦ÄÜÊÇÏÂ³Á£¬Îª0Ê±Ö÷Òª¹¦ÄÜÊÇ»ØËİ
 		if (CurrentIndex == -1)
 			return;
 		input.CompType = depth%input.readDimension();
 
-		if (input <= KdTreeDataflow[CurrentIndex])
+		if (input <= KdTreeDataflow[CurrentIndex]) //²âÊÔ½ÚµãÔÚµ±Ç°½ÚµãµÄÎ¬¶ÈÉÏĞ¡ÓÚµ±Ç°½Úµã £¬ÔòÏÈËÑË÷×ó×ÓÊ÷£¬ÔÚËÑË÷ÓÒ×ÓÊ÷
 		{
 			Search_node(recorded,k,recorddist,KdTreeDataflow[CurrentIndex].lchild, input, depth + 1);
 			if (flagDownTree == 0)
@@ -221,11 +218,12 @@ private:
 				push_topk<valueindex>(recorddist, valueindex(disttmp, CurrentIndex), k);
 
 				input.CompType = depth%input.readDimension();
-				double distabs = abs(input.Data[input.CompType] - KdTreeDataflow[CurrentIndex].Data[input.CompType]);
-				if (distabs > recorddist[0].value)
+				double distabs = abs(input.Data[input.CompType] - KdTreeDataflow[CurrentIndex].Data[input.CompType]);//¼ÆËãÓë³¬Æ½ÃæµÄ¾àÀë
+				if (distabs > recorddist[0].value) 
+					//ËµÃ÷¶ÑÖĞµÄ×î´óÖµĞ¡ÓÚ³¬Æ½Ãæ¾àÀë£¬µ½ÁíÒ»·ÖÖ§µÄËùÓĞ½Úµã¾àÀë¶¼´óÓÚÏÖÔÚÕÒµ½µÄ×î´óÖµ£¬ÁíÒ»·ÖÖ§Ò»¶¨Ã»ÓĞ¸üĞ¡µÄ£¬½øĞĞ¼ôÖ¦
 					return;
 				else
-					flagDownTree = 1;
+					flagDownTree = 1; //ËµÃ÷¶ÑÖĞµÄ×î´óÖµ´óÓÚµÈÓÚ³¬Æ½Ãæ¾àÀë£¬ÁíÒ»·ÖÖ§²»ÄÜ¼ôÖ¦£¬ĞèÒª½øÈëÁíÒ»·ÖÖ§Ñ°ÕÒ¿ÉÄÜµÄ¸ü½üµÄÖµ
 				
 			}
 			Search_node(recorded, k, recorddist, KdTreeDataflow[CurrentIndex].rchild, input, depth + 1);
@@ -250,7 +248,7 @@ private:
 			Search_node(recorded, k, recorddist, KdTreeDataflow[CurrentIndex].lchild, input, depth + 1);
 		}
 
-		flagDownTree = 0;
+		flagDownTree = 0; //µ½Ò¶×Ó½ÚµãÁË£¬¸ÃÖ´ĞĞ»ØËİ²½ÖèÁË
 		//µ½ÕâÀï¾Íµ½ÁËÒ¶×Ó½ÚµãÁË
 		if (recorded[CurrentIndex] == 0)
 		{
@@ -259,11 +257,12 @@ private:
 			push_topk<valueindex>(recorddist, valueindex(disttmp, CurrentIndex), k);
 		}
 	}
-
 	//vector<node<Ty>>::iterator sad;
 	//typedef _Vector_iterator<_Vector_val<_Simple_types<node<Ty> > > > nodeiterator;
+
+	//½«Ã»ÓĞKdTree¹ØÏµµÄÏßĞÔ±í×éÖ¯³Ékdtree,dimensionÎªÃ¿¸öÊı¾İµÄÎ¬¶È
 	int makeListAsKdTree(vector<node>& List,int left,int right,unsigned int depth,const size_t & dimension,int l_r=-1)const
-		//½«Ã»ÓĞKdTree¹ØÏµµÄÏßĞÔ±í×éÖ¯³Ékdtree,dimensionÎªÃ¿¸öÊı¾İµÄÎ¬¶È
+		
 	{
 		if (right<left || left>right)
 		{
@@ -297,9 +296,7 @@ private:
 	}
 };
 
-
-
-
+//CategoryÊÇÀà±ğ
 vector<node> GenerateGaussianData(int Category,vector<double> mean, vector<double> std,unsigned int num)
 {
 	default_random_engine e;
@@ -316,7 +313,6 @@ vector<node> GenerateGaussianData(int Category,vector<double> mean, vector<doubl
 	}
 	return output;
 }
-
 
 template<typename Ty>
 void addvector(vector<Ty>& A,const vector<Ty>& B)
@@ -341,7 +337,8 @@ vector<double> k_nearest_neighbors_Violence_search(vector<node> traindata, node 
 	return result;
 }
 
-int DecideCategory(const vector<node>& NearkNodes)//¸ù¾İkÁÙ½üµÄÖÖÀàÍ¶Æ±£¬ÉÙÊı·ş´Ó¶àÊı£¬µÃµ½Àà±ğ
+//¸ù¾İkÁÙ½üµÄÖÖÀàÍ¶Æ±£¬ÉÙÊı·ş´Ó¶àÊı£¬µÃµ½Àà±ğ
+int DecideCategory(const vector<node>& NearkNodes)
 {
 	vector<int> cats;
 	for (size_t i = 0; i < NearkNodes.size(); i++)
@@ -351,8 +348,8 @@ int DecideCategory(const vector<node>& NearkNodes)//¸ù¾İkÁÙ½üµÄÖÖÀàÍ¶Æ±£¬ÉÙÊı·ş´
 	if (!cats.empty())
 	{
 		int current = cats[0];
-		vector<int> countCat;
-		vector<int> UniqueCat;
+		vector<int> countCat; //¼ÆËã¶ÔÓ¦µÄÖÖÀàµÄ·Ö²¼¸öÊı
+		vector<int> UniqueCat; //½«ÖØ¸´µÄk½üÁÚÖÖÀàÊıÈ¥ÖØ£¬Ö»±£ÁôÒ»¸ö
 		UniqueCat.push_back(current);
 		countCat.push_back(1);
 
@@ -389,26 +386,26 @@ vector<double> k_nearest_neighbors_KdTree(const KdTree &trainDataKdtree,vector<n
 {
 	cout << "±¾²âÊÔnode²ÎÊıÈçÏÂ£º" << endl;
 	cout << testnode << endl;
+	cout << endl;
 	cout << k << "½üÁÚnodeÈçÏÂ£º" << endl;
-	auto searchresult = trainDataKdtree.Search_NearkIndex(k, testnode);
+	auto searchresult = trainDataKdtree.Search_NearkIndex(k, testnode);//ÕÒµ½k½üÁÚ£¬ºËĞÄÊÇµ÷ÓÃSearchNode
 	vector<node> NearkNode;
 	vector<double> result(k);
 	for (int j = 0; j < searchresult.size(); j++)
 	{
 		node tmpnode = trainDataKdtree.readnode(searchresult[j].index);
 		NearkNode.push_back(tmpnode);
-		//cout << tmpnode << endl;
-		//cout << "±¾node¾àÀë²âÊÔnodeµÄ¾àÀëÎª" << testnode.dist(tmpnode) << endl;
+		cout << tmpnode << endl;
+		cout << "±¾node¾àÀë²âÊÔnodeµÄ¾àÀëÎª" << testnode.dist(tmpnode) << endl;
 		//cout << endl;
 		result[j] = testnode.dist(tmpnode);
 	}
 
-	cout << "×îÖÕµÄKNNÅĞ¶¨Àà±ğÊÇ£º" << DecideCategory(NearkNode) << endl;
+	cout << "×îÖÕµÄKNNÅĞ¶¨Àà±ğÊÇ£º" << DecideCategory(NearkNode) << endl; //Í¨¹ık¸ö½ÚµãÅĞ¶Ï
 
 	sort(result.begin(),result.end());
 	return result;
 }
-
 
 void k_nearest_neighbors(vector<node> traindata, vector<node> testdata,unsigned int k)
 {
@@ -428,50 +425,28 @@ void k_nearest_neighbors(vector<node> traindata, vector<node> testdata,unsigned 
 		startKdTree = clock();
 		auto kddist = k_nearest_neighbors_KdTree(KdTreetest, dataflow, testdata[i], k);
 		endKdTree = clock();
-		KdTreeT += (double)(endKdTree - startKdTree) / CLOCKS_PER_SEC;
+		KdTreeT = (double)(endKdTree - startKdTree) / CLOCKS_PER_SEC; //¼ÇÂ¼KdTree·½·¨ÊµÏÖµÄKNNµÄÊ±¼ä
 
 		startViolence_search = clock();
 		auto violencedist = k_nearest_neighbors_Violence_search(dataflow, testdata[i], k);
 		endViolence_search = clock();
-		Violence_searchT+= (double)(endViolence_search - startViolence_search) / CLOCKS_PER_SEC;
+		Violence_searchT = (double)(endViolence_search - startViolence_search) / CLOCKS_PER_SEC;  //¼ÇÂ¼±©Á¦ËÑË÷·½·¨ÊµÏÖµÄKNNµÄÊ±¼ä
 
 		vector<double> minus;
 		for (size_t j = 0; j < kddist.size(); j++)
-		{
 			minus.push_back(abs(kddist[j] - violencedist[j]));
-			//cout << minus[j] << endl;
-		}
-		//cout << *max_element(minus.begin(),minus.end()) <<" "<< *min_element(minus.begin(), minus.end()) << endl;
-		if (*max_element(minus.begin(), minus.end()) > 0)
+		if (*max_element(minus.begin(), minus.end()) > 0) //ÓÃÒÔÑéÖ¤KdTreeÊµÏÖµÄKNNÊÇ·ñ³ö´í
 			throw exception("KdTree³ö´íÁË");
 
-		cout << "KdTreeT:" << KdTreeT << " " << "Violence_searchT:" << Violence_searchT << endl;
+		cout << "KdTreeT:" << KdTreeT << "s " << "Violence_searchT:" << Violence_searchT <<"s"<< endl;
 	}
 }
-
 
 
 int main()
 {
 	try
 	{
-		vector<double> sdasdas{ 3,21,5,1,2,7,5,8,3 };
-		std::sort(sdasdas.begin() , sdasdas.begin() + 3);
-		//train set
-		vector<node> Catgery1data = GenerateGaussianData(1, vector<double>{20, 3, 4, 5}, vector<double> {2, 3, 2, 1}, 1000000);
-		vector<node> Catgery2data = GenerateGaussianData(2, vector<double>{2.4, 3.2, 4.5, 8}, vector<double> {2, 3, 2, 1}, 1000000);
-		vector<node> Catgery3data = GenerateGaussianData(3, vector<double>{1, 5, 7, 10}, vector<double> {2, 3, 2, 1}, 1000000); //300000×éÊı¾İ KDtreeÓĞÃ÷ÏÔËÙ¶ÈÌáÉı ÊÇ±©Á¦ËÑË÷Ğ§ÂÊµÄÁ½±¶
-		vector<node> traindata;
-		addvector<node>(traindata, Catgery1data);
-		addvector<node>(traindata, Catgery2data);
-		addvector<node>(traindata, Catgery3data);
-		//test set
-		vector<node> testdata = GenerateGaussianData(-1, vector<double>{15, 3.73, 5.17, 7.67}, vector<double> {20, 34, 22, 11}, 100);
-		
-		unsigned int K = 100;
-		k_nearest_neighbors(traindata, testdata, K);
-		//tmp.push(node<double>(vector<double>{ 2, 3, 1 }));
-
 		vector<node> dataflow;
 
 		dataflow.push_back(node(0, vector<double>{ 2, 3, 1 }));
@@ -487,6 +462,28 @@ int main()
 
 		KdTree KdTreetest(dataflow);
 		KdTreetest.Search_NearkIndex(3, node(0, vector<double>{2, 3, 1}));
+
+		vector<double> sdasdas{ 3,21,5,1,2,7,5,8,3 };
+		std::sort(sdasdas.begin() , sdasdas.begin() + 3);
+		//train set
+		vector<node> Catgery1data = GenerateGaussianData(1, vector<double>{20, 3, 4, 5}, vector<double> {2, 3, 2, 1}, 1000000);
+		vector<node> Catgery2data = GenerateGaussianData(2, vector<double>{2.4, 3.2, 4.5, 8}, vector<double> {2, 3, 2, 1}, 1000000);
+		vector<node> Catgery3data = GenerateGaussianData(3, vector<double>{1, 5, 7, 10}, vector<double> {2, 3, 2, 1}, 1000000); 
+		//3000000×éÊı¾İ KDtreeÓĞÃ÷ÏÔËÙ¶ÈÌáÉı ÊÇ±©Á¦ËÑË÷Ğ§ÂÊµÄÁ½±¶
+		//
+		vector<node> traindata;
+		addvector<node>(traindata, Catgery1data); //½«ÈıÖÖÀà±ğµÄÊı¾İºÏ²¢ÔÚÒ»Æğ
+		addvector<node>(traindata, Catgery2data);
+		addvector<node>(traindata, Catgery3data);
+
+		//test set
+		vector<node> testdata = GenerateGaussianData(-1, vector<double>{15, 3.73, 5.17, 7.67}, vector<double> {20, 34, 22, 11}, 100);
+		
+		unsigned int K = 5;
+		k_nearest_neighbors(traindata, testdata, K);
+		//tmp.push(node<double>(vector<double>{ 2, 3, 1 }));
+
+		
 	}
 	catch (exception d)
 	{
