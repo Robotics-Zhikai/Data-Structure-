@@ -5,15 +5,29 @@
 #include <iostream>
 #include <map>
 #include <unordered_map>
+#include <iterator>
+
 using namespace std;
 
 void test()
 {
+	if (int(-20))
+		cout << "int(-20)" << endl;
+	int * tmp = nullptr;
+	if (tmp == nullptr)
+		cout << "s" << endl;
+	vector<int> vectmp = { 1,2,3,4 };
+	vector<int> hahaffg(vectmp.begin(), vectmp.begin() + 1);
+	list<int> sagg = {1,2,3,4};
+	list<int> sgahah(sagg.begin(), sagg.end());
+	
 	unordered_map<string, int> ag;
 	ag["stin"] = 1;
 	auto finded = ag.find("stin");
 	
 }
+
+
 
 // using nodetype = pair<char,int> ;
 // vector<nodetype> heap;
@@ -49,6 +63,151 @@ void test()
 //     }
 //     //这里不能用堆 但是这里的关于堆的简便写法可以借鉴
 // }
+
+
+
+
+
+
+//23. 合并K个升序链表
+//给你一个链表数组，每个链表都已经按升序排列。
+//
+//请你将所有链表合并到一个升序链表中，返回合并后的链表。
+//https://leetcode-cn.com/problems/merge-k-sorted-lists/solution/he-bing-kge-pai-xu-lian-biao-by-leetcode-solutio-2/
+class Solution23 {
+public:
+	// Definition for singly-linked list.
+	struct ListNode {
+		int val;
+		ListNode *next;
+		ListNode() : val(0), next(nullptr) {}
+		ListNode(int x) : val(x), next(nullptr) {}
+		ListNode(int x, ListNode *next) : val(x), next(next) {}
+	};
+
+	ListNode * transvec2listnodeptr(vector<int> num)
+	{
+		if (num.size() == 0)
+			return nullptr;
+		//vector<int> num = { -10,-9,-9,-3,-1,-1,0 };
+		ListNode * tmp = new ListNode[num.size()];
+		int i;
+		for (i = 0; i < num.size() - 1; i++)
+		{
+			tmp[i] = ListNode(num[i], tmp + i + 1);
+		}
+		tmp[i] = ListNode(num[i], nullptr);
+		return tmp;
+	}
+	void test()
+	{
+
+		ListNode * first0 = transvec2listnodeptr(vector<int>{-10, -9, -9, -3, -1, -1, 0 });
+		ListNode * first1 = transvec2listnodeptr(vector<int>{-5 });
+		ListNode * first2 = transvec2listnodeptr(vector<int>{4 });
+		ListNode * first3 = transvec2listnodeptr(vector<int>{-8 });
+		ListNode * first4 = transvec2listnodeptr(vector<int>{});
+		ListNode * first5 = transvec2listnodeptr(vector<int>{-9, -6, -5, -4, -2, 2, 3 });
+		ListNode * first6 = transvec2listnodeptr(vector<int>{-3, -3, -2, -1, 0 });
+		
+
+
+	
+
+		vector<ListNode*> lists = { first0,first1 ,first2,first3, first4 ,first5,first6 };
+		mergeKLists(lists);
+	}
+
+
+	
+	inline ListNode* merge_TWO_Lists(ListNode* L, ListNode* R)//合并两个有序链表 借鉴归并排序的实现思路
+	{
+		ListNode* Lcurrent = L;
+		ListNode* Rcurrent = R;
+
+		ListNode* mergeCurrent = nullptr;
+		if (Lcurrent != nullptr&&Rcurrent != nullptr) //这里容易出错
+		{
+			if (Lcurrent->val <= Rcurrent->val)
+			{
+				mergeCurrent = Lcurrent;
+				Lcurrent = Lcurrent->next;
+			}
+			else
+			{
+				mergeCurrent = Rcurrent;
+				Rcurrent = Rcurrent->next;
+			}
+		}
+		else if (Lcurrent != nullptr)
+		{
+			mergeCurrent = Lcurrent;
+			Lcurrent = Lcurrent->next;
+		}
+		else if (Rcurrent != nullptr)
+		{
+			mergeCurrent = Rcurrent;
+			Rcurrent = Rcurrent->next;
+		}
+		else
+			return mergeCurrent;
+
+		ListNode* mergebegin = mergeCurrent;
+		while (Lcurrent != nullptr && Rcurrent != nullptr)
+		{
+			if ((Lcurrent->val) <= (Rcurrent->val))
+			{
+				mergeCurrent->next = Lcurrent;
+				mergeCurrent = mergeCurrent->next;
+				Lcurrent = Lcurrent->next;
+			}
+			else
+			{
+				mergeCurrent->next = Rcurrent;
+				mergeCurrent = mergeCurrent->next;
+				Rcurrent = Rcurrent->next;
+			}
+		}
+
+		if (Lcurrent != nullptr)
+			mergeCurrent->next = Lcurrent;
+		else if (Rcurrent != nullptr)
+			mergeCurrent->next = Rcurrent;
+		else
+			mergeCurrent->next = nullptr;
+
+		return mergebegin;
+	}
+
+	inline ListNode* divide(vector<ListNode*>& lists) //分治法，时间复杂度是Lnlogn n是链表个数，L是每个链表的平均长度
+		//还有用优先级队列的方法，但是没什么技术含量，用priority queue的话
+	{
+		int left = 0;
+		int right = lists.size();
+		int mid = (left + right) / 2;
+
+		if (left == right)
+			return nullptr;
+		else if (right - 1 == left)
+			return *lists.begin();
+		else if (right - left == 2)
+			return merge_TWO_Lists(lists[left], lists[left+1]);  //这里容易出错
+
+
+		vector<ListNode*> Listleft(lists.begin(), (lists.begin()+mid));
+		vector<ListNode*> Listright((lists.begin() + mid), lists.end());
+
+		ListNode* leftnodeptr = divide(Listleft);
+		ListNode* rightnodeptr = divide(Listright);
+
+		return merge_TWO_Lists(leftnodeptr, rightnodeptr);
+	}
+	ListNode* mergeKLists(vector<ListNode*>& lists) {
+
+		return divide(lists);
+	}
+};
+
 
 //395. 至少有K个重复字符的最长子串
 //找到给定字符串（由小写字符组成）中的最长子串 T ， 要求 T 中的每一字符出现次数都不少于 k 。输出 T 的长度。
@@ -307,6 +466,8 @@ int main()
 {
 	try
 	{
+		Solution23 Solution23;
+		Solution23.test();
 		test();
 
 		Solution215 Solution215;
