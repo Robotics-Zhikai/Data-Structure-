@@ -11,6 +11,15 @@ using namespace std;
 
 void test()
 {
+	
+	vector<int > hafg{ 1,2,3,4 };
+	hafg.erase(hafg.begin());
+	hafg.insert(hafg.begin() + 1,8);
+	vector<int > hafg1 = { hafg.begin(),hafg.end() };
+	swap(*hafg.begin(), *(hafg.begin() + 1)); //交换元素时输入参数是引用
+	auto lambdaf = [](int a, int b) {return a > b; };
+	vector<int> testheap{ 1,2,3,4 };
+	make_heap(testheap.begin(), testheap.end());
 	if (int(-20))
 		cout << "int(-20)" << endl;
 	int * tmp = nullptr;
@@ -66,6 +75,161 @@ void test()
 
 
 
+//973. 最接近原点的 K 个点
+//我们有一个由平面上的点组成的列表 points。需要从中找出 K 个距离原点(0, 0) 最近的点。
+//
+//（这里，平面上两点之间的距离是欧几里德距离。）
+//
+//你可以按任何顺序返回答案。除了点坐标的顺序之外，答案确保是唯一的。
+//https://leetcode-cn.com/problems/k-closest-points-to-origin/solution/zui-jie-jin-yuan-dian-de-k-ge-dian-by-leetcode-sol/
+class Solution973 {
+
+	///////////////////////////////////////////////////////////////////////////////////
+	//题解给的分治法
+private:
+	mt19937 gen{ random_device{}() };
+
+public:
+	void random_select(vector<vector<int>>& points, int left, int right, int K) {
+		int pivot_id = uniform_int_distribution<int>{ left, right }(gen);
+		int pivot = points[pivot_id][0] * points[pivot_id][0] + points[pivot_id][1] * points[pivot_id][1];
+		swap(points[right], points[pivot_id]);
+		int i = left - 1;
+		for (int j = left; j < right; ++j) {
+			int dist = points[j][0] * points[j][0] + points[j][1] * points[j][1];
+			if (dist <= pivot) {
+				++i;
+				swap(points[i], points[j]);
+			}
+		}
+		++i;
+		swap(points[i], points[right]);
+		// [left, i-1] 都小于等于 pivot, [i+1, right] 都大于 pivot
+		if (K < i - left + 1) {
+			random_select(points, left, i - 1, K);
+		}
+		else if (K > i - left + 1) {
+			random_select(points, i + 1, right, K - (i - left + 1));
+		}
+		//这就隐含了当K=i-left+1时return
+	}
+
+	vector<vector<int>> kClosest_TiJie(vector<vector<int>>& points, int K) {
+		int n = points.size();
+		random_select(points, 0, n - 1, K);
+		return{ points.begin(), points.begin() + K };
+
+	}
+	///////////////////////////////////////////////////////////////////////////////////
+
+public:
+	vector<vector<int>> kClosestHeapPop(vector<vector<int>>& points, int K)//方法是建堆和pop堆，复杂度是n+klogn
+	{
+		auto lambdaf = [](const vector<int> &p1, const vector<int>& p2) {return (pow(p1[0], 2) + pow(p1[1], 2))>(pow(p2[0], 2) + pow(p2[1], 2)); };
+		vector<vector<int>> result;
+		make_heap(points.begin(), points.end(), lambdaf);
+		while (!points.empty() && result.size()<K)
+		{
+			pop_heap(points.begin(), points.end(), lambdaf);
+			result.push_back(points.back());
+			points.pop_back();
+		}
+		return result;
+	}
+
+	vector<vector<int>> kClosestTopK(vector<vector<int>>& points, int K) //方法是topk 复杂度是k+nlogk
+	{
+		auto lambdaf = [](const vector<int> &p1, const vector<int>& p2) {return (pow(p1[0], 2) + pow(p1[1], 2))<(pow(p2[0], 2) + pow(p2[1], 2)); };
+		vector<vector<int>> result;
+		make_heap(points.begin(), points.begin() + K, lambdaf);
+		if (K != 0)
+		{
+			for (auto it = points.begin() + K; it != points.end(); it++)
+			{
+				if (!lambdaf(points[0], *it))
+				{
+					pop_heap(points.begin(), points.begin() + K, lambdaf);
+					*(points.begin() + K - 1) = *it;
+					push_heap(points.begin(), points.begin() + K, lambdaf);
+				}
+			}
+			result = { points.begin(),points.begin() + K };
+		}
+		return result;
+	}
+
+	int K_num;
+	//要找距离最近的K个点，那么就能联想到快排算法中中点固定后就不动了这种操作
+	//还有二分的思想
+	int quickdivid(vector<vector<int>>& points, int left, int right) //借鉴快排的分治方法，这是O(n)的复杂度
+																	 //底下只要是出现return，就直接全部返回
+	{
+		static auto lambdaless = [](const vector<int> &p1, const vector<int>& p2) {return (pow(p1[0], 2) + pow(p1[1], 2))<(pow(p2[0], 2) + pow(p2[1], 2)); };
+		//这里容易出错
+		if (left == right)
+			return left;
+		if (right - left == 1)
+		{
+			if (left == K_num)
+				return left;
+			else
+				return left + 1;
+		}
+		if (right - left == 2)
+		{
+			if (!lambdaless(points[left], points[left + 1]))
+				swap(points[left], points[left + 1]);
+			//以下的这三个条件语句都很重要
+			if (left == K_num)
+				return left;
+			else if (left + 1 == K_num)
+				return left + 1;
+			else
+				return right;
+		}
+		//上边的这几个return就是相当于二分搜索搜索到那里了，就直接return
+
+		// vector<int> mid = points[left]; //这个在递归上很耗内存，耗费了2MB
+		int indexL = left + 1;
+		int indexR = right - 1;
+		while (indexL<indexR)
+		{
+			while (indexL<right && lambdaless(points[indexL], points[left]))
+				indexL++;
+			while (indexR>left && !lambdaless(points[indexR], points[left]))
+				indexR--;
+			if (indexL<indexR)
+				swap(points[indexL], points[indexR]);
+		}
+		swap(points[indexR], points[left]); //把这个用Swap代替后速度有大幅度提升
+		// points.insert(points.begin()+indexL,points[left]);//因为快速排序的优势就在于排一次后元素就不动了
+		// points.erase(points.begin()+left);               //而erase和insert的结合并没有体现出该优势
+
+		//这里容易出错
+		//底下的if else就是做的一个剪枝
+		if (indexL - 1 == K_num) //当中间的数刚好能够满足题意时，return，只要return就得到最终结果。indexL-1就是中间值的索引
+			return indexL - 1;
+		else if (indexL - 1>K_num) //当判断为在左子集时，进入左子集
+			return quickdivid(points, left, indexL - 1);
+		else  //否则进入右子集，不可以包括中间的那个值
+			return quickdivid(points, indexL - 1 + 1, right);
+
+	}
+	vector<vector<int>> kClosestQuickSort(vector<vector<int>>& points, int K)//借鉴快速排序，分治解决
+	{
+		int mid = quickdivid(points, 0, points.size());
+
+		return{ points.begin(),points.begin() + mid };
+	}
+
+	vector<vector<int>> kClosest(vector<vector<int>>& points, int K) {
+		K_num = K;
+		// return kClosestHeapPop(points, K);//256ms 40.5MB 击败91.22 61.04
+		// return kClosestTopK(points, K); //176ms 38MB 击败 99.6 99.75
+		return kClosestQuickSort(points, K); //124ms 38.1MB 击败99.97 99.63 我自己的分治实现
+		// return kClosest_TiJie(points,K); //题解的分治实现 136ms，37.9MB 击败99.93 99.85
+	}
+};
 
 
 
@@ -422,7 +586,7 @@ public:
 			return *min_element(S.begin(), S.end());
 		int dividgroup = 0;
 		if (S.size() % basenum == 0)
-			dividgroup = S.size() / basenum;
+			dividgroup = S.size() / basenum; //分成多个小组，每个小组有basenum个数
 		else
 			dividgroup = S.size() / basenum + 1;
 
