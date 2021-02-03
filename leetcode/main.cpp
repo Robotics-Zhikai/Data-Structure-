@@ -74,6 +74,186 @@ void test()
 // }
 
 
+//240. 搜索二维矩阵 II
+//编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：
+//
+//每行的元素从左到右升序排列。
+//每列的元素从上到下升序排列。
+//https://leetcode-cn.com/problems/search-a-2d-matrix-ii/solution/sou-suo-er-wei-ju-zhen-ii-by-leetcode-2/
+class Solution240 {
+public:
+	bool searchMatrixViolence_search(vector<vector<int>>& matrix, int target) //暴力搜索，N^2的复杂度
+	{
+		for (int i = 0; i<matrix.size(); i++)
+		{
+			for (int j = 0; j<matrix[i].size(); j++)
+			{
+				if (matrix[i][j] == target)
+					return 1;
+			}
+		}
+		return 0;
+	}
+	bool searchMatrixTwoSplit(vector<vector<int>>& matrix, int target) //二分搜索，nlogn的复杂度 但是剪枝不多
+	{
+		if (matrix.empty())
+			return 0;
+		int left = 0;
+		int right = matrix[0].size();
+		int mid = (left + right) / 2;
+		while (mid != left)
+		{
+			if (matrix[0][mid]>target)
+				right = mid;
+			else if (matrix[0][mid]<target)
+				left = mid;
+			else
+				return 1;
+			mid = (left + right) / 2;
+		}
+		int rightup = left;
+
+		left = 0;
+		right = matrix.size();
+		mid = (left + right) / 2;
+		while (mid != left)
+		{
+			if (matrix[mid][0]>target)
+				right = mid;
+			else if (matrix[mid][0]<target)
+				left = mid;
+			else
+				return 1;
+			mid = (left + right) / 2;
+		}
+		int leftdown = left;
+
+		//至此分割出一个可能存在的区域来
+		for (int i = 0; i <= leftdown; i++)
+		{
+			left = 0;
+			right = rightup + 1;
+			mid = (left + right) / 2;
+			while (mid != left)
+			{
+				if (matrix[i][mid]>target)
+					right = mid;
+				else if (matrix[i][mid]<target)
+					left = mid;
+				else
+					return 1;
+				mid = (left + right) / 2;
+			}
+			if (matrix[i][left] == target)
+				return 1;
+		}
+		return 0;
+	}
+
+	int binarySearch(vector<vector<int>>& matrix, int target, bool vertical, int num, int left, int right) //二分搜索的调用函数
+	{
+		std::ios::sync_with_stdio(0);
+		// int left = 0;
+		// int right = vertical?matrix.size():matrix[0].size();
+		int mid = (left + right) / 2;
+		if (!vertical)
+		{
+			while (mid != left)
+			{
+				if (matrix[num][mid]>target)
+					right = mid;
+				else if (matrix[num][mid]<target)
+					left = mid;
+				else
+					return mid;
+				mid = (left + right) / 2;
+			}
+		}
+		else
+		{
+			while (mid != left)
+			{
+				if (matrix[mid][num]>target)
+					right = mid;
+				else if (matrix[mid][num]<target)
+					left = mid;
+				else
+					return mid;
+				mid = (left + right) / 2;
+			}
+		}
+		return left;
+	}
+	bool searchMatrixDivide(vector<vector<int>>& matrix, int target, int leftdownx, int leftdowny, int rightupx, int rightupy) //nlogn 剪枝很多 分治法
+		//TIPS！！！！:如果leftdown和rightup用vector<int>的话，然后用花括号初始化的话会很慢，远不如直接用四个int来的快，在这个题中直接造成了运行超时
+	{
+		// std::ios::sync_with_stdio(0); //这个可能与读取速度有关系，是一个trick 
+		if (leftdownx == rightupx || leftdowny == rightupy)
+			return 0; // 说明矩阵是空的，一定找不到元素
+
+		if (matrix[leftdowny][leftdownx]>target || matrix[rightupy - 1][rightupx - 1]<target) //这也是一个剪枝步
+			return 0;
+		else if (matrix[leftdowny][leftdownx] == target)
+			return 1;
+		int locy = binarySearch(matrix, target, 1, (leftdownx + rightupx) / 2, leftdowny, rightupy);
+		int locx = (leftdownx + rightupx) / 2;
+
+		if (matrix[locy][locx] == target)
+			return 1;
+		else
+		{
+			int tmpx = binarySearch(matrix, target, 0, locy, leftdownx, rightupx);
+			if (matrix[locy][tmpx] == target)
+				return 1;
+		}
+		if (searchMatrixDivide(matrix, target, leftdownx, locy + 1, locx, rightupy))
+			return 1;
+		else if (searchMatrixDivide(matrix, target, locx + 1, leftdowny, rightupx, locy))
+			return 1;
+		else
+			return 0;
+	}
+
+	bool searchMatrix_Ncomplexity(vector<vector<int>>& matrix, int target)//O(n^0.5)的复杂度,充分利用矩阵已排序的特性
+	{
+		std::ios::sync_with_stdio(0);//似乎加上这个后更快了
+		if (matrix.empty())
+			return 0;
+		int row = matrix.size() - 1;//这里一定要减1  不能犯这种低级错误！！ 
+									//只能是在一个方向变小，另一个方向变大 如果在左上角或者左下角，那么任意数都比初始数大或小，是有问题的
+		int col = 0;
+		while (row != -1 && col != matrix[0].size()) //如果高度为m 宽度为n 则复杂度为m+n
+		{
+			if (matrix[row][col]<target)
+				col++;
+			else if (matrix[row][col]>target)
+				row--;
+			else
+				return 1;
+		}
+		return 0;
+	}
+
+
+	bool searchMatrix(vector<vector<int>>& matrix, int target) {
+		// return searchMatrixViolence_search(matrix, target); //直接报错超出时间限制
+		// return searchMatrixTwoSplit(matrix, target);//用的是二分法，384ms 14.3MB 击败12.27% 67.05% nlogn
+
+		// if (!matrix.empty())
+		// 	return searchMatrixDivide(matrix, target,  0,0 ,  (int)matrix[0].size(),(int)matrix.size() ); //192ms 13.7MB 38.59% 71.86% nlogn 但是比单纯二分更好 剪枝更多
+		// else
+		// 	return 0;
+
+		return searchMatrix_Ncomplexity(matrix, target); //108ms 13.8MB 94.42% 71.72%
+	}
+
+	void test()
+	{
+		vector<vector<int>> matrix = { { 1,4,7,11,15 }, { 2,5,8,12,19 }, { 3,6,9,16,22 }, { 10,13,14,17,24 }, { 18,21,23,26,30 } };
+		searchMatrix(matrix, 5);
+	}
+
+};
 
 //973. 最接近原点的 K 个点
 //我们有一个由平面上的点组成的列表 points。需要从中找出 K 个距离原点(0, 0) 最近的点。
@@ -630,6 +810,9 @@ int main()
 {
 	try
 	{
+		Solution240 Solution240;
+		Solution240.test();
+
 		Solution23 Solution23;
 		Solution23.test();
 		test();
