@@ -73,6 +73,135 @@ void test()
 //     //这里不能用堆 但是这里的关于堆的简便写法可以借鉴
 // }
 
+//4. 寻找两个正序数组的中位数
+//给定两个大小为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的中位数。
+//
+//进阶：你能设计一个时间复杂度为 O(log(m + n)) 的算法解决此问题吗？
+class Solution4 {
+public:
+	double findMedianSortedArrays_On(vector<int>& nums1, vector<int>& nums2) //O(m+n)复杂度的算法，可以剪枝 但是速度没有本质上的提升
+	{
+		vector<int> mergevec(nums1.size() + nums2.size());
+		auto it1 = nums1.begin();
+		auto it2 = nums2.begin();
+		auto itmerge = mergevec.begin(); //由于只是找中位数，因此不一定要合并 直接找index就行
+
+		while (it1 != nums1.end() && it2 != nums2.end())
+		{
+			if (*it1<*it2)
+			{
+				*itmerge = *it1;
+				itmerge++;
+				it1++;
+			}
+			else
+			{
+				*itmerge = *it2;
+				itmerge++;
+				it2++;
+			}
+			//可以在这里剪枝，当运行到一半时推出，但是没有本质上的速度提升
+		}
+		while (it1 != nums1.end())
+		{
+			*itmerge = *it1;
+			itmerge++;
+			it1++;
+		}
+		while (it2 != nums2.end())
+		{
+			*itmerge = *it2;
+			itmerge++;
+			it2++;
+		}
+		if (mergevec.size() % 2 == 0)
+			return (mergevec[(mergevec.size() - 1) / 2] + mergevec[(mergevec.size() - 1) / 2 + 1]) / 2.0;
+		else
+			return mergevec[(mergevec.size() - 1) / 2];
+	}
+
+	int divide(vector<int>& nums1, vector<int>& nums2, int cur1, int cur2, int k) //要找第k小的数 k的起算点是1
+	{
+		if (cur1 == nums1.size())
+			return nums2[cur2 + k - 1];
+		else if (cur2 == nums2.size())
+			return nums1[cur1 + k - 1];
+
+		if (k == 1)
+			return nums1[cur1] <= nums2[cur2] ? nums1[cur1] : nums2[cur2];
+
+		int nums1mid = cur1 + k / 2 - 1;
+		int nums2mid = cur2 + k / 2 - 1;
+
+		if (nums1mid<nums1.size() && nums2mid<nums2.size()) //按正常情况处理
+		{
+			if (nums1[nums1mid] <= nums2[nums2mid])
+				cur1 = nums1mid + 1;
+			else
+				cur2 = nums2mid + 1;
+			return divide(nums1, nums2, cur1, cur2, k - k / 2);
+		}
+		else //否则有越界，按特殊情况处理 此时不能根据k/2那么剪枝了 
+		{
+			int ktmp = 0;
+			while (cur1 != nums1.size() && cur2 != nums2.size())
+			{
+				if (nums1[cur1] <= nums2[cur2])
+				{
+					if (++ktmp == k)
+						return nums1[cur1];
+					cur1++;
+				}
+				else
+				{
+					if (++ktmp == k)
+						return nums2[cur2];
+					cur2++;
+				}
+			}
+			while (cur1 != nums1.size())
+			{
+				if (++ktmp == k)
+					return nums1[cur1];
+				cur1++;
+			}
+			while (cur2 != nums2.size())
+			{
+				if (++ktmp == k)
+					return nums2[cur2];
+				cur2++;
+			}
+		}
+		return -1;
+	}
+	double findMedianSortedArrays_Ologn(vector<int>& nums1, vector<int>& nums2)
+	{
+		vector<int> midk;
+		int mergesize = nums1.size() + nums2.size();
+		if (mergesize % 2 == 0)
+			midk = { mergesize / 2,mergesize / 2 + 1 };
+		else
+			midk = { (mergesize + 1) / 2 };
+
+		int sum = 0;
+		for (auto it = midk.begin(); it != midk.end(); it++)
+			sum += divide(nums1, nums2, 0, 0, *it);
+
+		if (midk.size() == 2)
+			return sum / 2.0;
+		else
+			return sum;
+	}
+	double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+		// return findMedianSortedArrays_On(nums1, nums2);//28ms 87.3MB 击败98.99% 73.99%
+		return findMedianSortedArrays_Ologn(nums1, nums2);//32ms 86.9MB 击败97.36% 85.53% 实现的还是不够简洁
+	}
+};
+
+
+
+
+
 
 //240. 搜索二维矩阵 II
 //编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：
