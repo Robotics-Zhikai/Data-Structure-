@@ -77,6 +77,7 @@ void test()
 //给定两个大小为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的中位数。
 //
 //进阶：你能设计一个时间复杂度为 O(log(m + n)) 的算法解决此问题吗？
+//https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/
 class Solution4 {
 public:
 	double findMedianSortedArrays_On(vector<int>& nums1, vector<int>& nums2) //O(m+n)复杂度的算法，可以剪枝 但是速度没有本质上的提升
@@ -128,9 +129,9 @@ public:
 			return nums1[cur1 + k - 1];
 
 		if (k == 1)
-			return nums1[cur1] <= nums2[cur2] ? nums1[cur1] : nums2[cur2];
+			return nums1[cur1] <= nums2[cur2] ? nums1[cur1] : nums2[cur2]; //如果不加k=1的情况的话会在k/2-1时出现负数
 
-		int nums1mid = cur1 + k / 2 - 1;
+		int nums1mid = cur1 + k / 2 - 1; //只有每次加k/2-1才能保证能够把不需要的剪枝
 		int nums2mid = cur2 + k / 2 - 1;
 
 		if (nums1mid<nums1.size() && nums2mid<nums2.size()) //按正常情况处理
@@ -149,7 +150,7 @@ public:
 				if (nums1[cur1] <= nums2[cur2])
 				{
 					if (++ktmp == k)
-						return nums1[cur1];
+						return nums1[cur1]; //没必要全部合并且没必要记录合并情况，index加到给定位置后就可以return了
 					cur1++;
 				}
 				else
@@ -172,7 +173,7 @@ public:
 				cur2++;
 			}
 		}
-		return -1;
+		return -1; //一定不会到这里
 	}
 	double findMedianSortedArrays_Ologn(vector<int>& nums1, vector<int>& nums2)
 	{
@@ -194,7 +195,32 @@ public:
 	}
 	double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
 		// return findMedianSortedArrays_On(nums1, nums2);//28ms 87.3MB 击败98.99% 73.99%
-		return findMedianSortedArrays_Ologn(nums1, nums2);//32ms 86.9MB 击败97.36% 85.53% 实现的还是不够简洁
+		return findMedianSortedArrays_Ologn(nums1, nums2);//32ms 86.9MB 击败97.36% 85.53% 实现的还是不够简洁 
+		//LeetCode的测试数据不够大规模，体现不出logn算法的优势来
+	}
+
+	void test() //检测一下当大规模数据时到底是不是log的算法比线性算法好
+	{
+		vector<int> vec1;
+		for (int i = 0; i < 100000; i++)
+			vec1.push_back(rand() % 1000);
+		vector<int> vec2;
+		for (int i = 0; i < 1000000; i++)
+			vec2.push_back(rand() % 10000);
+
+		clock_t begin = clock();
+		double onresult = findMedianSortedArrays_On(vec1, vec2);
+		clock_t end = clock();
+		cout << "findMedianSortedArrays_On花费了" << (double)(end - begin) / CLOCKS_PER_SEC << "秒" << endl; //测试结果为2.817秒
+
+		begin = clock();
+		double olognresult = findMedianSortedArrays_Ologn(vec1, vec2);
+		end = clock();
+		cout << "findMedianSortedArrays_Ologn花费了" << (double)(end - begin) / CLOCKS_PER_SEC << "秒" << endl; //测试结果为0.314秒
+		//速度有明显改进
+
+		if (onresult != olognresult)
+			throw exception("实现出错");
 	}
 };
 
@@ -939,6 +965,9 @@ int main()
 {
 	try
 	{
+		Solution4 Solution4;
+		Solution4.test();
+
 		Solution240 Solution240;
 		Solution240.test();
 
