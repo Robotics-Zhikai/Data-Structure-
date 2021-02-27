@@ -1,6 +1,44 @@
 #pragma once
 #include "main.h"
 
+/*
+剑指 Offer 14- I. 剪绳子
+给你一根长度为 n 的绳子，请把绳子剪成整数长度的 m 段（m、n都是整数，n>1并且m>1），
+每段绳子的长度记为 k[0],k[1]...k[m-1] 。请问 k[0]*k[1]*...*k[m-1] 可能的最大乘积是多少？
+例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。
+*/
+class SolutionOffer14_1 {
+public:
+	int cuttingRope(int n) {
+		vector<int> Tn(n + 1, 0);
+		if (n == 0)
+			return 0;
+		else if (n == 1)
+		{
+			Tn[1] = 1;
+			return 1;
+		}
+		Tn[1] = 1;
+
+		for (int In = 2; In <= n; In++) //时间复杂度是N^2 空间复杂度是N 有巧妙的方法能降到N  但是估计面试是想不到的
+		{
+			int maxthis = 0;
+			for (int i = 1; i <= In - 1; i++)
+			{
+				int big = max(max(Tn[i] * (In - i), i*(In - i)), Tn[i] * Tn[In - i]);//注意这个判断容易丢
+				//动态规划的核心
+				if (big>maxthis)
+				{
+					maxthis = big;
+				}
+			}
+			Tn[In] = maxthis;
+		}
+		return Tn[n];
+	}
+};
+
+
 //70. 爬楼梯
 //假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
 //
