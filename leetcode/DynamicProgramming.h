@@ -2,6 +2,151 @@
 #include "main.h"
 
 /*
+5. 最长回文子串
+给你一个字符串 s，找到 s 中最长的回文子串。
+*/
+class Solution5 {
+public:
+	bool isbackStr(const string& str) //判断是否是回文串
+	{
+		if (str.size() <= 1)
+			return 1;
+		int left = 0;
+		int right = str.size() - 1;
+		while (left<right)
+		{
+			if (str[left++] != str[right--])
+				return 0;
+		}
+		return 1;
+	}
+	string longestPalindromeDP(string s) //用动态规划的方法
+	{
+		vector<vector<bool>> dp(s.size(), vector<bool>(s.size(), 0));//前闭后闭，标记字串是否是回文
+		if (s.size() == 1)
+			return s;
+		for (int i = 0; i<s.size(); i++)
+			dp[i][i] = 1;  //每个一个长度的字符串肯定是回文字符串
+		for (int i = 0; i <= s.size() - 2; i++)
+		{
+			dp[i][i + 1] = isbackStr(s.substr(i, 2)); //设置长度为2的字串的备忘录
+													  //需要注意的是substr不是类似于stl里边的前闭后开的，其参数含义为索引位置和长度！！！！！
+													  // cout<<s.substr(i,2)<<" "<<dp[i][i+1]<<endl;
+		}
+
+		for (int length = 3; length <= s.size(); length++)
+		{
+			for (int i = 0; i <= s.size() - length; i++)
+			{
+				// if (isbackStr(s.substr(i,i+length))) //如果这么搞的话就成了暴力枚举
+				// dp[i][i+1] = 1; 
+				dp[i][i + length - 1] = (s[i] == s[i + length - 1]) && (dp[i + 1][i + length - 1 - 1]); //很重要的递推式
+																										//关键是要想到这个递推式
+			}
+		}
+		for (int i = 0; ; i++)
+		{
+			for (int row = 0, col = s.size() - 1 - i; row <= i&&col <= s.size() - 1; row++, col++)
+			{
+				if (dp[row][col] == 1)
+				{
+					return s.substr(row, col - row + 1);
+				}
+			}
+		}
+	}
+
+	string CenterSpan(const string & s, int leftindex, int rightindex) //前闭后闭
+																	   //两种扩散的方法，一种是以间隙为中心，一种是以数字为中心
+	{
+
+		if (s.size() <= 1)
+			return s;
+
+		if (leftindex == rightindex)
+		{
+			int j;
+			if (leftindex == 0)
+				return s.substr(0, 1);
+			else if (leftindex == s.size() - 1)
+				return s.substr(s.size() - 1, 1);
+			for (j = 1; (leftindex + j) != s.size() && (leftindex - j) != -1; j++)
+			{
+				if (s[leftindex + j] != s[leftindex - j])
+				{
+					j--; //试探性的探出去，如果被打脸了就返回来
+					break;
+				}
+			}
+			if (!((leftindex + j) != s.size() && (leftindex - j) != -1))
+				j--;
+			return s.substr(leftindex - j, 2 * j + 1);
+		}
+		else if (leftindex<rightindex)
+		{
+			if (s[leftindex] != s[rightindex])
+				return string("");
+			if (leftindex == 0 || rightindex == s.size() - 1) //当处于边界时，不扩展
+				return s.substr(leftindex, rightindex - leftindex + 1);
+
+			int j;
+			for (j = 1; (rightindex + j) != s.size() && (leftindex - j) != -1; j++)
+			{
+				if (s[rightindex + j] != s[leftindex - j])
+				{
+					j--;
+					break;
+				}
+			}
+			if (!((rightindex + j) != s.size() && (leftindex - j) != -1))
+				j--;
+			return s.substr(leftindex - j, 2 * j + rightindex - leftindex + 1);
+		}
+		else
+			return "";
+
+	}
+	string longestPalindromeMidSpread(string s) //用中心扩散的方法，也是我一开始5分钟内想到的方法
+												//但是由于处理边界时不好处理，就没有继续写，转而去写动态规划了
+	{
+
+		vector<string> vecHitstr(s.size(), " ");  //恰好是给定数位置的拓展
+		vector<string> vecMidstr(s.size() - 1, " "); //间隙扩展
+
+		for (int i = 0; i<s.size(); i++)
+			vecHitstr[i] = CenterSpan(s, i, i);
+		for (int i = 0; i<s.size() - 1; i++)
+			vecMidstr[i] = CenterSpan(s, i, i + 1);
+
+		int Biggest = 0;
+		string BigStr = "";
+		for (int i = 0; i<vecHitstr.size(); i++)
+			if (vecHitstr[i].size()>Biggest)
+			{
+				Biggest = vecHitstr[i].size();
+				BigStr = vecHitstr[i];
+			}
+		for (int i = 0; i<vecMidstr.size(); i++)
+			if (vecMidstr[i].size()>Biggest)
+			{
+				Biggest = vecMidstr[i].size();
+				BigStr = vecMidstr[i];
+			}
+		return BigStr;
+	}
+	string longestPalindrome(string s) {
+		// return longestPalindromeDP(s); //876ms 29.3MB 20.93% 52.14%
+		return longestPalindromeMidSpread(s); //40ms 29.8MB 75.56% 47.71%
+	}
+
+	void test()
+	{
+		longestPalindrome(string("cbbd"));
+	}
+};
+
+
+/*
 剑指 Offer 14- II. 剪绳子 II
 给你一根长度为 n 的绳子，请把绳子剪成整数长度的 m 段（m、n都是整数，n>1并且m>1），
 每段绳子的长度记为 k[0],k[1]...k[m - 1] 。请问 k[0]*k[1]*...*k[m - 1] 可能的最大乘积是多少？

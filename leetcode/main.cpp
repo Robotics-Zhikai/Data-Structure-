@@ -4,7 +4,11 @@
 
 void test()
 {
-	
+	vector<int>(10, 2);
+	string te = "125asg";
+
+	string sub = te.substr(1, 3); //注意substr的用法
+
 	vector<int > hafg{ 1,2,3,4 };
 	hafg.erase(hafg.begin());
 	hafg.insert(hafg.begin() + 1,8);
@@ -71,6 +75,9 @@ int main()
 {
 	try
 	{
+		Solution5 Solution5;
+		Solution5.test();
+
 		Solution70 Solution70;
 		Solution70.test();
 
