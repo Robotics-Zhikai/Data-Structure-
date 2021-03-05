@@ -30,8 +30,8 @@ public:
 		for (int i = 0; i <= s.size() - 2; i++)
 		{
 			dp[i][i + 1] = isbackStr(s.substr(i, 2)); //设置长度为2的字串的备忘录
-													  //需要注意的是substr不是类似于stl里边的前闭后开的，其参数含义为索引位置和长度！！！！！
-													  // cout<<s.substr(i,2)<<" "<<dp[i][i+1]<<endl;
+				//需要注意的是substr不是类似于stl里边的前闭后开的，其参数含义为索引位置和长度！！！！！
+				// cout<<s.substr(i,2)<<" "<<dp[i][i+1]<<endl;
 		}
 
 		for (int length = 3; length <= s.size(); length++)
@@ -57,7 +57,9 @@ public:
 	}
 
 	string CenterSpan(const string & s, int leftindex, int rightindex) //前闭后闭
-																	   //两种扩散的方法，一种是以间隙为中心，一种是以数字为中心
+		//两种扩散的方法，一种是以间隙为中心，一种是以数字为中心
+		//比较难写的是这个函数！！！！！！ 需要能够想到以间隙为中心扩展和以数字为中心扩展
+		//体现了适当的增加中间值可以减少初始化的步骤 这个问题增加了间隔
 	{
 
 		if (s.size() <= 1)
@@ -78,14 +80,14 @@ public:
 					break;
 				}
 			}
-			if (!((leftindex + j) != s.size() && (leftindex - j) != -1))
+			if (!((leftindex + j) != s.size() && (leftindex - j) != -1)) //这里也是不太容易注意到的点
 				j--;
 			return s.substr(leftindex - j, 2 * j + 1);
 		}
 		else if (leftindex<rightindex)
 		{
-			if (s[leftindex] != s[rightindex])
-				return string("");
+			if (s[leftindex] != s[rightindex]) //这里也是易错点
+				return string("");  //当用间隙时，如果间隙两端的数字不相等，理所当然的就不是回文串
 			if (leftindex == 0 || rightindex == s.size() - 1) //当处于边界时，不扩展
 				return s.substr(leftindex, rightindex - leftindex + 1);
 
@@ -108,6 +110,7 @@ public:
 	}
 	string longestPalindromeMidSpread(string s) //用中心扩散的方法，也是我一开始5分钟内想到的方法
 												//但是由于处理边界时不好处理，就没有继续写，转而去写动态规划了
+												//当把间隙也考虑进来进行拓展时就好处理了
 	{
 
 		vector<string> vecHitstr(s.size(), " ");  //恰好是给定数位置的拓展
@@ -137,6 +140,11 @@ public:
 	string longestPalindrome(string s) {
 		// return longestPalindromeDP(s); //876ms 29.3MB 20.93% 52.14%
 		return longestPalindromeMidSpread(s); //40ms 29.8MB 75.56% 47.71%
+
+	//动态规划法要枚举所有边界，是N^2的
+	//中心扩散法不需要枚举N^2的边界，是2N的
+	//虽然二者都是N^2的复杂度，但是显然后者更实惠些
+	//动态规划法多算了不是回文串的部分，而中心扩散法一个不是回文串的也没有算 理所当然的后者时间更短
 	}
 
 	void test()
