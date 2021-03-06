@@ -1,6 +1,76 @@
 #pragma once
 #include "main.h"
 
+/*
+64. 最小路径和
+给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+
+说明：每次只能向下或者向右移动一步。
+*/
+//这道题只能向下或者向右移动一步 是一个比较明显的动态规划 但是当上下左右都能移动时，就不好看成动态规划了 可能是贪心
+class Solution64 {
+public:
+	int inf = 99999;
+	int minPathSum(vector<vector<int>>& grid) {
+		if (grid.empty())
+			return 0;
+		if (grid.size() == 1)
+			return accumulate(grid[0].begin(), grid[0].end(), 0);
+		int m = grid.size();
+		int n = grid[0].size();
+		vector<vector<int>> dp(m, vector<int>(n, inf));
+		//实际上可以不要这个dp，直接在grid上修改值 因为按照顺序的话原矩阵的值只需要用一次
+		//这样就可以把空间复杂度降到1
+		dp[0][0] = grid[0][0];
+		for (int j = 1; j<n; j++)
+		{
+			int col = j;
+			int row = 0;
+			while (col != -1 && row != m) //这两个while循环是重复的内容，可以封装到一个函数中
+			{
+				if (row == 0)
+					dp[row][col] = dp[row][col - 1] + grid[row][col];
+				else if (col == 0)
+					dp[row][col] = dp[row - 1][col] + grid[row][col];
+				else
+				{
+					int uptodown = dp[row - 1][col] + grid[row][col];
+					int lefttoright = dp[row][col - 1] + grid[row][col];
+					if (uptodown<lefttoright)
+						dp[row][col] = uptodown;
+					else
+						dp[row][col] = lefttoright;
+				}
+				row++;
+				col--;
+			}
+		}
+		for (int i = 1; i<m; i++)
+		{
+			int col = n - 1;
+			int row = i;
+			while (col != -1 && row != m)
+			{
+				if (row == 0)
+					dp[row][col] = dp[row][col - 1] + grid[row][col];
+				else if (col == 0)
+					dp[row][col] = dp[row - 1][col] + grid[row][col];
+				else
+				{
+					int uptodown = dp[row - 1][col] + grid[row][col];
+					int lefttoright = dp[row][col - 1] + grid[row][col];
+					if (uptodown<lefttoright)
+						dp[row][col] = uptodown;
+					else
+						dp[row][col] = lefttoright;
+				}
+				row++;
+				col--;
+			}
+		}
+		return dp[m - 1][n - 1];
+	}
+};
 
 /*
 96. 不同的二叉搜索树
@@ -33,8 +103,6 @@ public:
 		return vecnum[n];
 	}
 };
-
-
 
 
 /*

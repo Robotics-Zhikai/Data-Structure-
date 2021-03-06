@@ -75,6 +75,8 @@ int main()
 {
 	try
 	{
+		vector<int> saf(10, 1);
+		bool s=saf.empty();
 		Solution5 Solution5;
 		Solution5.test();
 

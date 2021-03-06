@@ -7,5 +7,6 @@
 #include <map>
 #include <unordered_map>
 #include <iterator>
+#include <numeric>
 
 using namespace std;
