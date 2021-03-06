@@ -2,6 +2,97 @@
 #include "main.h"
 
 /*
+474. 一和零
+给你一个二进制字符串数组 strs 和两个整数 m 和 n 。
+
+请你找出并返回 strs 的最大子集的大小，该子集中 最多 有 m 个 0 和 n 个 1 。
+
+如果 x 的所有元素也是 y 的元素，集合 x 是集合 y 的 子集 。
+*/
+class Solution474 {
+public:
+
+	int findMaxFormDP1(vector<string>& strs, int m, int n)
+	{
+		vector<vector<int>> dp2DLast(m + 1, vector<int>(n + 1, 0));
+		vector<vector<int>> dp2D(m + 1, vector<int>(n + 1, 0)); //[0,m] [0,n]
+																// vector<vector<vector<int>>> dp(strs.size()+1,dp2D); //后开
+
+																//弄成三维数组更好理解些 dp[i][j][k] 第一维是物品的选取范围是[0,i)，第二维是最多有j个0，第三维是最多有k个1
+																//然后经过分析，发现i+1的dp仅和i的dp有关，这样的话就可以用两个二维矩阵Last和Current来代替
+																//这样直接就把内存消耗由100MB降到了10MB 运行时间由480ms降到了272ms
+
+		for (int i = 1; i <= strs.size(); i++)
+		{
+			int count0 = count(strs[i - 1].begin(), strs[i - 1].end(), '0');
+			int count1 = count(strs[i - 1].begin(), strs[i - 1].end(), '1');
+			for (int j = 0; j <= m; j++)
+			{
+				for (int k = 0; k <= n; k++)
+				{
+					int j_count0 = j - count0;
+					int k_count1 = k - count1;
+					if (j_count0<0 || k_count1<0) //此时肯定装不进新的字符串
+												  //dp[i][j][k] = dp[i-1][j][k];  
+												  //为了更好的对比 把没有经过滚动数组降维的保留下来 下边一行和本行其实是等价的
+						dp2D[j][k] = dp2DLast[j][k];
+					else
+						//dp[i][j][k] = max(dp[i-1][j][k],dp[i-1][j_count0][k_count1]+1);//01背包问题的核心
+						dp2D[j][k] = max(dp2DLast[j][k], dp2DLast[j_count0][k_count1] + 1);
+				}
+			}
+			dp2DLast = dp2D; //有一个滚动的过程
+		}
+		return dp2D[m][n];
+	}
+
+	int findMaxFormDP2(vector<string>& strs, int m, int n)//更深层次的根据递推式的优化
+	{
+		//虽然在findMaxFormDP1中有相应的压缩，但是任旧有两个vector<vector<int>>储存前一个和后一个值
+		//实际上可以只用一个vector<vector<int>>，从后往前更新 
+		//用一个vector<vector<int>>对速度没有本质提升，只是让占有空间更小了
+		//vector<vector<int>> dp2D(m+1,vector<int>(n+1,0)); //[0,m] [0,n]
+		int dp2D[m + 1][n + 1]; //动态创建一个二维数组
+		memset(dp2D, 0, sizeof(dp2D)); //将以dp2D指针开始的(m+1)*(n+1)字节内存的数据赋值为0
+									   //当用这个替代vector<vector<int>> 时直接由268ms 9.5MB 降到了60ms 8.5MB 速度有了本质提升
+
+		for (int i = 1; i <= strs.size(); i++)
+		{
+			int count0 = count(strs[i - 1].begin(), strs[i - 1].end(), '0');
+			int count1 = count(strs[i - 1].begin(), strs[i - 1].end(), '1');
+			//for(int j = 0;j<=m;j++)
+			for (int j = m; j >= 0; j--)
+			{
+				//for(int k=0;k<=n;k++)
+				for (int k = n; k >= 0; k--)
+				{
+					int j_count0 = j - count0;
+					int k_count1 = k - count1;
+					if (j_count0<0 || k_count1<0) //此时肯定装不进新的字符串
+												  //dp2D[j][k] = dp2DLast[j][k]; 
+						dp2D[j][k] = dp2D[j][k];
+					else
+						//dp2D[j][k] = max(dp2DLast[j][k],dp2DLast[j_count0][k_count1]+1);
+						dp2D[j][k] = max(dp2D[j][k], dp2D[j_count0][k_count1] + 1);
+					//由于是从后往前，所以所有小于jk的dp2D都没有更新
+				}
+			}
+			//dp2DLast = dp2D; //有一个滚动的过程
+		}
+		return dp2D[m][n];
+	}
+
+	//这是一个01背包问题 字符串集合中的每一个字符串是否放入
+	//和基本的01背包问题的区别是本题有两个约束条件，因此初始情况下有三维
+	//可以用暴力求解，枚举所有可能性，复杂度是c*2^n，n=strs.size() 
+	int findMaxForm(vector<string>& strs, int m, int n) {
+		//return findMaxFormDP1(strs,m,n);
+		return findMaxFormDP2(strs, m, n); //本质上这两个函数基于的方法是一样的，但是实现方式有区别 DP2更高效
+	}
+};
+
+
+/*
 64. 最小路径和
 给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
 
