@@ -1,6 +1,42 @@
 #pragma once
 #include "main.h"
 
+
+/*
+96. 不同的二叉搜索树
+给定一个整数 n，求以 1 ... n 为节点组成的二叉搜索树有多少种？
+难度中等
+*/
+class Solution96 {
+public:
+	//用DP的方法一次通过 0ms 6MB 100% 63.4%
+	int numTrees(int n) {
+		vector<int> vecnum(n + 1, 0);
+		if (n == 0)
+			return 1;
+		else if (n == 1)
+			return 1;
+		else if (n == 2)
+			return 2;
+		vecnum[0] = 1;
+		vecnum[1] = 1;
+		vecnum[2] = 2;
+		for (int i = 3; i <= n; i++)
+		{
+			int currentnum = 0;
+			for (int index = 0; index<i; index++)
+			{
+				currentnum += vecnum[index] * vecnum[i - index - 1];
+			}
+			vecnum[i] = currentnum;
+		}
+		return vecnum[n];
+	}
+};
+
+
+
+
 /*
 5. 最长回文子串
 给你一个字符串 s，找到 s 中最长的回文子串。
