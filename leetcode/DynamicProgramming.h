@@ -2,12 +2,191 @@
 #include "main.h"
 
 /*
+494. 目标和
+给定一个非负整数数组，a1, a2, ..., an, 和一个目标数，S。现在你有两个符号 + 和 -。
+对于数组中的任意一个整数，你都可以从 + 或 -中选择一个符号添加在前面。
+
+返回可以使最终数组和为目标数 S 的所有添加符号的方法数。
+
+https://leetcode-cn.com/problems/target-sum/solution/494-mu-biao-he-01bei-bao-xiang-jie-by-ca-1kt5/
+*/
+class Solution494 {
+public:
+	int findTargetSumWaysDP1(vector<int>& nums, int S)
+	{
+		const int n = nums.size();
+		int sum = accumulate(nums.begin(), nums.end(), 0);
+
+		if (S>sum) //全部加起来还比S小 那么就不能表示
+			return 0; //这个容易丢！！！！！！
+
+		//int dp[n][2 * sum + 1]; //dp[i][j]表示[0,i]的数等于j-sum有多少种符号选取方法
+		//memset(dp, 0, sizeof(dp)); //后闭 ！！！！！！！！！！！
+		//可能是vs版本低的原因，在vs2015中不能动态分配数组，只能是在编译期就知道数组大小才可以
+
+		vector<vector<int>> dp(n, vector<int>(2 * sum + 1, 0));
+
+		if (nums[0] == 0) //这里容易出错！！！！！！ 必须正确考虑初始条件
+			dp[0][0 + sum] = 2;
+		else
+		{
+			dp[0][-nums[0] + sum] = 1;
+			dp[0][nums[0] + sum] = 1;
+		}
+
+		for (int i = 1; i<n; i++)
+		{
+			for (int j = 0; j<2 * sum + 1; j++)
+			{
+				int first = 0;
+				int second = 0;
+				if (j - nums[i] >= 0)
+				{
+					first = dp[i - 1][j - nums[i]]; //当前数值符号记为+有这么多种方法
+				}
+				if (j + nums[i]<2 * sum + 1)
+				{
+					second = dp[i - 1][j + nums[i]]; //当前数值符号记为-有这么多种方法
+				}
+				dp[i][j] = first + second; //这是核心的递推方程 
+				//考虑边界情况时不要想得太复杂，如果太复杂大概率有更简单更普遍能代表所有情况的代码！！！！！！！！
+				//就比如下边注释掉的这段代码，考虑很多情况，涵盖还不完全，实际上很简单的上边这段就可以解决
+				// if (dp[i-1][j]!=0 && nums[i]!=0)
+				// {
+				//     dp[i][j] = 0;//说明前边的就能满足 没必要加上或减去现在这个大于0的数字
+				// }
+				// else
+				// {
+
+				// }
+			}
+		}
+		return S + sum<2 * sum + 1 ? dp[n - 1][S + sum] : 0;
+		//一定要注意！！！不应该是找最大值，而应该是找最后一个值 因为所有的数字都需要加符号，不存在某个数字不用的情况
+		// int result = 0;
+		// for(int i = 0;i<n;i++)
+		// {
+		//     if (S+sum<2*sum+1&&dp[i][S+sum]>result)
+		//         result = dp[i][S+sum];
+		// }
+		// return result;
+	}
+	int findTargetSumWaysDP2(vector<int>& nums, int S)  //经过空间优化的版本
+	{
+		const int n = nums.size();
+		int sum = accumulate(nums.begin(), nums.end(), 0);
+
+		if (S>sum) //全部加起来还比S小 那么就不能表示
+			return 0; //这个容易丢！！！！！！
+
+		// int dp[n][2*sum+1]; //dp[i][j]表示[0,i]的数等于j-sum有多少种符号选取方法
+		// memset(dp,0,sizeof(dp)); //后闭 ！！！！！！！！！！！
+
+		//int dp_cur[2 * sum + 1]; //从下边代码可以看到dpi只与dpi-1有关
+		//int dp_last[2 * sum + 1];
+		//memset(dp_cur, 0, sizeof(dp_cur));
+		//memset(dp_last, 0, sizeof(dp_last));
+		vector<int> dp_cur(2 * sum + 1, 0);
+		vector<int> dp_last(2 * sum + 1, 0);
+
+		auto curdp = dp_cur.begin(); //必须有这个，否则代表数组首地址的dp_cur dp_last是无法交换的
+		auto lastdp = dp_last.begin();
+
+		if (nums[0] == 0) //这里容易出错！！！！！！ 必须正确考虑初始条件
+						  //dp[0][0+sum] = 2;
+			lastdp[0 + sum] = 2;
+		else
+		{
+			// dp[0][-nums[0]+sum] = 1;
+			// dp[0][nums[0]+sum] = 1;
+			lastdp[-nums[0] + sum] = 1;
+			lastdp[nums[0] + sum] = 1;
+		}
+
+		int * mid = 0;
+		for (int i = 1; i<n; i++)
+		{
+			for (int j = 0; j<2 * sum + 1; j++)
+			{
+				int first = 0;
+				int second = 0;
+				if (j - nums[i] >= 0)
+				{
+					//first = dp[i-1][j-nums[i]];
+					first = lastdp[j - nums[i]];
+				}
+				if (j + nums[i]<2 * sum + 1)
+				{
+					//second = dp[i-1][j+nums[i]];
+					second = lastdp[j + nums[i]];
+				}
+				//dp[i][j] = first+second; //这是核心的递推方程 
+				curdp[j] = first + second;
+			}
+			swap(lastdp, curdp); //交换指针而不是数据，可以提高速度 
+								 //经过交换后当前的dp就换到了last
+		}
+		return S + sum<2 * sum + 1 ? lastdp[S + sum] : 0;
+	}
+	int findTargetSumWaysDP3(vector<int>& nums, int S)
+	{
+		//这道题能转换到标准的01背包问题
+		//Sum为所有数之和 A为符号为+的数的和 B为符号为-的数的和 A+B=Sum A-B=S 
+		//联立得到2A=S+Sum A=(S+Sum)/2 而S、Sum 都是已知的，因此A是一个固定的数
+		//也就是说符号为+的数的和应该等于A时就找到了一种解
+		//又因为所有的输入数的序列为整数，所以符号位+的数的和不应该有小数，因此当(S+Sum)/2是小数时也不能找到解
+		const int n = nums.size();
+		int sum = accumulate(nums.begin(), nums.end(), 0);
+		if (sum<S || (S + sum) % 2 != 0)
+			return 0;
+
+		int A = (S + sum) / 2; //DP3时间少的主要原因是一开始就把问题规模降下来了
+
+		//int dp[n][A + 1]; //dp[i][j]表示[0,i]的数中选中的数的和等于j的有多少种方法
+		//memset(dp, 0, sizeof(dp));
+		vector<vector<int>> dp(n, vector<int>(A + 1, 0));
+
+		if (nums[0]<A + 1)
+			dp[0][nums[0]] = 1;
+		dp[0][0] += 1;
+		//只考虑第一个数，当首项非零时，和为0的方法就是不选，有1个方法
+		//只考虑第一个数，当首项为0时，和为0的方法有两个，选和不选 
+		for (int i = 1; i<n; i++)
+		{
+			for (int j = 0; j <= A; j++)
+			{
+				dp[i][j] = j - nums[i] >= 0 ? dp[i - 1][j - nums[i]] : 0; //选当前值时有这么多方法
+				dp[i][j] += dp[i - 1][j]; //不选当前值时有这么多方法 二者加起来就是总的方法数量
+				//这个可以调整成1维逆序 比较好调，就不调了
+			}
+		}
+		return dp[n - 1][A]; //由于原问题已经转化了，所以与S无关了！！！！！！
+	}
+	//也是一个01背包问题，按照01背包问题的思路去想，但是不同的是这个相当于所有的物品都得装，
+	//因此不能把dp[][]看做是不等式，只能看做等式
+	//除了用动态规划，还可以用其他方法
+	int findTargetSumWays(vector<int>& nums, int S) {
+		//return findTargetSumWaysDP1(nums,S); //48ms 8.9MB 55.05% 77.19%
+		//return findTargetSumWaysDP2(nums,S); //48ms 8.7MB 55.05 88.84
+		return findTargetSumWaysDP3(nums, S); //8ms 8.6MB 92.48% 98.29%
+	}
+
+	void test()
+	{
+		findTargetSumWays(vector<int>{2, 107, 109, 113, 127, 131, 137, 3, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 47, 53}, 2147483647);
+	}
+};
+
+
+/*
 474. 一和零
 给你一个二进制字符串数组 strs 和两个整数 m 和 n 。
 
 请你找出并返回 strs 的最大子集的大小，该子集中 最多 有 m 个 0 和 n 个 1 。
 
 如果 x 的所有元素也是 y 的元素，集合 x 是集合 y 的 子集 。
+
+https://leetcode-cn.com/problems/ones-and-zeroes/solution/dong-tai-gui-hua-zhuan-huan-wei-0-1-bei-bao-wen-ti/
 */
 class Solution474 {
 public:
@@ -16,11 +195,11 @@ public:
 	{
 		vector<vector<int>> dp2DLast(m + 1, vector<int>(n + 1, 0));
 		vector<vector<int>> dp2D(m + 1, vector<int>(n + 1, 0)); //[0,m] [0,n]
-																// vector<vector<vector<int>>> dp(strs.size()+1,dp2D); //后开
+		// vector<vector<vector<int>>> dp(strs.size()+1,dp2D); //后开
 
-																//弄成三维数组更好理解些 dp[i][j][k] 第一维是物品的选取范围是[0,i)，第二维是最多有j个0，第三维是最多有k个1
-																//然后经过分析，发现i+1的dp仅和i的dp有关，这样的话就可以用两个二维矩阵Last和Current来代替
-																//这样直接就把内存消耗由100MB降到了10MB 运行时间由480ms降到了272ms
+		//弄成三维数组更好理解些 dp[i][j][k] 第一维是物品的选取范围是[0,i)，第二维是最多有j个0，第三维是最多有k个1
+		//然后经过分析，发现i+1的dp仅和i的dp有关，这样的话就可以用两个二维矩阵Last和Current来代替
+		//这样直接就把内存消耗由100MB降到了10MB 运行时间由480ms降到了272ms
 
 		for (int i = 1; i <= strs.size(); i++)
 		{
@@ -33,8 +212,8 @@ public:
 					int j_count0 = j - count0;
 					int k_count1 = k - count1;
 					if (j_count0<0 || k_count1<0) //此时肯定装不进新的字符串
-												  //dp[i][j][k] = dp[i-1][j][k];  
-												  //为了更好的对比 把没有经过滚动数组降维的保留下来 下边一行和本行其实是等价的
+					//dp[i][j][k] = dp[i-1][j][k];  
+					//为了更好的对比 把没有经过滚动数组降维的保留下来 下边一行和本行其实是等价的
 						dp2D[j][k] = dp2DLast[j][k];
 					else
 						//dp[i][j][k] = max(dp[i-1][j][k],dp[i-1][j_count0][k_count1]+1);//01背包问题的核心
@@ -51,10 +230,11 @@ public:
 		//虽然在findMaxFormDP1中有相应的压缩，但是任旧有两个vector<vector<int>>储存前一个和后一个值
 		//实际上可以只用一个vector<vector<int>>，从后往前更新 
 		//用一个vector<vector<int>>对速度没有本质提升，只是让占有空间更小了
-		//vector<vector<int>> dp2D(m+1,vector<int>(n+1,0)); //[0,m] [0,n]
-		int dp2D[m + 1][n + 1]; //动态创建一个二维数组
-		memset(dp2D, 0, sizeof(dp2D)); //将以dp2D指针开始的(m+1)*(n+1)字节内存的数据赋值为0
-									   //当用这个替代vector<vector<int>> 时直接由268ms 9.5MB 降到了60ms 8.5MB 速度有了本质提升
+		vector<vector<int>> dp2D(m+1,vector<int>(n+1,0)); //[0,m] [0,n]
+
+	//	int dp2D[m + 1][n + 1]; //动态创建一个二维数组
+	//	memset(dp2D, 0, sizeof(dp2D)); //将以dp2D指针开始的(m+1)*(n+1)字节内存的数据赋值为0
+	//当用这个替代vector<vector<int>> 时直接由268ms 9.5MB 降到了60ms 8.5MB 速度有了本质提升
 
 		for (int i = 1; i <= strs.size(); i++)
 		{
