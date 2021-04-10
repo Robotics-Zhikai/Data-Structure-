@@ -76,6 +76,10 @@ int main()
 {
 	try
 	{
+		vector<int> tmp = { 1,2,3,4 };
+		swap(*tmp.begin(), *(tmp.end() - 1));
+		swap(tmp[0], tmp[1]);
+
 		Solution206 Solution206;
 		Solution206.test();
 

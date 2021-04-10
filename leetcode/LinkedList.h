@@ -69,8 +69,5 @@ public:
 		head = reverseList(head);
 	}
 
-	ListNode* reverseList(ListNode* head) {
-		return reverseListRecur(head);
-	}
 };
 
