@@ -1,6 +1,7 @@
 #include "main.h"
 #include "DivideAndConquer.h"
 #include "DynamicProgramming.h"
+#include "LinkedList.h"
 
 void test()
 {
@@ -75,6 +76,9 @@ int main()
 {
 	try
 	{
+		Solution206 Solution206;
+		Solution206.test();
+
 		Solution494 Solution494;
 		Solution494.test();
 
