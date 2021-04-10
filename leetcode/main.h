@@ -8,5 +8,6 @@
 #include <unordered_map>
 #include <iterator>
 #include <numeric>
+#include <stack>
 
 using namespace std;
