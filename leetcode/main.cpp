@@ -5,6 +5,21 @@
 
 void test()
 {
+/*
+to_string 数字转string
+stoi string转数字 
+
+
+*/
+	string strnum = to_string(13.415);
+
+	stack<int > st;
+	st.push(1);
+
+	vector<int> tmp = { 1,2,3,4 };
+	swap(*tmp.begin(), *(tmp.end() - 1));
+	swap(tmp[0], tmp[1]);
+
 	vector<int>(10, 2);
 	string te = "125asg";
 
@@ -21,8 +36,8 @@ void test()
 	make_heap(testheap.begin(), testheap.end());
 	if (int(-20))
 		cout << "int(-20)" << endl;
-	int * tmp = nullptr;
-	if (tmp == nullptr)
+	int * tmp1 = nullptr;
+	if (tmp1 == nullptr)
 		cout << "s" << endl;
 	vector<int> vectmp = { 1,2,3,4 };
 	vector<int> hahaffg(vectmp.begin(), vectmp.begin() + 1);
@@ -77,12 +92,7 @@ int main()
 {
 	try
 	{
-		stack<int > st;
-		st.push(1);
-		
-		vector<int> tmp = { 1,2,3,4 };
-		swap(*tmp.begin(), *(tmp.end() - 1));
-		swap(tmp[0], tmp[1]);
+		test();
 
 		Solution206 Solution206;
 		Solution206.test();
@@ -104,7 +114,7 @@ int main()
 
 		Solution23 Solution23;
 		Solution23.test();
-		test();
+		
 
 		Solution215 Solution215;
 		Solution215.test();
