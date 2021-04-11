@@ -11,6 +11,7 @@ void test()
 	string sub = te.substr(1, 3); //注意substr的用法
 
 	vector<int > hafg{ 1,2,3,4 };
+	
 	hafg.erase(hafg.begin());
 	hafg.insert(hafg.begin() + 1,8);
 	vector<int > hafg1 = { hafg.begin(),hafg.end() };
@@ -76,6 +77,9 @@ int main()
 {
 	try
 	{
+		stack<int > st;
+		st.push(1);
+		
 		vector<int> tmp = { 1,2,3,4 };
 		swap(*tmp.begin(), *(tmp.end() - 1));
 		swap(tmp[0], tmp[1]);
