@@ -12,7 +12,7 @@ stoi string×ªÊý×Ö
 
 */
 	string strnum = to_string(13.415);
-
+	
 	stack<int > st;
 	st.push(1);
 

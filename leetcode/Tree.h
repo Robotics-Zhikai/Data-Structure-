@@ -258,7 +258,7 @@ public:
 
 class SolutionOffer07 {
 public:
-	unordered_map<int, int> mapping;//inorder中数字和index的映射
+	unordered_map<int, int> mapping;//inorder中数字和index的映射 O(n)的空间存储哈希映射
 	vector<int> preo;
 	vector<int> ino;
 	TreeNode* recur(int rootindex, int left, int right)//左闭右开
