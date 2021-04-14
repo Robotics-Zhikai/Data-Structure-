@@ -144,7 +144,7 @@ public:
 		//没有用递归
 		//写非递归的树遍历程序的时候，要借助栈，然后按照脑子中想的遍历顺序去一步一步写，自然就写出来了
 	{
-		stack<bool> LorR;//记录当前节点的访问情况 0为初次访问，1为第二次访问
+		stack<bool> LorR;//记录当前节点的访问情况 0为初次访问，1为已经访问了右子树
 		vector<TreeNode*> S;
 
 		TreeNode *curp = root;
@@ -247,4 +247,92 @@ public:
 		//return pathSumStack(root, target); //4ms 19.4MB 97.81% 67.98%
 		return TraverseRecur(root, target);//8ms 19.6MB 86.98% 30.63% 这个时间不准 每次运行都不一样 且变化范围很大 
 	}
+};
+
+
+/*
+剑指 Offer 07. 重建二叉树
+输入某二叉树的前序遍历和中序遍历的结果，请重建该二叉树。假设输入的前序遍历和中序遍历的结果中都不含重复的数字。
+这要好好看看！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+*/
+
+class SolutionOffer07 {
+public:
+	unordered_map<int, int> mapping;//inorder中数字和index的映射
+	vector<int> preo;
+	vector<int> ino;
+	TreeNode* recur(int rootindex, int left, int right)//左闭右开
+													   //输入子树的根节点在preo的索引rootindex，并把子树的所有在ino的索引用[left,right)括起来
+													   //然后返回子树的根节点
+	{
+		if (left >= right)
+			return nullptr;
+		int rootvalue = preo[rootindex];
+		TreeNode* node = new TreeNode(rootvalue);
+		node->left = recur(rootindex + 1, left, mapping[rootvalue]);//二叉树的遍历是先遍历左子树，再遍历右子树
+																	//所以rootindex+1是左子树的根节点， rootindex+mapping[rootvalue]-left+1是右子树的根节点
+		node->right = recur(rootindex + mapping[rootvalue] - left + 1, mapping[rootvalue] + 1, right);
+		return node;
+	}
+	TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+		preo = preorder;//把这个提出去能够提升速度
+		ino = inorder;
+		for (int i = 0; i<inorder.size(); i++)
+			mapping[inorder[i]] = i;
+		return recur(0, 0, inorder.size());
+	}
+
+/*
+
+前序遍历，从根节点root开始，只要有左子节点，就一直会往左下方走，直到最左下角。 
+而中序遍历，是从最左下角往上（示例中的4-5-8-9-3），如果碰到节点有右子节点，则会转向（示例中的8-10）。
+
+因此，代码中的if块是用前序数组一直构建左子树，如果碰到了inorder[inorderIndex]，表示到了左下角，
+这时就需要往上走并处理右子树，也就是while代码块。
+
+这是迭代的方法，这跟已知二叉树结构，迭代深度优先遍历二叉树的程序结构是一样的，都是借助栈，从
+根节点开始，不断把左子节点压栈，只不过已知树的结构可以直接通过判断左子树是否为null来判断，
+而对于已知遍历结果未知树的结构来说，需要从前序遍历的值和中序遍历的值相等来判断左子树为null。
+
+然后就是弹栈，直到弹到右子树出现
+
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        if (!preorder.size()) {
+            return nullptr;
+        }
+        TreeNode* root = new TreeNode(preorder[0]);
+        stack<TreeNode*> stk;
+        stk.push(root);
+        int inorderIndex = 0;
+        for (int i = 1; i < preorder.size(); ++i) {
+            int preorderVal = preorder[i];
+            TreeNode* node = stk.top();
+            if (node->val != inorder[inorderIndex]) {
+                node->left = new TreeNode(preorderVal);
+                stk.push(node->left);
+            }
+            else {
+                while (!stk.empty() && stk.top()->val == inorder[inorderIndex]) {
+                    node = stk.top();
+                    stk.pop();
+                    ++inorderIndex;
+                }
+                node->right = new TreeNode(preorderVal);
+                stk.push(node->right);
+            }
+        }
+        return root;
+    }
+};
+
+作者：LeetCode-Solution
+链接：https://leetcode-cn.com/problems/zhong-jian-er-cha-shu-lcof/solution/mian-shi-ti-07-zhong-jian-er-cha-shu-by-leetcode-s/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+
+
+*/
 };
