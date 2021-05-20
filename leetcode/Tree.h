@@ -380,3 +380,51 @@ public:
 
 */
 };
+
+
+/*
+剑指 Offer 26. 树的子结构
+输入两棵二叉树A和B，判断B是不是A的子结构。(约定空树不是任意一个树的子结构)
+
+B是A的子结构， 即 A中有出现和B相同的结构和节点值。
+
+*/
+class SolutionOffer26 {
+public:
+	bool recur(TreeNode* Aroot, TreeNode* Broot)
+	{
+		if ((Aroot == Broot &&Broot == nullptr) || (Broot == nullptr&&Aroot != nullptr))
+			return 1;
+		if (Aroot == nullptr&&Broot != nullptr)
+			return 0;
+
+		if (Aroot->val == Broot->val) {
+			if (recur(Aroot->left, Broot->left) && recur(Aroot->right, Broot->right)) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+
+	bool search(TreeNode* root, TreeNode* Broot) //递归的搜索某一节点为根的子结构是否包含在root中
+	{ //只有能直接判断root为根的子树都不能或能匹配Broot时，才直接返回
+		if (root == nullptr || Broot == nullptr)
+			return 0;
+		if (root->val == Broot->val) {
+			if (recur(root, Broot))
+				return 1;
+		}
+
+		if (search(root->left, Broot) || search(root->right, Broot))
+			return 1;
+		return 0;
+	}
+
+
+	bool isSubStructure(TreeNode* A, TreeNode* B) {
+		if (B == nullptr&&A != nullptr)
+			return 0;
+
+		return search(A, B);
+	}
+};
