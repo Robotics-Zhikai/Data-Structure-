@@ -79,6 +79,50 @@ public:
 		return result;
 	}
 };
+/*
+剑指 Offer 32 - III.从上到下打印二叉树 III
+请实现一个函数按照之字形顺序打印二叉树，即第一行按照从左到右的顺序打印，
+第二层按照从右到左的顺序打印，第三行再按照从左到右的顺序打印，其他行以此类推。
+*/
+class SolutionOffer32_III {
+public:
+	vector<vector<int>> levelOrder(TreeNode* root) { //之字形打印
+		int level = 0;
+		vector<vector<int>> result;
+		//时间复杂度为O(n),空间复杂度为O(n)
+		//还可以直接用队列，只不过每次把vector push到result中时需要间隔一个reverse一下
+		stack<TreeNode*> sta1; //用两个栈来得到不同的遍历顺序
+		stack<TreeNode*> sta2;
+
+		sta1.push(root);
+		do {
+			vector<int> tmp;
+			while (!sta1.empty()) {
+				if (sta1.top() != nullptr) {
+					tmp.push_back(sta1.top()->val);
+					sta2.push(sta1.top()->left);
+					sta2.push(sta1.top()->right);
+				}
+				sta1.pop();
+			}
+			if (!tmp.empty())
+				result.push_back(tmp);
+			tmp.clear();
+			while (!sta2.empty()) {
+				if (sta2.top() != nullptr) {
+					tmp.push_back(sta2.top()->val);
+					sta1.push(sta2.top()->right);
+					sta1.push(sta2.top()->left);
+				}
+				sta2.pop();
+			}
+			if (!tmp.empty())
+				result.push_back(tmp);
+		} while (!sta1.empty() || !sta2.empty());
+		return result;
+	}
+
+};
 
 /*
 剑指 Offer 27. 二叉树的镜像
