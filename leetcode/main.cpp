@@ -2,6 +2,7 @@
 #include "DivideAndConquer.h"
 #include "DynamicProgramming.h"
 #include "LinkedList.h"
+#include "DFS.h"
 
 void test()
 {
@@ -92,6 +93,9 @@ int main()
 {
 	try
 	{
+		SolutionOffer12 SolutionOffer12;
+		SolutionOffer12.test();
+
 		test();
 
 		Solution206 Solution206;
