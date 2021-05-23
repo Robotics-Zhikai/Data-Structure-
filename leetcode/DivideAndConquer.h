@@ -888,3 +888,57 @@ public:
 	}
 };
 
+/*
+剑指 Offer 53 - I. 在排序数组中查找数字 I
+统计一个数字在排序数组中出现的次数。
+
+直接用分治 剪枝的方法
+
+*/
+
+class Solution53_I
+{
+public:
+    int OnMethod(vector<int>& nums, int target)
+    {
+        int count = 0;
+        for(int i = 0;i<nums.size();i++){
+            if (target==nums[i])
+                count++;
+        }
+        return count;
+    }
+
+    int countAround(vector<int> & nums,int target,int index)
+    {
+        int count = 0;
+        for(int i = index;i<nums.size();i++){
+            if (nums[i]==target)
+                count++;
+            else
+                break;
+        }
+        for(int i = index-1;i>=0;i--){
+            if (nums[i]==target)
+                count++;
+            else
+                break;
+        }
+        return count;
+    }
+    int LogNmethod(vector<int>& nums,int L,int R,int target) //[L,R) 前闭后开
+    {
+        if (L==R)
+            return 0;
+        int mid = (L+R)/2;
+        if(target==nums[mid])
+            return countAround(nums,target,mid); //常数时间找到
+        else if (target>nums[mid])
+            return LogNmethod(nums,mid+1,R,target); //注意这里容易出错 因为分了三路，因此需要mid+1
+        else
+            return LogNmethod(nums,L,mid,target);
+    }
+    int search(vector<int>& nums, int target) {
+        return LogNmethod(nums,0,nums.size(),target);
+    }
+};
