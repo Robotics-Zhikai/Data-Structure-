@@ -928,11 +928,11 @@ public:
     }
     int LogNmethod(vector<int>& nums,int L,int R,int target) //[L,R) 前闭后开
     {
-        if (L==R)
+        if (L==R) //二分法查找元素只要元素在有序数组中，就肯定能找到，如果L==R就说明找不到
             return 0;
         int mid = (L+R)/2;
         if(target==nums[mid])
-            return countAround(nums,target,mid); //常数时间找到
+            return countAround(nums,target,mid); //常数时间找到重复的元素个数
         else if (target>nums[mid])
             return LogNmethod(nums,mid+1,R,target); //注意这里容易出错 因为分了三路，因此需要mid+1
         else
@@ -940,5 +940,33 @@ public:
     }
     int search(vector<int>& nums, int target) {
         return LogNmethod(nums,0,nums.size(),target);
+    }
+};
+
+
+/*
+剑指 Offer 53 - II. 0～n-1中缺失的数字
+一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0～n-1之内。
+在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
+同样是直接用分治法 二分剪枝
+*/
+
+class SolutionOffer53_II {
+public:
+    int recur(vector<int>& nums,int L,int R)
+    {
+        if(L==R && R==nums.size()) //这个判断条件容易忽略掉
+            return L;
+        if (L==R)
+            return nums[L]-1;
+        int mid = (L+R)/2;
+        if (mid==nums[mid]) //要利用题中给的0-n-1条件，进而利用索引和索引值之间的关系
+            return recur(nums,mid+1,R);
+        else 
+            return recur(nums,L,mid);
+    }
+
+    int missingNumber(vector<int>& nums) {
+        return recur(nums,0,nums.size());
     }
 };
