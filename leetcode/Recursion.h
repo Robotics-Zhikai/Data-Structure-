@@ -102,3 +102,36 @@ public:
         //递归方法很好写
     }
 };
+
+
+/*
+剑指 Offer 33. 二叉搜索树的后序遍历序列
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。如果是则返回 true，否则返回 false。假设输入的数组的任意两个数字都互不相同。
+*/
+class SolutionOffer33 {
+public:
+    bool recur(vector<int> & postorder,int L,int R) //判断在[L,R)范围的元素是否符合后序遍历
+    { //要充分利用二叉搜索树这一条件，在[L,R)的序列范围内，最靠右的是根节点，然后从最靠右往前判断找到小于postorder[R-1]的点
+        if (R-L==1 || R-L==0 || R-L==2 ) //当等于这些时肯定是正确的
+            return 1;
+        
+        int i;
+        for(i = R-2;i>=L;i--){
+            if (postorder[i]<postorder[R-1])
+                break;
+        }
+        for(int j = i;j>=L;j--){
+            if (postorder[j]>postorder[R-1]) //在这之前必然大于postorder[R-1]，否则就说明bool为0
+                return 0;
+        }
+        if (i<L)
+            return recur(postorder,L,R-1);
+        else
+            return recur(postorder,L,i+1)&&recur(postorder,i+1,R-1);
+    }
+    //单调栈O(n)复杂度的方法见https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/solution/di-gui-he-zhan-liang-chong-fang-shi-jie-jue-zui-ha/
+    bool verifyPostorder(vector<int>& postorder) {
+        return recur(postorder,0,postorder.size()); //递归方式面试时容易想到 用单调栈的方式不太容易想到
+        //递归方式用主定理可以得到复杂度是nlogn，但是在糟糕的情况时复杂度是n^2
+    }
+};
