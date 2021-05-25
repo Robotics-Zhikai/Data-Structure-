@@ -970,3 +970,115 @@ public:
         return recur(nums,0,nums.size());
     }
 };
+
+
+
+/*
+剑指 Offer 36. 二叉搜索树与双向链表
+输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的循环双向链表。要求不能创建任何新的节点，只能调整树中节点指针的指向。
+*/
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+        left = NULL;
+        right = NULL;
+    }
+
+    Node(int _val, Node* _left, Node* _right) {
+        val = _val;
+        left = _left;
+        right = _right;
+    }
+};
+class SolutionOffer36 {
+public:
+    Node* treeToDoublyListRecur(Node* root) { //这个就当练手了，面试时不要写这个，容易出错且代码量大
+        if (root==nullptr)
+            return nullptr;
+        if (root->left==nullptr && root->right == nullptr) //叶子结点肯定是以该叶子结点为root的子树的最大结点
+            return root;
+        Node* maxleft = treeToDoublyListRecur(root->left);
+        if (maxleft!=nullptr){
+            maxleft->right = root; //将左边的调整后的序列与根节点相连
+            root->left = maxleft;
+        }
+
+        Node* maxright = treeToDoublyListRecur(root->right);
+        if (maxright!=nullptr){ //由于递归函数返回的是子树的最大结点，因此需要以O(n)的复杂度找到最小结点
+            Node* minright = maxright;
+            while(minright->left!=nullptr){
+                if (minright->left!=nullptr)
+                    minright = minright->left;
+            }
+            root->right = minright; //将最小结点与根节点相连
+            minright->left = root;
+        }
+        
+        if (root->right == nullptr) //考虑的边界情况，总之要返回以root为根的子树的最大结点
+            return root;
+        else
+            return maxright; //返回以root为根的子树的最大结点
+    }
+    Node* nlognmethod(Node* root){
+        Node* MAX = treeToDoublyListRecur(root);
+        if (MAX!=nullptr){
+            Node* MIN = MAX;
+            while(MIN->left!=nullptr){
+                if (MIN->left!=nullptr)
+                    MIN = MIN->left;
+            }
+            MAX->right = MIN;
+            MIN->left = MAX;
+            return MIN;
+        }else{
+            return nullptr;
+        }
+    }
+
+    void DFS(Node* root)
+    {
+        if (root==nullptr)
+            return ;
+        DFS(root->left); //这就是个中序遍历
+
+        if (pre==nullptr){ //pre初始化为nullptr,第一个中序遍历到的点就是head
+            head = root;
+        }else{ //将pre的right设置为当前中序遍历到的点
+            pre->right = root;
+        }
+        root->left = pre;
+        pre = root; //pre每次等于中序遍历的结点
+
+        DFS(root->right);
+    }
+
+    Node* nmethod(Node* root){ //面试时写这个
+        DFS(root);
+        if (pre!=nullptr){
+            pre->right = head;
+            head->left = pre;
+            return head;
+        }
+        return nullptr;
+        
+    }
+    Node* treeToDoublyList(Node* root){
+        // return nlognmethod(root);//用的是分治法
+        return nmethod(root); //用的是树的中序遍历
+        //上下两个在LeetCode的测试集中差距不大，但是当数据量上来后，nmethod具备明显优势，且更简单
+        
+    }
+private:
+    Node* pre;
+    Node* head;
+};
+
+
+
