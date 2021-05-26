@@ -27,7 +27,7 @@ public:
                 recur(str,isvisited,i,tmp,vecstr);
             }
         }
-
+        
         isvisited[index] = 0;
         tmp.pop_back();
     }

@@ -773,3 +773,95 @@ public:
 		cout << climbStairs(333345) << endl;
 	}
 };
+
+/*
+42. 接雨水
+给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+
+*/
+//这道题用动态规划比较好想，面试时候也容易想到 也好写
+
+class Solution42 {
+public:
+    int DP(vector<int>& height) //这个比较好理解也好写
+    {
+        if(height.empty())
+            return 0;
+        vector<int> LeftMax(height.size(),0); //leftmax[i]表示i及i左边的柱子的最高值
+        vector<int> RightMax(height.size(),0); //rightmax[i]表示i及i右边的柱子的最高值
+        LeftMax[0] = height[0];
+        RightMax[height.size()-1] = height[height.size()-1];
+        for(int i = 1;i<height.size();i++){
+            LeftMax[i] = max(height[i],LeftMax[i-1]);
+        }
+        for(int i = height.size()-2;i>=0;i--){
+            RightMax[i] = max(height[i],RightMax[i+1]);
+        }
+        int sum = 0;
+        for(int i = 0;i<height.size();i++){
+            sum += min(LeftMax[i],RightMax[i])-height[i]; 
+        }
+        return sum;
+    }
+    int Myself(vector<int>& height) //这个虽然是自己写的，但是容易出错，且从左往右扫会造成资源浪费
+    {
+        if (height.empty())
+            return 0;
+        int Left = numeric_limits<int>::min();
+        int Leftindex = -1;
+        int sum = 0;
+        int oldsum = 0;
+        for(int i = 0;i<height.size();i++){ //先从左往右扫,是一种贪心思想，遇到更高的挡板时与之前的无关
+            if (height[i]<Left)
+                sum+=Left-height[i];
+            else{
+                oldsum = sum;
+                Left = height[i];
+                Leftindex = i;
+            }
+        }
+        int leftstroe = Leftindex; ///如果leftindex不是最后一个，说明以Left为高度的left并不能装下合适的水，就回退到oldsum
+        if (Leftindex!=height.size()-1){ //再从右往左扫
+            sum = oldsum;
+            Left = numeric_limits<int>::min();
+            for(int i = height.size()-1;i>=leftstroe;i--){
+                if(height[i]<Left)
+                    sum+=Left-height[i];
+                else{
+                    Left = height[i];
+                }
+            }
+        }
+        return sum;
+    }
+    int Twoptr(vector<int>& height) //双指针的方法
+    {
+        int ans = 0;
+        int left = 0, right = height.size() - 1;
+        int leftMax = 0, rightMax = 0;
+        while (left < right) {
+            leftMax = max(leftMax, height[left]); //存储left及left左边的最大值
+            rightMax = max(rightMax, height[right]); //存储right及right右边的最大值
+            if (height[left] < height[right]) { //left右边的实际最大height值只能比height[right]（当前rightmax）更大或相等 这其实和动态规划的最后一步是一样的
+                ans += leftMax - height[left]; //每次确定最肯定的接雨水容量 每个i只能接min(leftmax,rightmax)-height[i]
+                ++left;
+            } else { //同样的，right左边的实际最大值只能比height[left]（当前leftmax）更大或相等
+                ans += rightMax - height[right];  //每次确定最肯定的接雨水容量
+                --right;
+            }
+        }
+        return ans;
+        // 作者：LeetCode-Solution
+        // 链接：https://leetcode-cn.com/problems/trapping-rain-water/solution/jie-yu-shui-by-leetcode-solution-tuvc/
+        // 来源：力扣（LeetCode）
+        // 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+    }
+
+    int trap(vector<int>& height) {
+        // return DP(height); //这是O(n)时间复杂度，O(n)空间复杂度
+        // return Myself(height); //这是O(n)时间复杂度，O（1）空间复杂度
+        return Twoptr(height); //这是O(n)时间复杂度，O（1）空间复杂度
+    }
+};
+
+
