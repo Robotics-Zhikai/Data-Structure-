@@ -338,6 +338,63 @@ public:
 
 };
 
+/*
+剑指 Offer 04. 二维数组中的查找
+在一个 n * m 的二维数组中，每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。
+请完成一个高效的函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
+跟上边的那个题是一样的
+*/
+//多刷题还是有好处的，LeetCode240原来刷的时候写的很复杂，现在写的就比较简洁了
+class SolutionOffer4 {
+public:
+
+    bool binarySearch(vector<int> & array,int target,int L,int R)
+    {
+        if (L==R)
+            return 0;
+        int mid = (L+R)/2;
+        if (array[mid]==target)
+            return 1;
+        else if (array[mid]<target)
+            return binarySearch(array,target,mid+1,R);
+        else if (array[mid]>target)
+            return binarySearch(array,target,L,mid);
+        return 0;
+    }
+    bool OMlogN(vector<vector<int>>& matrix, int target) //MlogN复杂度
+    {
+        for(int i = 0;i<matrix.size();i++){
+            if (binarySearch(matrix[i],target,0,matrix[i].size()))
+                return 1;
+        }
+        return 0;
+    }
+    bool OMplusN(vector<vector<int>>& matrix, int target) //M+N复杂度
+    {
+        if (matrix.size()==0)
+            return 0;
+        //从右上角元素开始，当前元素比target小时，下移一格，当前元素比target大时，左移一格
+        //https://leetcode-cn.com/problems/er-wei-shu-zu-zhong-de-cha-zhao-lcof/solution/mian-shi-ti-04-er-wei-shu-zu-zhong-de-cha-zhao-zuo/ 把矩阵以左下角为中心，逆时针旋转45度
+        int row = 0;
+        int col = matrix[0].size()-1;
+
+        while(row<matrix.size()&&col>=0){
+            if(matrix[row][col]<target)
+                row++;
+            else if (matrix[row][col]>target)
+                col--;
+            else if (matrix[row][col]==target)
+                return 1;
+        }
+        return 0;
+    }
+    bool findNumberIn2DArray(vector<vector<int>>& matrix, int target) {
+        // return OMlogN(matrix,target);
+        return OMplusN(matrix,target); //这个运行时间远快与上边那个
+    }
+};
+
+
 //973. 最接近原点的 K 个点
 //我们有一个由平面上的点组成的列表 points。需要从中找出 K 个距离原点(0, 0) 最近的点。
 //
