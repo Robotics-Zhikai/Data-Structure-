@@ -865,3 +865,36 @@ public:
 };
 
 
+
+/*
+剑指 Offer 46. 把数字翻译成字符串
+给定一个数字，我们按照如下规则把它翻译为字符串：0 翻译成 “a” ，1 翻译成 “b”，……，11 翻译成 “l”，……，25 翻译成 “z”。
+一个数字可能有多个翻译。请编程实现一个函数，用来计算一个数字有多少种不同的翻译方法。
+*/
+
+class SolutionOffer46 {
+public:
+    int translateNum(int num) {
+        string numstr = to_string(num);
+        vector<vector<int>> dp(numstr.size(),vector<int>(numstr.size(),1));
+        //dp[i][j]表示在区间[i,j]内的string有多少种不同的翻译方法
+        for (int i = 0;i<numstr.size()-1;i++){
+            if (stoi(string(numstr.begin()+i,numstr.begin()+i+2))<=25)
+                dp[i][i+1] = 2;
+            else
+                dp[i][i+1] = 1;
+        }
+        
+        for(int len = 3;len<=numstr.size();len++){
+            for(int i = 0;i<numstr.size()-len+1;i++){
+                int self = numstr[i+len-1]-'0';
+                int merge = stoi(string(numstr.begin()+i+len-2,numstr.begin()+i+len));
+                dp[i][i+len-1] = dp[i][i+len-2]+((merge<=25&&merge!=self)?dp[i][i+len-3]:0); //merge!=self把06 6的情况去掉
+                //新加入的字符与前一个连起来翻译再加上新加入的字符不与前一个连起来翻译，总的数量的就是新的dp
+            }
+        }
+        //上边这两个for完全可以合并，然后用滚动数组把空间复杂度降到O(1)
+        return dp[0][numstr.size()-1];
+
+    }
+};
