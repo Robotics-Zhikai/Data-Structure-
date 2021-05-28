@@ -37,3 +37,66 @@ public:
         return {sum1,sum2};
     }
 };
+
+
+
+/*
+剑指 Offer 56 - II. 数组中数字出现的次数 II
+在一个数组 nums 中除一个数字只出现一次之外，其他数字都出现了三次。请找出那个只出现一次的数字。
+
+*/
+
+class SolutionOffer56_II {
+public:
+    int HASHMAPmethod(vector<int> & nums){ //空间复杂度是n，时间复杂度是n
+        map<int,int> MAP;
+        for(auto n:nums){
+            if (MAP.find(n)==MAP.end()){
+                MAP[n] = 1;
+            }
+            else
+                MAP[n]++;
+        }
+        for(auto n:MAP){
+            if(n.second == 1){
+                return n.first;
+            }
+        }
+        return -1;
+    }
+    
+    int SpaceO1method(vector<int> & nums){ //空间复杂度是1，时间复杂度是n
+        vector<int> bitstorage(32,0);
+        for(int n:nums){
+            unsigned int index = 1; 
+            //这个index为int时，当最高位为1时就不能继续左移了 所以设置为unsigned int       
+            for(int i = bitstorage.size()-1;i>=0;i--){
+                bitstorage[i]+=((n&index)==0?0:1); //这里容易出错，注意统计位的方法,不能直接加(n&index)
+                index = index<<1;
+            }
+        }
+        int res = 0;
+        for(int i = 0;i<bitstorage.size();i++){
+            res = res*2+(bitstorage[i]%3);
+        }
+        return res;
+    }
+    int SpaceO1methodLESSSpace(vector<int>& nums) { //更小占用空间的方法
+        int ret = 0; //这个代码写的太溜了
+        for (int i = 0; i < 32; i++) {
+            int temp = 0;
+            for (int &num: nums) 
+               temp += ((num >> i) & 1);
+            ret += ((temp % 3) << i);
+        }
+        return ret;
+    }
+    int singleNumber(vector<int>& nums) {
+        return SpaceO1methodLESSSpace(nums);
+        return SpaceO1method(nums);
+        return HASHMAPmethod(nums);
+    }
+};
+
+
+
