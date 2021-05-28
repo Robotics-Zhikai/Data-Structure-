@@ -187,3 +187,54 @@ public:
 		return isBalancedRecur(root, &maxdepth);
 	}
 };
+
+/*
+剑指 Offer 13. 机器人的运动范围
+地上有一个m行n列的方格，从坐标 [0,0] 到坐标 [m-1,n-1] 。一个机器人从坐标 [0, 0] 的格子开始移动，
+它每次可以向左、右、上、下移动一格（不能移动到方格外），
+也不能进入行坐标和列坐标的数位之和大于k的格子。例如，当k为18时，机器人能够进入方格 [35, 37] ，因为3+5+3+7=18。
+但它不能进入方格 [35, 38]，因为3+5+3+8=19。请问该机器人能够到达多少个格子？
+
+*/
+
+class SolutionOffer13 {
+public:
+    
+    void DFS(vector<vector<int>>& visit,int m,int n,int k,const int M,const int N){
+
+        visit[m][n] = 1;
+        // string row = to_string(m);
+        // string col = to_string(n);
+        // row = row+col;
+        // for(int i = 0;i<row.size();i++){
+            // SUM+=row[i]-'0';
+        // }
+
+        int SUM = m/10+m%10+n/10+n%10; //直接用这个简单的计算方法即可 可以大幅缩小递归占用空间
+        if (SUM<=k)
+            Count++;
+        else
+            return; //如果超过k，就直接剪枝
+
+        if (m<M-1&&visit[m+1][n]==0){ //访问过也剪枝
+            DFS(visit,m+1,n,k,M,N);
+        }
+        if (m>0&&visit[m-1][n]==0){
+            DFS(visit,m-1,n,k,M,N);
+        }
+        if (n>0 && visit[m][n-1]==0){
+            DFS(visit,m,n-1,k,M,N);
+        }
+        if (n<N-1&&visit[m][n+1]==0){
+            DFS(visit,m,n+1,k,M,N);
+        }
+    }
+    int movingCount(int m, int n, int k) {
+        Count = 0;
+        vector<vector<int>> visit(m,vector<int>(n,0));
+        DFS(visit,0,0,k,m,n);
+        return Count;
+    }
+private:
+    int Count = 0;
+};
