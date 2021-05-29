@@ -98,5 +98,63 @@ public:
     }
 };
 
+/*
+剑指 Offer 20. 表示数值的字符串
+请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。
+
+数值（按顺序）可以分成以下几个部分：
+
+若干空格
+一个 小数 或者 整数
+（可选）一个 'e' 或 'E' ，后面跟着一个 整数
+若干空格
+小数（按顺序）可以分成以下几个部分：
+
+（可选）一个符号字符（'+' 或 '-'）
+下述格式之一：
+至少一位数字，后面跟着一个点 '.'
+至少一位数字，后面跟着一个点 '.' ，后面再跟着至少一位数字
+一个点 '.' ，后面跟着至少一位数字
+整数（按顺序）可以分成以下几个部分：
+
+（可选）一个符号字符（'+' 或 '-'）
+至少一位数字
+
+*/
+class SolutionOffer20 {
+public:
+    bool isNumber(string s) { //题解中用到的是状态机的方法 这个有空要多看看，难点在于归纳各种正确的情况
+        //去掉首尾空格
+        s.erase(0,s.find_first_not_of(' '));
+        s.erase(s.find_last_not_of(' ')+1,s.size());
+        if (s.size() == 0) return false;
+        
+    
+        bool numFlag = false;
+        bool dotFlag = false;
+        bool eFlag = false;
+        for (int i = 0; i < s.size(); i++) {
+            //判定为数字，则标记numFlag
+            if (s[i] >= '0' && s[i] <= '9') {
+                numFlag = true;
+                //判定为.  需要没出现过.并且没出现过e .最多出现一次，且在e的前边
+            } else if (s[i] == '.' && !dotFlag && !eFlag) {
+                dotFlag = true;
+                //判定为e，需要没出现过e，并且出过数字了 e最多出现一次，且出现前有数字
+            } else if ((s[i] == 'e' || s[i] == 'E') && !eFlag && numFlag) {
+                eFlag = true;
+                numFlag = false;//为了避免123e这种请求，出现e之后就标志为false，因为此时e已经是最后一位了
+                //判定为+-符号，只能出现在第一位或者紧接e后面
+            } else if ((s[i] == '+' || s[i] == '-') && (i == 0 || s[i-1] == 'e' || s[i-1] == 'E')) {
+                //只有在e后边有符号是可接受的
+                
+            } else {//其他情况，都是非法的
+                return false;
+            }
+        }
+        return numFlag;
+    }
+
+};
 
 
