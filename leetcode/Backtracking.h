@@ -47,3 +47,43 @@ public:
     }
 
 };
+
+
+/*
+46. 全排列
+给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
+
+*/
+//跟上边的大同小异 就是做一个DFS而已 挺简单的
+class Solution46 {
+public:
+    vector<vector<int>> res;
+    void DFS(vector<int>&nums,vector<bool>& isvisited,int index,vector<int>&storage)
+    {
+        isvisited[index] = 1;
+        storage.push_back(nums[index]);
+        if (storage.size()==nums.size()){
+            res.push_back(storage);
+        }
+        else{
+            for(int i = 0;i<nums.size();i++){
+                if (isvisited[i]==0){
+                    DFS(nums,isvisited,i,storage);
+                }
+            }
+        }
+        isvisited[index]=0;
+        storage.pop_back();
+        
+    }
+
+    vector<vector<int>> permute(vector<int>& nums) {
+        res = {};
+        vector<bool> isvisited(nums.size(),0);
+        vector<int> storage;
+        for(int i = 0;i<nums.size();i++){
+            DFS(nums,isvisited,i,storage);
+        }
+        return res;
+    }   
+};
