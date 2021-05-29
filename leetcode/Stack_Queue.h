@@ -332,3 +332,66 @@ private:
     deque<int> MAX;
     deque<int> DEQ;
 };
+
+
+/*
+剑指 Offer 59 - II. 队列的最大值
+请定义一个队列并实现函数 max_value 得到队列里的最大值，要求函数max_value、push_back 和 pop_front 的**均摊**时间复杂度都是O(1)。
+
+若队列为空，pop_front 和 max_value 需要返回 -1
+
+*/
+
+//这个跟上边的两个题大同小异
+//重点是要记住做法 理解做法
+class MaxQueue {
+public:
+    //要求的是均摊时间复杂度是O(1)，因此在某一操作中可能会出现操作了很多次，但是进过均摊分析可以把该
+    //处的复杂度均摊到其他操作中（即其他操作可能操作的更少了）
+    MaxQueue() {
+
+    }
+    
+    int max_value() {
+        if(MAX.empty())
+            return -1;
+        else    
+            return MAX.back();
+    }
+    
+    void MAXpush(int value)
+    {
+        if (MAX.empty()){
+            MAX.push_back(value);
+        }
+        else if (value>=MAX.back()){
+            MAX.push_back(value);
+        }
+    }
+    void push_back(int value) {
+        DEQ.push_back(value);
+        MAXpush(value);
+    }
+    
+    int pop_front() {
+        if (!DEQ.empty() && !MAX.empty()){
+            if(DEQ.front()==MAX.front()){
+                MAX.pop_front();
+            }
+            int res = DEQ.front();
+            DEQ.pop_front();
+
+            if (MAX.empty()){ //重点是这一步，就需要用平摊分析来分析 。当发现MAX为空时，需要把DEQ中的元素MAXpush到MAX中
+                for(int i = 0;i<DEQ.size();i++){
+                    MAXpush(DEQ[i]);
+                }
+            }
+            return res;
+        }
+        else   
+            return -1;
+    }
+private:
+    deque<int> DEQ;
+    deque<int> MAX;
+};
