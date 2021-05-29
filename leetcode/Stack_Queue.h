@@ -246,4 +246,89 @@ class MinStack {
 
 */
 
- 
+ /*
+剑指 Offer 59 - I. 滑动窗口的最大值
+给定一个数组 nums 和滑动窗口的大小 k，请找出所有滑动窗口里的最大值。
+
+示例:
+
+输入: nums = [1,3,-1,-3,5,3,6,7], 和 k = 3
+输出: [3,3,5,5,6,7] 
+解释: 
+
+  滑动窗口的位置                最大值
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/hua-dong-chuang-kou-de-zui-da-zhi-lcof
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+ */
+//这个题与上边的最小栈结合起来看
+
+class Solution59_I {
+public:
+    void MAXpush(int n )
+    {
+        if (MAX.empty())
+            MAX.push_back(n);
+        else if (n>=MAX.back()){
+            MAX.push_back(n);
+        }
+    }
+    void push(int n)
+    {
+        DEQ.push_back(n);
+        MAXpush(n);
+    }
+    void pop()
+    {
+        if (!DEQ.empty() && !MAX.empty()){
+            if (DEQ.front()==MAX.front()){
+                MAX.pop_front();
+            }
+            DEQ.pop_front();
+
+            //下边的这个for主要处理的情况是当新加入的值小于最大值时，push不会加入MAX，进而MAX不断从前边流失，
+            //最终造成MAX流失为空，此时需要确定新的最大值，需要把deq中的数MAXpush到MAX中
+            if(MAX.empty()){ //注意这里容易写错！！ 类比最小栈那个题，容易把这个for丢掉（因为最小栈那个不会从另一个方向流失元素）
+                for(int i = 0;i<DEQ.size();i++){
+                    MAXpush(DEQ[i]);
+                }
+            }
+        }   
+        
+    }
+    int getMAX()
+    {
+        return MAX.back();
+    }
+
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        if(nums.empty())
+            return nums;
+        vector<int> res;
+        for(int i = 0;i<k;i++){ //先把第一个窗口完整的弄满
+            push(nums[i]);
+        }
+        
+        res.push_back(getMAX());
+        for(int base = 1;base<=nums.size()-k;base++){
+            push(nums[base+k-1]);
+            pop(); 
+            res.push_back(getMAX());
+        }
+        return res;
+    }
+
+
+private:
+    deque<int> MAX;
+    deque<int> DEQ;
+};
