@@ -299,7 +299,7 @@ public:
             //最终造成MAX流失为空，此时需要确定新的最大值，需要把deq中的数MAXpush到MAX中
             if(MAX.empty()){ //注意这里容易写错！！ 类比最小栈那个题，容易把这个for丢掉（因为最小栈那个不会从另一个方向流失元素）
                 for(int i = 0;i<DEQ.size();i++){
-                    MAXpush(DEQ[i]);
+                    MAXpush(DEQ[i]); //这就体现出双端队列的好处了，可以直接遍历
                 }
             }
         }   
