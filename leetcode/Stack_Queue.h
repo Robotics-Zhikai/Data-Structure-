@@ -92,3 +92,158 @@ public:
 		return ComplexMethod(pushed,popped);
     }
 };
+
+
+/*
+155. 最小栈
+设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
+
+push(x) —— 将元素 x 推入栈中。
+pop() —— 删除栈顶的元素。
+top() —— 获取栈顶元素。
+getMin() —— 检索栈中的最小元素。
+*/
+//leetcode 155
+class MinStack {
+public:
+    /** initialize your data structure here. */
+    MinStack() {
+
+    }
+    
+    void push(int val) {
+        if (MIN.empty())
+            MIN.push(val);
+        else if (MIN.top()>=val){
+            MIN.push(val);
+        }
+        STACK.push(val);
+    }
+    
+    void pop() {
+        if (!MIN.empty() && MIN.top()==STACK.top()){
+            MIN.pop();
+        }
+        STACK.pop();
+    }
+    
+    int top() {
+        return STACK.top();
+    }
+    
+    int getMin() {    
+        return MIN.top();
+    }
+private:
+    stack<int> MIN;
+    stack<int> STACK;
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
+
+//这个不用辅助栈的方法不太容易想到，要反复重点看！！！！
+/*
+这是不需要辅助栈的方法
+stack用来存储和min的差值，min存储最小值，每次出栈的时候通过差值和当前min计算要出栈的值和之前的min
+如果差值diff大于等于0，说明要出栈的值大于等于当前min，那么要出栈的值在入栈的时候没有更新min，返回min+diff；
+如果差值diff小于0，说明当前要出栈的值就是min(因为入栈的时候我们选择的就是min和入栈元素的最小值)，同时，通过min-diff计算出之前min
+要注意的是diff可能会超出int范围，类似于 Integer.MAX_VALUE - 1 这种，所以diff要用Long存
+    
+class MinStack {
+
+    Integer min = null;
+    Stack<Long> data = new Stack<>();
+
+ 
+    public MinStack1() {
+
+    }
+
+    public void push(int x) {
+        if (data.isEmpty()) {
+            data.push(0L);
+            min = x;
+        } else {
+            //如果x是最小的数，这里可能越界，所以用Long来保存
+            data.push(Long.valueOf(x) - min); //push入的是diff
+            min = Math.min(x, min); //更新min
+        }
+    }
+
+    public void pop() {
+        Long diff = data.pop();
+        if (diff >= 0) {
+            //return min + diff;
+        } else {
+            int res = min;
+            min = (int) (min - diff); //每次pop都要更新一下min，以便min被之后元素改掉的能够被复原
+            //return res;
+        }
+    }
+
+    public int top() {
+        Long diff = data.peek();
+        if (diff >= 0) {
+            return (int) (min + diff);
+        } else {
+            return min;
+        }
+    }
+
+    public int getMin() {
+        return min;
+    }
+}
+*/
+
+/*
+//一种更容易理解的方法，但本质上还是每次都记录了之前的最小值，比辅助栈的方法甚至耗费空间会更多
+class MinStack {
+    private Node head;
+    
+    public void push(int x) {
+        if(head == null) 
+            head = new Node(x, x);
+        else 
+            head = new Node(x, Math.min(x, head.min), head);
+    }
+
+    public void pop() {
+        head = head.next;
+    }
+
+    public int top() {
+        return head.val;
+    }
+
+    public int getMin() {
+        return head.min;
+    }
+    
+    private class Node {
+        int val;
+        int min;
+        Node next;
+        
+        private Node(int val, int min) {
+            this(val, min, null);
+        }
+        
+        private Node(int val, int min, Node next) {
+            this.val = val;
+            this.min = min;
+            this.next = next;
+        }
+    }
+}
+
+*/
+
+ 
