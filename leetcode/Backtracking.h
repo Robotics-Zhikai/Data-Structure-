@@ -88,6 +88,51 @@ public:
     }   
 };
 
+/*
+47. 全排列 II
+给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
+*/
+class Solution47 {
+public:
+    void DFS(vector<int>& nums,vector<bool>& isvisited,vector<int>& storage)
+    {
+        optional<int> lastNum = {};
+        for(int i = 0;i<nums.size();i++){
+
+            if (isvisited[i]==0){
+                if (!lastNum.has_value()){
+                    lastNum = nums[i];
+                }
+                else if (nums[i]==lastNum){
+                    continue;       //这里以常数时间剪枝掉重复的排列
+                }
+                else
+                    lastNum = nums[i]; 
+
+                isvisited[i] = 1; //把这个放在for循环里边的话就不用像46全排列I中在主函数for循环了
+                storage.push_back(nums[i]);
+                if (storage.size()==nums.size())
+                    res.push_back(storage);
+                DFS(nums,isvisited,storage); 
+                isvisited[i] = 0;
+                storage.pop_back();
+            }
+        }
+    }
+
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        res = {};
+        sort(nums.begin(),nums.end()); //排序后在之后的建树过程中就能以常数时间剪掉重复排列的根节点
+        //注意理解这个排序 否则如果不排序的话判断同一层的节点是否是重复的只能加一个hash，这样的话代价是很大的
+        //保证相同的数字都相邻，然后每次填入的数一定是这个数所在重复数集合中「从左往右第一个未被填过的数字」
+        vector<bool>isvisited(nums.size(),0);
+        vector<int> storage;
+        DFS(nums,isvisited,storage);
+        return res;
+    }
+private:
+    vector<vector<int>> res;
+};
 
 /*
 39. 组合总和
