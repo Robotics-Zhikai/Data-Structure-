@@ -181,3 +181,103 @@ public:
 private:
     vector<vector<int>> result;
 };
+
+
+/*
+22. 括号生成
+数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
+*/
+//这种回溯都有固定的套路
+class Solution22 {
+public:
+
+    void DFS(string & str,vector<bool>& isvisit,string& storage)
+    {
+        optional<char> lastchar;
+        for(int i = 0;i<str.size();i++){
+            if (isvisit[i]==0){
+                if (!lastchar.has_value()){
+                    lastchar = str[i];
+                }
+                else if (lastchar==str[i])
+                    continue;
+                else
+                    lastchar = str[i]; //用来去重的
+                isvisit[i] = 1;
+
+                storage.push_back(str[i]);
+
+                if (str[i]=='(') //用来辅助剪枝
+                    leftNum++;
+                else if (str[i]==')')
+                    rightNum++;
+                bool Clip = 0;
+                // https://leetcode-cn.com/problems/generate-parentheses/solution/hui-su-suan-fa-by-liweiwei1419/
+                if (leftNum<rightNum) //当前加入到storage中使用的右括号数大于使用的左括号数则剪枝 因为右括号代表终止，右括号更多说明前边没有与之相匹配的左括号了，之后不管再怎么加括号都不能保证匹配
+                    Clip = 1;
+                if (storage[0]==')') //遇到这种情况直接剪枝 能节省不少计算量 这种情况实际上已经包含在了上边的if中
+                    Clip = 1;
+                if(Clip){ 
+
+                }
+                else{
+                    // Valid.push_back(str[i]);
+                    // int flag = 0;
+                    // if (Valid.size()>=2 && *(Valid.end()-1)==')' && *(Valid.end()-2)=='('){
+                    //     Valid.pop_back();
+                    //     Valid.pop_back();
+                    //     flag = 1;
+                    // } //不能用辅助栈边递归边判断是否正确，用辅助栈的话很有可能把本不应该pop 的pop出去了
+                    if (storage.size()==str.size()){
+                        // vector<char> Valid ;
+                        // for(int i = 0;i<storage.size();i++){
+                        //     Valid.push_back(storage[i]);
+                        //     if (Valid.size()>=2 && *(Valid.end()-1)==')' && *(Valid.end()-2)=='('){
+                        //         Valid.pop_back();
+                        //         Valid.pop_back();
+                        //     }
+                        // }
+                        // if (Valid.empty()) //加上if (leftNum<rightNum)的剪枝后直接这个也不用判断
+                            res.push_back(storage);
+                    }
+                    
+                    DFS(str,isvisit,storage);
+                }
+                
+                isvisit[i] = 0;
+                if (*(storage.end()-1)=='('){
+                    leftNum--;
+                }
+                else if (*(storage.end()-1)==')'){
+                    rightNum--;
+                } //用来辅助剪枝
+                storage.pop_back();
+                
+            }
+        }
+
+    }
+
+    vector<string> generateParenthesis(int n) {
+        //整个程序的编写过程先是写DFS，按照生成有重复元素序列的全排列的方法来写 
+        //然后在此基础上进行剪枝，最后写记录res的if语句 
+        //按这个顺序或者说框架来一步一步写是不会出错的
+        string str;
+        for(int i = 0;i<n;i++){
+            str.push_back('(');
+        }
+        for(int i = 0;i<n;i++){
+            str.push_back(')');
+        } //需要先排好序
+        vector<bool> isvisit(2*n,0);
+        string storage;
+        leftNum = 0;
+        rightNum = 0;
+        DFS(str,isvisit,storage);
+        return res;
+    }
+private:
+    vector<string> res;
+    int leftNum;
+    int rightNum;
+};
