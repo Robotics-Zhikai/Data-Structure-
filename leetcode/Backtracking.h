@@ -87,3 +87,52 @@ public:
         return res;
     }   
 };
+
+
+/*
+39. 组合总和
+给定一个无重复元素的数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
+
+candidates 中的数字可以无限制重复被选取。
+
+说明：
+
+所有数字（包括 target）都是正整数。
+解集不能包含重复的组合。 (实现这个是难点)
+
+*/
+
+class Solution39 {
+public:
+    
+    void DFS(vector<int>& candidates, int target,int index,int Sum,vector<int>&storage)
+    {
+        Sum+=candidates[index];
+        storage.push_back(candidates[index]);
+        
+        if (Sum==target){
+            result.push_back(storage);
+        }     
+        for(int i = index;i<candidates.size();i++){ 
+            //每次都选其本身和后边的几个作为子节点，否则就会选重（这跟n个数里边挑不重复的两个数的方法类似）
+            //这里容易出错，for循环中i的初始值不能是0，应该是index，才能避免元素顺序不同的重复集
+            //https://leetcode-cn.com/problems/combination-sum/solution/shou-hua-tu-jie-zu-he-zong-he-combination-sum-by-x/ 可以看这个里边画的图去理解避免重复的原理
+            if (Sum+candidates[i]>target)
+                continue; //直接剪枝
+            else 
+                DFS(candidates,target,i,Sum,storage);
+        }
+        storage.pop_back();
+    }
+
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<int> storage;
+        result = {};
+        for(int i = 0;i<candidates.size();i++){
+            DFS(candidates,target,i,0,storage);
+        }
+        return result;
+    }
+private:
+    vector<vector<int>> result;
+};
