@@ -281,3 +281,150 @@ private:
     int leftNum;
     int rightNum;
 };
+
+
+/*
+79. 单词搜索
+给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。
+如果 word 存在于网格中，返回 true ；否则，返回 false 。
+
+单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。
+同一个单元格内的字母不允许被重复使用。
+*/
+
+class Solution79 {
+public:
+
+    bool DFS(vector<vector<char>>& board,int i,int j,vector<vector<bool>>& isvisited,string& word,string & storage)
+    {
+        if (i<0 || i>=board.size() || j<0 || j>=board[0].size())
+            return 0;
+        if (isvisited[i][j]==1)
+            return 0; //访问过了 直接返回 相当于剪枝
+        isvisited[i][j] = 1;
+        // vector<vector<int>> Seq;
+        // if (i>0){
+        //     if (isvisited[i-1][j]==0){
+        //         Seq.push_back(vector<int>{i-1,j});
+        //     }
+        // }
+        // if (i<board.size()-1){
+        //     if (isvisited[i+1][j]==0){
+        //         Seq.push_back(vector<int>{i+1,j});
+        //     }
+        // }
+        // if (j<board[0].size()-1){
+        //     if (isvisited[i][j+1]==0){
+        //         Seq.push_back(vector<int>{i,j+1});
+        //     }
+        // }
+        // if (j>0){
+        //     if (isvisited[i][j-1]==0){
+        //         Seq.push_back(vector<int>{i,j-1});
+        //     }
+        // } //用这个的话速度太慢太慢了
+
+        storage.push_back(board[i][j]); //用storage也是减慢的因素
+        bool clip = 0;
+        if (*(storage.end()-1)!=word[storage.size()-1])
+            clip = 1;
+        if (storage==word)
+            return 1;
+        if (clip){
+
+        }
+        else{
+            if (DFS(board,i-1,j,isvisited,word,storage)||DFS(board,i+1,j,isvisited,word,storage)||
+                DFS(board,i,j-1,isvisited,word,storage)||DFS(board,i,j+1,isvisited,word,storage)){
+                    return 1;
+                }
+        }
+        
+        isvisited[i][j] = 0;
+        storage.pop_back();
+        return 0;
+    }
+    bool SlowMethod(vector<vector<char>>& board, string word){
+        if (board.empty())
+            return 0;
+        vector<vector<bool>> isvisited(board.size(),vector<bool>(board[0].size(),0));
+        string storage;
+        for (int i = 0;i<board.size();i++){
+            for (int j = 0;j<board[i].size();j++){
+                if(board[i][j]==word[0] && DFS(board,i,j,isvisited,word,storage))
+                    return 1;
+            }
+        }
+        return 0;
+    }
+
+    bool FastDFS(vector<vector<char>>& board,int i,int j,vector<vector<bool>>& isvisited,string& word,int level)//用引用也可以大大提升速度
+    //用这个实现方法不容易出错 且更快
+    {
+        if (level==word.size())
+            return 1;
+        if (i<0 || i>=board.size() || j<0 || j>=board[0].size())
+            return 0;
+        if (isvisited[i][j]==1)
+            return 0; //访问过了 直接返回 相当于剪枝
+        
+        isvisited[i][j] = 1;
+
+        bool clip = 0; //标志是否剪枝
+        //没有用上边的storage，因为本题的目的不是为了输出序列，而是为了找序列。用level可以提升速度
+        if (board[i][j]!=word[level]) 
+            clip = 1;
+        if (clip){
+
+        }
+        else{
+            if (FastDFS(board,i-1,j,isvisited,word,level+1)||FastDFS(board,i+1,j,isvisited,word,level+1)||
+                FastDFS(board,i,j-1,isvisited,word,level+1)||FastDFS(board,i,j+1,isvisited,word,level+1)){
+                    return 1;
+                }
+        }
+        
+        isvisited[i][j] = 0;
+        return 0;
+    }
+    bool FASTMethod(vector<vector<char>>& board, string word){
+        if (board.empty())
+            return 0;
+        vector<vector<bool>> isvisited(board.size(),vector<bool>(board[0].size(),0));
+
+        for(int k=0; k<word.size(); k++)
+        {
+            int flag = 0;
+            for(int i=0; i<board.size(); i++)
+            {
+                for(int j=0; j<board[i].size(); j++)
+                {
+                    if(board[i][j]==word[k]) 
+                    {
+                        flag = 1;
+                        break;
+                    }
+        
+                }
+                if(flag==1) break;
+            }
+            if(flag==0) return false;
+        } //加上这个后直接就从200多ms降到了4ms
+        //取了个巧，事先就判断word中的所有元素是否都在board中，如果不在就直接返回 不用继续判断
+        //主要是为了过测试集中的一个比较麻烦的用例
+
+        for (int i = 0;i<board.size();i++){
+            for (int j = 0;j<board[i].size();j++){
+                if(board[i][j]==word[0] && FastDFS(board,i,j,isvisited,word,0))
+                    return 1;
+            }
+        }
+        return 0;
+    }
+    bool exist(vector<vector<char>>& board, string word) {
+        return FASTMethod(board,word);
+        return SlowMethod(board,word);
+    }
+};
+
+
