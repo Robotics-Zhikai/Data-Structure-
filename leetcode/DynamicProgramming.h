@@ -898,3 +898,38 @@ public:
 
     }
 };
+
+/*
+300. 最长递增子序列
+给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+
+子序列是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。
+例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。
+
+
+*/
+//有nlogn的解法，时间有限暂时先不看
+
+class Solution300 {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        vector<int> dp(nums.size(),0); //储存包含i位置元素的i位置及之前元素的最长严格递增子序列长度 
+        dp[0] = 1;
+        for(int i = 1;i<nums.size();i++){
+            int MAX = INT_MIN;
+            for (int j = 0;j<i;j++){
+                if (nums[i]>nums[j]){
+                    if (dp[j]>MAX){
+                        MAX = dp[j];
+                    }
+                }
+            }
+            if (MAX==INT_MIN){
+                dp[i] = 1;
+            }
+            else
+                dp[i] = MAX+1;
+        }
+        return *max_element(dp.begin(),dp.end());
+    }
+};
