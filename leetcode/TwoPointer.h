@@ -173,3 +173,31 @@ public:
 }; //注意这个不断优化的过程
 
 
+/*
+3. 无重复字符的最长子串
+给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+*/
+
+class Solution3 {
+public:
+    int lengthOfLongestSubstring(string s) { //一遍过，一开始想的就是双指针的方法
+        if (s.empty())
+            return 0;
+        int left = 0;
+        int right = 1;
+        int MAXlen = 1;
+
+        while (right<s.size()){
+            //下边的这个for空间复杂度是1，时间复杂度是n；可借助map unorderedmap来以空间换时间进而判断新加入的字符是否独特
+            for(int i = left;i<right;i++){ //新扩展一个right，然后判断[left,right)内的数是否都与right的数不相同
+                if (s[i]==s[right]){ //[left,right]内存放各字符肯定都互不相同的字符串
+                    left = i+1;
+                    break;
+                }
+            }
+            MAXlen = right-left+1>MAXlen?right-left+1:MAXlen;
+            right++;//不断扩展右边界
+        }//本质上还是一种暴力的求解方法
+        return MAXlen;
+    }
+};
