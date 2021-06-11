@@ -99,3 +99,77 @@ public:
         return NULL;
     }
 };
+
+
+/*
+287. 寻找重复数
+给定一个包含 n + 1 个整数的数组 nums ，其数字都在 1 到 n 之间（包括 1 和 n），可知至少存在一个重复的整数。
+
+假设 nums 只有 一个重复的整数 ，找出 这个重复的数 。
+
+你设计的解决方案必须不修改数组 nums 且只用常量级 O(1) 的额外空间。
+
+*/
+
+class Solution287 {
+public:
+    int solveMethod1(vector<int>& nums){
+        sort(nums.begin(),nums.end());//不能排序，因为题目中要求必须不修改nums
+        for (int i = 0;i<nums.size()-1;i++){
+            if (nums[i]==nums[i+1])
+                return nums[i];
+        }
+        return 0;
+    }
+    int solveMethod2(vector<int> & nums){
+        //不修改nums，充分利用题目条件：给定一个包含 n + 1 个整数的数组 nums ，其数字都在 1 到 n 之间（包括 1 和 n）
+        //用二分法来做，说是二分法，其实就是每趟扫描剪枝掉绝不可能出现重复数的数集合
+        //https://leetcode-cn.com/problems/find-the-duplicate-number/solution/er-fen-fa-si-lu-ji-dai-ma-python-by-liweiwei1419/
+        int left = 1;
+        int right = nums.size()-1; //[left,right]是可能出现重复数的范围
+        int mid = (left+right)/2;  
+        while(left<right){
+            int cnt = 0;
+            for(auto num:nums){
+                if (num<=mid)
+                    cnt++;
+            }
+            if (cnt>mid){ //意味着在nums中小于等于mid的数的数量比mid还大，那么肯定在[left,mid]区间有重复数
+                right = mid; //说明重复数出现在[left,mid]区间
+            }
+            else{
+                left = mid+1;
+            }
+            mid = (left+right)/2;  
+        } //最终的时间复杂度是nlogn,空间复杂度是1
+        return right;
+    }
+    int solveMethod3(vector<int> & nums){ //这个要能根据题中条件想到链表
+        //用快慢指针的方法，每个nums的值表示指向的下一个结点的index，当有重复元素时，
+        //表明重复元素的值所指向的index有两个元素指向该元素，也就是有一个环，用判断环形链表入口的三指针方法
+        //把环形链表入口找到，即可找到重复的整数
+        int slow = 0;
+        int fast = 0;
+        while(fast!=nums.size()){ //肯定有重复元素，这也就造成了这个while循环如果里边不return的话这个函数就不return了
+            slow = nums[slow]; //slow指针每次移动一格
+            fast = nums[nums[fast]]; //fast指针每次移动两格
+            if (fast==slow){
+                int ptr= slow;
+                slow = 0;
+                while(slow!=ptr){
+                    slow = nums[slow];
+                    ptr = nums[ptr];
+                }
+                return slow; //返回的是进入环形链表的index，正好是重复的值
+            }
+        }
+        return 0;
+    }
+
+    int findDuplicate(vector<int>& nums) {
+        return solveMethod3(nums); //时间复杂度是n，空间复杂度是1
+        // return solveMethod2(nums);
+    }
+}; //注意这个不断优化的过程
+
+
