@@ -428,3 +428,45 @@ public:
 };
 
 
+/*
+17. 电话号码的字母组合
+给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
+
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+
+
+*/
+//很常规的回溯
+class Solution17 {
+public:
+    vector<string> res;
+    void DFS(map<char,string>& MAP,string& digits,int level,string& str)
+    {
+        if (level==digits.size()){
+            res.push_back(str);
+            return;
+        }
+        string Cur = MAP[digits[level++]];
+        if (Cur == ""){
+            DFS(MAP,digits,level,str);
+        }
+        else{
+            for(int i = 0;i<Cur.size();i++){
+                str.push_back(Cur[i]);
+                DFS(MAP,digits,level,str);
+                str.pop_back();
+            }
+        }
+    }
+    vector<string> letterCombinations(string digits) {
+        map<char,string> MAP = { {'1',""},{'2',"abc"},{'3',"def"},{'4',"ghi"}
+                         ,{'5',"jkl"},{'6',"mno"},{'7',"pqrs"},{'8',"tuv"},{'9',"wxyz"}  };
+        res = {};
+        if (digits.empty())
+            return res;
+        string str;
+        DFS(MAP,digits,0,str);
+        return res;
+        
+    }
+};

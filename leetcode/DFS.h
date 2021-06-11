@@ -199,9 +199,7 @@ public:
 
 class SolutionOffer13 {
 public:
-    
     void DFS(vector<vector<int>>& visit,int m,int n,int k,const int M,const int N){
-
         visit[m][n] = 1;
         // string row = to_string(m);
         // string col = to_string(n);
