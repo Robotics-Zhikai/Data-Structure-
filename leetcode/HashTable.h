@@ -79,4 +79,75 @@ public:
 };
 
 
+/*
+1. 两数之和
+给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
 
+你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+
+你可以按任意顺序返回答案。
+
+*/
+class Solution1 {
+public:
+    vector<int> solveMethod1(vector<int>& nums, int target){
+        //这个是用nlogn的时间复杂度，n的空间复杂度
+        //跟三数之和用到的方法差不多
+        int left = 0;
+        int right = nums.size()-1;
+        vector<vector<int>> copynums;
+        for (int i = 0;i<nums.size();i++){
+            copynums.push_back({i,nums[i]});
+        }
+        sort(copynums.begin(),copynums.end(),[](vector<int>&a,vector<int>&b){return a[1]<b[1];});
+        while(left<right){
+            int cur = copynums[left][1]+copynums[right][1];
+            if (cur>target){
+                do{
+                    right--;
+                }while(right>=0 && copynums[right][1]==copynums[right+1][1]);
+            }
+            else if (cur<target){
+                do{
+                    left++;
+                }while(left<copynums.size() && copynums[left][1]==copynums[left-1][1]);
+            }
+            else{
+                return {copynums[left][0],copynums[right][0]};
+            }
+        }
+        return {};
+    }
+    vector<int> solveMethod2(vector<int>& nums, int target){
+        unordered_map<int,int> MAP;
+        for(int i = 0;i<nums.size();i++){
+            MAP.insert({nums[i],i});
+        }
+        for(int i = 0;i<nums.size();i++){
+            auto right = MAP.find(target-nums[i]);
+            if (right != MAP.end() ){
+                if (right->second==i)
+                    continue;
+                return {i,right->second};
+            }
+        }
+        return {};
+    }
+    vector<int> solveMethod3(vector<int>& nums, int target){
+        //两数之和肯定有两个数，按照下边的方法求解
+        unordered_map<int,int> MAP;
+        for (int i = 0;i<nums.size();i++){
+            auto Find = MAP.find(target-nums[i]);
+            if (Find!=MAP.end()){
+                return {Find->second,i};
+            }
+            MAP[nums[i]] = i;
+        }
+        return {};
+    }
+    //这个HASH的实现贼难写。。要多写！！！！！！
+    vector<int> twoSum(vector<int>& nums, int target) {
+        return solveMethod3(nums,target);
+        return solveMethod2(nums,target);
+    }
+};

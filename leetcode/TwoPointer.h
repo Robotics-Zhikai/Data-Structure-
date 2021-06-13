@@ -378,7 +378,7 @@ public:
             int leftptr = i+1;
             int rightptr = nums.size()-1;
             while(leftptr<rightptr){ 
-                //这里用双指针，实际上经过排序后的数列，求两数之和不用n^2枚举，用这里的双指针方法n的复杂度就能找到。
+                //这里用双指针，实际上经过排序后的数列，求两数之和不用n^2枚举，用这里的双指针方法n的复杂度就能找到(如果包括排序的话是nlogn的复杂度)。
                 //可见LeetCode1 两数之和
                 if (nums[leftptr]+nums[rightptr]+nums[i]>0){
                     do{ //去除重复
