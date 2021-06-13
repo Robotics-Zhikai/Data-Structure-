@@ -320,3 +320,131 @@ public:
 };
 
 
+/*
+15. 三数之和
+给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，
+使得 a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
+
+注意：答案中不可以包含重复的三元组。
+
+*/
+//这个用到了两数之和的O(n)求解方法
+class Solution15 {
+public:
+    vector<vector<int>> solveMethod1(vector<int>& nums) {
+        //算是暴力枚举加剪枝
+        vector<vector<int>> res;
+        sort(nums.begin(),nums.end());
+        for (int i = 0;i<nums.size();i++){
+            if (i>0 && nums[i]==nums[i-1]){ //避免重复
+                continue;
+            }
+            if (nums[i]>0) //加这样的一个剪枝仍然超时
+                break;
+            for (int j = i+1;j<nums.size();j++){
+                if (j>i+1 && nums[j]==nums[j-1]){ //避免重复
+                    continue;
+                }
+                if (nums[i]+nums[j]>0)
+                    break;
+                for (int k = j+1;k<nums.size();k++){
+                    if (k>j+1 && nums[k]==nums[k-1]){ //避免重复
+                        continue;
+                    }
+                    if (nums[i]+nums[j]+nums[k]>0)
+                        break;
+                    if (nums[i]+nums[j]+nums[k]==0){
+                        res.push_back({nums[i],nums[j],nums[k]});
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    vector<vector<int>> solveMethod2(vector<int>& nums) {
+        //复杂度由method1的n^3降到了n^2
+        vector<vector<int>> res;
+        sort(nums.begin(),nums.end()); //nlogn
+        for (int i = 0;i<nums.size();i++){ //n^2
+            if (i>0 && nums[i]==nums[i-1]){
+                continue;
+            }
+            if (nums[i]>0)  //因为已经经过排序了，所以nums[i]>0的话就直接退出
+                break;
+            int leftptr = i+1;
+            int rightptr = nums.size()-1;
+            while(leftptr<rightptr){ 
+                //这里用双指针，实际上经过排序后的数列，求两数之和不用n^2枚举，用这里的双指针方法n的复杂度就能找到。
+                //可见LeetCode1 两数之和
+                if (nums[leftptr]+nums[rightptr]+nums[i]>0){
+                    do{ //去除重复
+                        rightptr--;
+                    }while(rightptr>=0 && nums[rightptr]==nums[rightptr+1]);
+                }
+                else if (nums[leftptr]+nums[rightptr]+nums[i]<0){
+                    do{
+                        leftptr++;
+                    }while(leftptr<nums.size() && nums[leftptr]==nums[leftptr-1]);
+                }
+                else{
+                    res.push_back({nums[i],nums[leftptr],nums[rightptr]});
+                    do{
+                        leftptr++;
+                    }while(leftptr<nums.size() && nums[leftptr]==nums[leftptr-1]);
+                    do{
+                        rightptr--;
+                    }while(rightptr>=0 && nums[rightptr]==nums[rightptr+1]);
+                }
+            }
+        }
+        return res;
+    }
+
+    vector<vector<int>> solveMethod3(vector<int>& nums) {
+        vector<vector<int>> res;
+        sort(nums.begin(),nums.end());
+        auto numsbeg = nums.begin();
+        for (int i = 0;i<nums.size();i++){
+            if (i>0 && nums[i]==nums[i-1]){
+                continue;
+            }
+            if (nums[i]>0)  //因为已经经过排序了，所以nums[i]>0的话就直接退出
+                break;
+            int leftptr = i+1;
+            int rightptr = nums.size()-1;
+            while(leftptr<rightptr){
+                int curres = *(numsbeg+leftptr)+*(numsbeg+rightptr)+*(numsbeg+i);
+                if (curres>0){
+                    do{
+                        rightptr--;
+                    }while(rightptr>=0 && *(numsbeg+rightptr)==*(numsbeg+rightptr+1));
+                }
+                else if (curres<0){
+                    do{
+                        leftptr++;
+                    }while(leftptr<nums.size() && *(numsbeg+leftptr)==*(numsbeg+leftptr-1));
+                }
+                else{
+                    res.push_back({nums[i],*(numsbeg+leftptr),*(numsbeg+rightptr)});
+                    do{
+                        leftptr++;
+                    }while(leftptr<nums.size() && *(numsbeg+leftptr)==*(numsbeg+leftptr-1));
+                    do{
+                        rightptr--;
+                    }while(rightptr>=0 && *(numsbeg+rightptr)==*(numsbeg+rightptr+1));
+                }
+            }
+        }
+        return res;
+    }
+
+
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        return solveMethod2(nums);
+        return solveMethod3(nums); 
+        //method3和method2用到的方法完全一样，只不过method3没有用[],
+        //而是用的解引用*。神奇的是，method3在LeetCode提交的运行时间较method2由112ms提升到了60ms
+        //暂时还不知为何
+    }
+};
