@@ -201,3 +201,55 @@ public:
         return MAXlen;
     }
 };
+
+
+/*
+19. 删除链表的倒数第 N 个结点
+给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+
+进阶：你能尝试使用一趟扫描实现吗？
+
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution19 {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        //第一次想到并通过的方法是双指针，时间复杂度是n，空间复杂度是1，这几乎是最优解法了
+        //还可以用栈先进后出的方法，先把所有结点压栈，然后弹出第n个结点，就是倒数第n个结点，且栈顶元素就是倒数第n个结点的前置结点
+        ListNode* firstBefore = nullptr;
+        ListNode* first = head;
+        ListNode* second = first;
+        int i;
+        for (i = 0;i<n && second!=nullptr;i++){
+            second = second->next;
+        } 
+        if (i<n){
+            return nullptr;
+        }
+        while(second!=nullptr){
+            firstBefore = first;
+            first = first->next;
+            second = second->next;
+        }
+        if (firstBefore==nullptr){
+            return first->next;
+        }
+        else{
+            firstBefore->next = first->next;
+            return head;
+        }
+
+        return nullptr;
+    }
+};
+
