@@ -253,3 +253,70 @@ public:
     }
 };
 
+
+/*
+11. 盛最多水的容器
+给你 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。
+在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0) 。
+找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+说明：你不能倾斜容器。
+
+
+*/
+//同样也是双指针。重点是要想到这个思路
+//这个题多看看！！！
+class Solution11 {
+public:
+    int solveMethod1(vector<int>& height){
+        //用暴力求解的方法，直接超时了 时间复杂度是n^2
+        int MAX = INT_MIN;
+        int MAXleftIndex = -1;
+        int MAXrightIndex = -1;
+        int MAXwaterlevel = -1;
+        for(int i = 0;i<height.size();i++){
+            int j = i+1;
+            if (MAXleftIndex!=-1 && MAXrightIndex!=-1){ //加上这个剪枝后过了几个超时的例子，但是还是超时
+                if (i>=MAXleftIndex && i<=MAXrightIndex && height[i]<=MAXwaterlevel){
+                    j = MAXrightIndex+1;
+                }
+            } 
+            for (j;j<height.size();j++){
+                int waterlevel = min(height[i],height[j]);
+                if (waterlevel*(j-i)>MAX){
+                    MAX = waterlevel*(j-i);
+                    MAXleftIndex = i;
+                    MAXrightIndex = j;
+                    MAXwaterlevel = waterlevel;
+                }   
+            }
+        }
+        return MAX;
+    }
+    int solveMethod2(vector<int>& height){
+        //用双指针的方法，一开始指向最靠边的两个边界，然后不断回缩，直到两边界回缩相遇
+        //具体回缩的方法是回缩挡板长度小的那个。因为如果回缩长的那个，回缩后装的水肯定不如原来的
+        //回缩短的那个还可能超出原来的MAX
+        //https://leetcode-cn.com/problems/container-with-most-water/solution/sheng-zui-duo-shui-de-rong-qi-by-leetcode-solution/
+        int leftindex = 0;
+        int rightindex = height.size()-1;
+        int MAX = INT_MIN;
+        int cur;
+        while(leftindex!=rightindex){
+            if ((cur=(rightindex-leftindex)*min(height[leftindex],height[rightindex]))>MAX)
+                MAX = cur;
+            if (height[leftindex]<=height[rightindex]){
+                leftindex++;
+            }
+            else{
+                rightindex--;
+            }
+        }
+        return MAX;
+    }
+    int maxArea(vector<int>& height) {
+        return solveMethod2(height);
+    }
+};
+
+
