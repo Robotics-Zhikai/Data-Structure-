@@ -329,6 +329,9 @@ public:
 
 */
 //这个用到了两数之和的O(n)求解方法
+//https://leetcode-cn.com/problems/3sum/solution/pai-xu-shuang-zhi-zhen-zhu-xing-jie-shi-python3-by/
+//https://leetcode-cn.com/problems/3sum/solution/san-shu-zhi-he-by-leetcode-solution/ 
+//两个链接结合起来看
 class Solution15 {
 public:
     vector<vector<int>> solveMethod1(vector<int>& nums) {
@@ -387,7 +390,7 @@ public:
                         leftptr++;
                     }while(leftptr<nums.size() && nums[leftptr]==nums[leftptr-1]);
                 }
-                else{
+                else{ //找到一个等于0的，然后需要同时动两头的指针才可能找到
                     res.push_back({nums[i],nums[leftptr],nums[rightptr]});
                     do{
                         leftptr++;
