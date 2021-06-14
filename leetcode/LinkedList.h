@@ -190,4 +190,189 @@ public:
 // https://leetcode-cn.com/problems/copy-list-with-random-pointer/solution/fu-zhi-dai-sui-ji-zhi-zhen-de-lian-biao-by-leetcod/
 
 
+/*
+148. 排序链表
+给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
+
+进阶：
+
+你可以在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序吗？
+
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution148 {
+public:
+    ListNode* solveMethod1(ListNode* head) {
+        //空间复杂度是n
+        vector<int> storage;
+        ListNode* cur = head;
+        while(cur!=nullptr){
+            storage.push_back(cur->val);
+            cur = cur->next;
+        }
+        sort(storage.begin(),storage.end());
+        cur = head;
+        auto it = storage.begin();
+        while(cur!=nullptr){
+            cur->val = *(it++);
+            cur = cur->next;
+        }
+        return head;
+    }
+    int lenList(ListNode* head){
+        int len = 0;
+        ListNode* cur = head;
+        while(cur!=nullptr){
+            len++;
+            cur = cur->next;
+        }
+        return len;
+    }
+    ListNode* offsetInt(ListNode* node,int offset){
+        if (offset==0)
+            return node;
+        int i = 0;
+        while(node!=nullptr){
+            node = node->next;
+            i++;
+            if (i==offset){
+                return node;
+            }
+        }
+        return nullptr;
+    }
+    ListNode* merge(ListNode* leftsplit,ListNode* rightsplit){ 
+        //合并有序链表 常数空间复杂度，直接改链表指针 
+        if(leftsplit==nullptr)
+            return rightsplit;
+        else if (rightsplit == nullptr)
+            return leftsplit;
+
+        ListNode* leftcur = leftsplit;
+        ListNode* leftend = nullptr;
+        ListNode* rightcur = rightsplit;
+        ListNode* rightend = nullptr;
+        ListNode* mergeCur = nullptr;
+        ListNode* mergebegin = mergeCur;
+        while(leftcur!=leftend && rightcur!=rightend){
+            if (leftcur->val>rightcur->val){
+                if (mergebegin==nullptr){
+                    mergebegin = rightcur;
+                    mergeCur = rightcur;
+                }
+                else{
+                    mergeCur->next = rightcur;
+                    mergeCur = mergeCur->next;
+                }
+                rightcur = rightcur->next;
+            }
+            else {
+                if (mergebegin == nullptr){
+                    mergebegin = leftcur;
+                    mergeCur = leftcur;
+                }
+                else{
+                    mergeCur->next = leftcur;
+                    mergeCur = mergeCur->next;
+                }
+                leftcur = leftcur->next;
+            }
+        }
+
+        ListNode* cur;
+        if (leftcur==leftend && rightcur!=rightend){
+            mergeCur->next = rightcur;
+        }
+        else if (leftcur!=leftend && rightcur==rightend){
+            mergeCur->next = leftcur;
+        }
+        return mergebegin;
+    }
+    void couthead(ListNode* head){//用于debug的
+        ListNode*cur = head;
+        while (cur!=nullptr){
+            cout<<cur->val<<" ";
+            cur = cur->next;
+        }
+        cout<<endl;
+    }
+    ListNode* solveMethod2(ListNode* head){
+        //用归并排序，自底向上排，采用迭代的方法 时间复杂度是nlogn，空间复杂度是1
+        int N = lenList(head);
+        ListNode* cur = head;
+        ListNode* newhead = nullptr;
+        ListNode* last = nullptr;
+        for (int interval = 2;interval<=2*N;interval*=2){//2*n是为了处理归并排序时会多余出来的数
+            newhead = nullptr;
+            last = nullptr;
+            while(cur!=nullptr){
+                ListNode* leftsplit = cur;
+                ListNode* curnext = offsetInt(cur,interval);
+                ListNode* rightsplit = offsetInt(leftsplit,interval/2);
+
+                ListNode* thiscur; //把子链表从总链表中切出来，免得造成循环指，这个地方容易出错
+                if ((thiscur = offsetInt(cur,interval-1))!=nullptr)
+                    thiscur->next = nullptr;
+                if ((thiscur = offsetInt(cur,interval/2-1))!=nullptr)
+                    thiscur->next = nullptr;
+
+                ListNode* mergedbegin = merge(leftsplit,rightsplit);
+                ListNode* mergedend = offsetInt(mergedbegin,interval-1);
+                if (newhead==nullptr){
+                    newhead = mergedbegin;
+                }
+                else{
+                    last->next = mergedbegin;
+                }
+                last = mergedend;
+                cur = curnext;
+            }
+            cur = newhead;//这个地方容易出错，每总的排一次序头结点要变
+        }
+        return newhead;
+    }
+    ListNode* solveMethod3(ListNode* head){
+    //同样用归并排序，但是用递归的方式实现，实现起来简单，但是空间复杂度就是递归栈的大小也就是logn而不是1了
+    //每次找链表的中点时用快慢指针的方法，这样扫一遍就能从慢指针得到中点了
+        if (head==nullptr)
+            return nullptr;
+        else if (head->next==nullptr)
+            return head;
+        else if (head->next->next==nullptr){
+            if(head->val<=head->next->val)
+                return head;
+            else{
+                ListNode* headnext = head->next;
+                head->next->next = head;
+                head->next = nullptr;
+                return headnext;
+            }
+        }
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while(fast!=nullptr&& fast->next!=nullptr){//注意这个循环条件容易写错 必须保证fast每次移动两格，否则就不能使得fast走完全程后slow走一半了（主要需要考虑到fast->next为nullptr时就不能移动两格了）
+            slow = slow->next;
+            fast = fast->next!=nullptr?fast->next->next:nullptr;
+        } //用快慢指针找链表中点
+        ListNode* rightsplit = slow->next;
+        slow->next = nullptr; //切断链
+        return merge(solveMethod3(head),solveMethod3(rightsplit));
+    }
+    ListNode* sortList(ListNode* head) {
+        return solveMethod3(head); //这种就是用递归的方法不容易出错且代码量少，面试的时候尽量写递归的形式
+        return solveMethod2(head);
+    }
+};
+
+
 
