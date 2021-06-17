@@ -505,3 +505,91 @@ public:
 };
 
 
+
+/*
+
+236. 二叉树的最近公共祖先
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+百度百科中最近公共祖先的定义为：“对于有根树 T 的两个节点 p、q，
+最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution236 {
+public:
+    bool find(TreeNode* root,TreeNode* p){
+        if (root==nullptr && p == nullptr){
+            return 1;
+        }
+        else if (root==nullptr && p!=nullptr){
+            return 0;
+        }
+        else if (root == p){
+            return 1;
+        }
+        return (find(root->left,p) || find(root->right,p));
+    }
+    TreeNode* traverse(TreeNode* root,TreeNode* p,TreeNode* q){
+        //这个本质上是一个暴力枚举的解法，时间复杂度在n^2
+        if (root==nullptr)
+            return nullptr;
+        if (p==q)
+            return p;
+        if (p==root) //当遇到某一结点就是要查找的结点时，就直接返回
+            return p; 
+        if (q==root)
+            return q;
+        
+        bool leftp = find(root->left,p);
+        bool leftq = find(root->left,q);
+        if (leftp&&leftq){
+            return traverse(root->left,p,q);
+        }
+        else if (!leftp && !leftq){
+            return traverse(root->right,p,q);
+        }
+        else{ //只有二者分列子树的两侧的时候才是最深的公共结点
+            return root;
+        }
+        return nullptr;
+    }
+    TreeNode* solveMethod1(TreeNode* root,TreeNode* p,TreeNode* q){
+        return traverse(root,p,q);
+    }
+    
+    //https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/solution/236-er-cha-shu-de-zui-jin-gong-gong-zu-xian-hou-xu/
+    TreeNode* solveMethod2(TreeNode* root,TreeNode* p,TreeNode* q){
+        //递归实现，只扫一遍，是O(N)的复杂度 这个思路要经常复习
+        if (root==p || root == q){
+            return root;
+        }
+        if (root == nullptr)
+            return nullptr;
+        TreeNode* rootleft = solveMethod2(root->left,p,q); //认为这个递归函数返回的就是子问题的解
+        TreeNode* rootright = solveMethod2(root->right,p,q);
+        if (rootleft!=nullptr && rootright==nullptr){
+            return rootleft;
+        }
+        else if (rootleft==nullptr && rootright!=nullptr){
+            return rootright;
+        }
+        else if (rootleft!=nullptr && rootright!=nullptr){
+            return root;
+        }
+        return nullptr;
+    }
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        return solveMethod2(root,p,q);
+        return solveMethod1(root,p,q);
+    }
+};
