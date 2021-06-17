@@ -428,3 +428,80 @@ public:
 		return search(A, B);
 	}
 };
+
+
+/*
+114. 二叉树展开为链表
+给你二叉树的根结点 root ，请你将它展开为一个单链表：
+
+展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
+展开后的单链表应该与二叉树 先序遍历 顺序相同。
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution114 {
+public:
+    void solveMethod1(TreeNode* root){
+        stack<TreeNode*> sta;
+
+        TreeNode* listCur = nullptr;
+        if(root!=nullptr)
+            sta.push(root);
+        while(!sta.empty() && sta.top()!=nullptr){
+            TreeNode* popEle = sta.top();
+            if (listCur!=nullptr){
+                listCur->right = popEle;
+                listCur->left = nullptr;
+            }
+            sta.pop();
+            listCur = popEle;
+            if (popEle->right!=nullptr){
+                sta.push(popEle->right);
+            }
+            if (popEle->left!=nullptr){
+                sta.push(popEle->left);
+            }
+        }
+    }
+    TreeNode* solveMethod2(TreeNode* root){ //这个要重点看看
+    //这是O(1)的空间复杂度，但是时间复杂度较O(N)的空间复杂度的实现更大些
+        if (root==nullptr || (root->left==nullptr && root->right==nullptr)){
+            return root;
+        }
+        TreeNode* leftrecur =  solveMethod2(root->left); //递归实现，认为左子树已经排成链表了，然后返回链表头
+        TreeNode* rightrecur = solveMethod2(root->right);
+
+        TreeNode* Cur = leftrecur;
+        while(Cur!=nullptr && Cur->right!=nullptr){
+            Cur = Cur->right;
+        } //到达左子树的链表尾
+        if (Cur!=nullptr){
+            Cur->right = rightrecur;
+            Cur->left = nullptr;
+        }
+        if (leftrecur!=nullptr){
+            root->right = leftrecur;
+        }
+        else{
+            root->right = rightrecur;
+        }
+        root->left = nullptr;
+        return root;
+    }
+    void flatten(TreeNode* root) {
+        solveMethod2(root); //同样的，递归实现代码更简单，而且容易想
+    }
+};
+
+
