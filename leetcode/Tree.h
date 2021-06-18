@@ -305,16 +305,17 @@ public:
 	unordered_map<int, int> mapping;//inorder中数字和index的映射 O(n)的空间存储哈希映射
 	vector<int> preo;
 	vector<int> ino;
-	TreeNode* recur(int rootindex, int left, int right)//左闭右开
-													   //输入子树的根节点在preo的索引rootindex，并把子树的所有在ino的索引用[left,right)括起来
-													   //然后返回子树的根节点
+	TreeNode* recur(int rootindex, int left, int right)
+	//左闭右开
+	//输入子树的根节点在preo的索引rootindex，并把子树的所有在ino的索引用[left,right)括起来
+	//然后返回子树的根节点
 	{
 		if (left >= right)
 			return nullptr;
 		int rootvalue = preo[rootindex];
 		TreeNode* node = new TreeNode(rootvalue);
 		node->left = recur(rootindex + 1, left, mapping[rootvalue]);//二叉树的遍历是先遍历左子树，再遍历右子树
-																	//所以rootindex+1是左子树的根节点， rootindex+mapping[rootvalue]-left+1是右子树的根节点
+												//所以rootindex+1是左子树的根节点， rootindex+mapping[rootvalue]-left+1是右子树的根节点
 		node->right = recur(rootindex + mapping[rootvalue] - left + 1, mapping[rootvalue] + 1, right);
 		return node;
 	}
@@ -379,6 +380,55 @@ public:
 
 
 */
+};
+
+
+/*
+105. 从前序与中序遍历序列构造二叉树
+根据一棵树的前序遍历与中序遍历构造二叉树。
+
+注意:
+你可以假设树中没有重复的元素。
+ 
+ 这个题跟上边剑指offer07重建二叉树是一样的
+*/
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution105 {
+public:
+    unordered_map<int,int> MAP;
+    vector<int> pre;
+    vector<int> inord;
+    TreeNode* recur(int rootindex,int left,int right){
+    //recur的话就是给定根节点在pre中的index，和要构建的以rootindex为根节点的子树在inorder中的索引范围
+    //然后递归得到一个构建完成的子树，指向子树的根节点
+        if (left==right){//这里容易出错，容易把这个写漏或者退出条件没写对
+            return nullptr;
+        }//可以这么理解：left等于right意味着构建的子树是一个空树，直接return nullptr即可
+        TreeNode* rootnode = new TreeNode(pre[rootindex]);
+        rootnode->left = recur(rootindex+1,left,MAP[pre[rootindex]]);
+        rootnode->right = recur(rootindex+MAP[pre[rootindex]]-left+1,MAP[pre[rootindex]]+1,right);
+        return rootnode;
+    }
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        //就用递归实现吧，迭代实现容易出错且不好想
+        MAP.clear();
+        pre = preorder;
+        inord = inorder;
+        for (int i = 0;i<inorder.size();i++){
+            MAP[inorder[i]] = i;
+        }
+        return recur(0,0,inorder.size());
+    }
 };
 
 
