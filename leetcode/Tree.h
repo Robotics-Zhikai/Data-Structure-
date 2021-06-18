@@ -593,3 +593,72 @@ public:
         return solveMethod1(root,p,q);
     }
 };
+
+
+/*
+102. 二叉树的层序遍历
+给你一个二叉树，请你返回其按 层序遍历 得到的节点值。 （即逐层地，从左到右访问所有节点）。
+
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution102 {
+public:
+    vector<vector<int>> solveMethod1(TreeNode* root) {
+        queue<TreeNode*> que;
+        vector<vector<int>> res;
+        que.push(root);
+        int levelnum = 1;
+        while(!que.empty() && que.front()!=nullptr){
+            int thisnum = 0;
+            vector<int> vec;
+            for(int i = 0;i<levelnum;i++){
+                if (que.front()->left!=nullptr){
+                    que.push(que.front()->left);
+                    thisnum++;
+                }
+                if (que.front()->right!=nullptr){
+                    que.push(que.front()->right);
+                    thisnum++;
+                }
+                vec.push_back(que.front()->val);
+                que.pop();
+            }
+            res.push_back(vec);
+            levelnum = thisnum;
+        }
+        return res;
+    }
+    void recur(vector<vector<int>>& res,TreeNode* root,int depth){
+        if (root==nullptr)
+            return ;
+        if (res.size()<depth+1){
+            res.push_back(vector<int>{});
+        }
+        res[depth].push_back(root->val);
+        recur(res,root->left,depth+1);
+        recur(res,root->right,depth+1);
+    }
+    vector<vector<int>> solveMethod2(TreeNode* root) {
+        //递归实现，代码简单，运行速度块，但是占据的内存相对较大
+        vector<vector<int>> res;
+        recur(res,root,0);
+        return res;
+    }
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        return solveMethod2(root);
+    }
+};
+
+
