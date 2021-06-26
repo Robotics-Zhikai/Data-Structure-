@@ -395,3 +395,54 @@ private:
     deque<int> DEQ;
     deque<int> MAX;
 };
+
+
+/*
+
+739. 每日温度
+请根据每日 气温 列表，重新生成一个列表。对应位置的输出为：要想观测到更高的气温，至少需要等待的天数。
+如果气温在这之后都不会升高，请在该位置用 0 来代替。
+
+例如，给定一个列表 temperatures = [73, 74, 75, 71, 69, 72, 76, 73]，你的输出应该是 [1, 1, 4, 2, 1, 1, 0, 0]。
+
+提示：气温 列表长度的范围是 [1, 30000]。每个气温的值的均为华氏度，都是在 [30, 100] 范围内的整数。
+
+
+*/
+
+class Solution739 {
+public:
+    vector<int> solveMethod1(vector<int>& temperatures){
+        //时间复杂度是n^2，空间复杂度是1，直接超时了
+        //题解的暴力法没有这里的实现这么暴力，而是充分利用了[30,100]范围内的温度值的条件，然后从后往前遍历
+        vector<int> res(temperatures.size(),0);
+        for(int i = 0;i<temperatures.size();i++){
+            for (int j = 1;i+j<temperatures.size();j++){
+                if (temperatures[i+j]>temperatures[i]){
+                    res[i] = j;
+                    break;
+                }
+            }
+        }
+        return res;
+    }
+    vector<int> solveMethod2(vector<int>& temperatures){ 
+        //用单调栈的方法 时间复杂度是n，因为每个元素进一次单调栈然后出一次单调栈（均摊分析的思想）
+        //这个也是重点是思路，想通了很简单
+        //可以跟着https://leetcode-cn.com/problems/daily-temperatures/solution/mei-ri-wen-du-by-leetcode-solution/ 这个里边的实际数据实例走一遍
+        stack<int> staIndex; //下标的stack,因为要求的是下标的差，因此存储下标更有意义
+        vector<int> res(temperatures.size(),0);
+        for(int i = 0;i<temperatures.size();i++){
+            while(!staIndex.empty() && temperatures[i]>temperatures[staIndex.top()]){
+                res[staIndex.top()] = i-staIndex.top();
+                //如果找到当前温度比栈顶大的，就一直往出弹，并能够得出结果
+                staIndex.pop();
+            }
+            staIndex.push(i);
+        }
+        return res;
+    }
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        return solveMethod2(temperatures);
+    }
+};
