@@ -446,3 +446,132 @@ public:
         return solveMethod2(temperatures);
     }
 };
+
+
+/*
+581. 最短无序连续子数组
+给你一个整数数组 nums ，你需要找出一个 连续子数组 ，
+如果对这个子数组进行升序排序，那么整个数组都会变为升序排序。
+
+请你找出符合题意的 最短 子数组，并输出它的长度。
+
+
+*/
+
+class Solution581 {
+public:
+    int solveMethod1(vector<int>& nums){
+        //基础是插入排序，
+        //然后记录插入排序过程中swap的最大index和最小index，进而right-left+1就得到了最终结果
+        //这个复杂度是n^2，虽然有剪枝，但是本质上还是n^2
+        int right = -1;
+        int left = nums.size();
+        int MINupper = INT_MAX;
+        for(int i = 1;i<nums.size();i++){
+            if (nums[i]>=nums[i-1])
+                continue;
+            if (nums[i]>=MINupper){ 
+                //如果当前值大于最左侧边界，就不用swap多次了，swap一次后直接剪枝即可
+                swap(nums[i],nums[i-1]);
+                if (i>right)
+                    right = i;
+            }
+            else{
+                bool swapflag = 0;
+                int j = i;
+                for(;j>0;j--){
+                    if (nums[j]<nums[j-1]){
+                        if (j>right)
+                            right = j;
+                        swap(nums[j],nums[j-1]);
+                        swapflag = 1;
+                    }
+                    else
+                        break;
+                }
+                if (swapflag==1 && j<left){
+                    left = j;
+                    MINupper = nums[left];
+                }
+            }
+        }
+        if (right==-1)
+            return 0;
+        else    
+            return right-left+1;
+    }
+    int solveMethod2(vector<int>& nums){
+        //直接调用排序然后比较边界不一样的数，就是问题的解
+        //这个排序的复杂度是nlogn
+        //36ms 远远超过method1
+        vector<int> copy = nums;
+        sort(copy.begin(),copy.end());
+        int left = -1;
+        int right = -1;
+        for(int i = 0;i<nums.size();i++){
+            if (nums[i]!=copy[i]){
+                left = i;
+                break;
+            }
+        }
+        for (int i = nums.size()-1;i>=0;i--){
+            if (nums[i]!=copy[i]){
+                right = i;
+                break;
+            }
+        }
+        if (left==-1 || right==-1){
+            return 0;
+        }
+        else{
+            return right-left+1;
+        }
+    }
+    int solveMethod3(vector<int>& nums){
+        //用单调栈的方法解决
+        //这个不太好写 多写写！！！！
+        //这个其实本质上还是method1中插入排序要找最左侧，只不过借助栈把没必要比较的都弹出去了
+        //时间复杂度和空间复杂度都是n
+        //有空间复杂度为1的解法，但是不太容易想到
+        if (nums.empty() || nums.size()==1)
+            return 0;
+        stack<int> CorrectTOP; //栈的栈顶是迄今为止排序正确的 直接存放nums中的元素
+    
+        int left = INT_MAX; //存放最左侧下标
+        for (int i = 0;i<nums.size();i++){
+            while(!CorrectTOP.empty()&&CorrectTOP.top()>nums[i]){
+                CorrectTOP.pop();
+                if (CorrectTOP.size()<left)
+                    left = CorrectTOP.size(); //这个反应了左侧下标的变化
+            }
+            CorrectTOP.push(nums[i]);
+        }
+        
+        int right = INT_MAX; //存放最右侧下标
+        while(!CorrectTOP.empty()){
+            CorrectTOP.pop();
+        }
+        for (int i = nums.size()-1;i>=0;i--){
+            while(!CorrectTOP.empty()&&CorrectTOP.top()<nums[i]){ //这个小于号容易写错成小于等于号
+                CorrectTOP.pop();
+                if (CorrectTOP.size()<right)
+                    right = CorrectTOP.size();
+            }
+            CorrectTOP.push(nums[i]);
+        }
+        right = nums.size()-right;
+
+        if (left==INT_MAX ||right==INT_MAX){
+            return 0;
+        }
+        else 
+            return right-left;
+
+    }
+    int findUnsortedSubarray(vector<int>& nums) {
+        return solveMethod3(nums); //还是单调栈的套路
+    }
+};
+
+
+
