@@ -464,4 +464,174 @@ public:
 };
 
 
+/*
+146. LRU 缓存机制
+运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制 。
+实现 LRUCache 类：
 
+LRUCache(int capacity) 以正整数作为容量 capacity 初始化 LRU 缓存
+int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1 。
+void put(int key, int value) 如果关键字已经存在，则变更其数据值；
+如果关键字不存在，则插入该组「关键字-值」。
+当缓存容量达到上限时，它应该在写入新数据之前删除最久未使用的数据值，从而为新的数据值留出空间。
+ 
+
+进阶：你是否可以在 O(1) 时间复杂度内完成这两种操作？
+
+*/
+
+//一个比较傻（低效）的实现，运行超时了，但是运行结果是正确的
+class LRUCacheMethod1 {
+public:
+    LRUCacheMethod1(int capacity):_cap(capacity) {}
+    
+    int get(int key) {
+        _time++;
+        if (MAP.find(key)!=MAP.end()){
+            MAPvisit[key] = _time;
+            return MAP[key];
+        }
+        else{
+            return -1;
+        }
+    }
+    
+    void put(int key, int value) {
+        _time++;
+        if (MAP.size()<_cap){
+            MAPvisit[key] = _time;
+            MAP[key] = value;
+        }
+        else{
+            if (MAP.find(key)==MAP.end()){
+                int max = INT_MIN;
+                int recordMinindex = -1;
+                for(auto& pair:MAPvisit){
+                    if ((_time-pair.second)>max){
+                        max = _time-pair.second;
+                        recordMinindex = pair.first;
+                    }
+                }
+                MAP.erase(recordMinindex);
+                MAPvisit.erase(recordMinindex);
+            }
+            
+            MAP[key] = value;
+            MAPvisit[key] = _time;
+        }
+    }
+private:
+    unordered_map<int,int> MAP;
+    unordered_map<int,int> MAPvisit;
+    const int _cap;
+    int _time = 0;
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+
+class node{
+public:
+    node(int key,int value):_key(key),_value(value){}
+    node* next = nullptr;
+    node* prev = nullptr;
+    int _key;
+    int _value;
+};
+
+//一个比较高效的实现 逻辑还是挺简单的
+class LRUCache {
+    //用双向链表和哈希表来实现LRU
+    //最近访问的通过HASHMAP O(1)找到后放在链表的最后，或者找不到时新建一个node加到链表最后
+    //要删除一个最久未使用的数据值时直接删除掉双向链表的头结点
+public:
+    LRUCache(int capacity):_capacity(capacity) {
+
+    }
+    
+    int get(int key) {
+        auto found = MAP.find(key);
+        if(found==MAP.end()){
+            return -1;
+        }
+        else{
+            node* foundNode = found->second;
+            eraseNode(foundNode);
+            insertNode(foundNode);
+            return foundNode->_value;
+        }
+    }
+    
+    void put(int key, int value) {
+        if (MAP.find(key)!=MAP.end()){
+            MAP[key]->_value = value;
+            eraseNode(MAP[key]);
+            insertNode(MAP[key]); //注意这个更新数据也算是对数据进行访问
+        }
+        else{
+            node * newnode = new node(key,value);
+            if (MAP.size()<_capacity){
+                insertNode(newnode);
+                MAP[key] = newnode;
+            }
+            else{
+                node * deletenode = firstnode;
+                eraseNode(deletenode);
+                MAP.erase(deletenode->_key);
+                delete deletenode;
+                insertNode(newnode);
+                MAP[key] = newnode;
+            }
+        }
+    }
+private:
+    unordered_map<int,node*> MAP;
+    const int _capacity;
+
+    node* lastnode = nullptr;
+    node* firstnode = nullptr;
+
+    void insertNode(node* addr){
+        if (lastnode==nullptr){
+            lastnode = addr;
+            firstnode = addr;
+            addr->next = nullptr;
+            addr->prev = nullptr;
+        }
+        else{
+            lastnode->next = addr;
+            addr->next = nullptr;
+            addr->prev = lastnode;
+            lastnode = addr;
+        }
+    }
+    void eraseNode(node* addr){
+        if (addr->next==nullptr && addr->prev==nullptr){
+            firstnode = nullptr;
+            lastnode = nullptr;
+        }
+        else if (addr->prev==nullptr){
+            addr->next->prev = nullptr;
+            firstnode = addr->next;
+        }
+        else if (addr->next==nullptr){
+            addr->prev->next = nullptr;
+            lastnode = addr->prev;
+        }
+        else{
+            addr->prev->next = addr->next;
+            addr->next->prev = addr->prev;
+        }
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
