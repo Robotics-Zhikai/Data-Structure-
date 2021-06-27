@@ -83,3 +83,46 @@ public:
 		return getLeastNumbersPriorityQueue(arr, k);//用堆不如用分治快 因为分治里有剪枝 而堆的话经常是O(n)
 	}
 };
+
+
+/*
+347. 前 K 个高频元素
+给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率前 k 高的元素。你可以按 任意顺序 返回答案。
+*/
+
+class Solution347 {
+public:
+	//也可用快速排序的方法，每扫一次剪枝一半的方式进行处理
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int,int> freq;
+        for (int i = 0;i<nums.size();i++){
+            if (freq.find(nums[i])==freq.end()){
+                freq[nums[i]] = 0;
+            }
+            else{
+                freq[nums[i]]++;
+            }
+        }
+        
+        auto lambda = [](pair<int,int>& a,pair<int,int>& b)->bool{return a.second>b.second;};
+        //大于号建立小根堆，小于号建立大根堆
+		priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(lambda)> PriQue(lambda);
+        for(auto&m:freq){
+            if (PriQue.size()<k){ //建立小根堆
+                PriQue.push(m);
+            }
+            else{
+                if (m.second>=PriQue.top().second){ //然后根据头结点值进行pop和push
+                    PriQue.pop();
+                    PriQue.push(m);
+                }
+            }
+        } //时间复杂度是nlogk，在k非常小时时间复杂度趋于n
+        vector<int> res;
+        for(int i = 0;i<k;i++){ //最终得到前k个最大值
+            res.push_back(PriQue.top().first);
+            PriQue.pop();
+        }
+        return res;
+    }
+};
