@@ -149,3 +149,157 @@ public:
 };
 
 
+/*
+
+128. 最长连续序列
+给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+
+
+进阶：你可以设计并实现时间复杂度为 O(n) 的解决方案吗？
+
+*/
+
+
+class UnionFind1{
+public:
+    UnionFind1(int SIZE):_parent(SIZE,-1),_rank(SIZE,1) 
+    //注意这个构造函数，外界只需要给一个多大的集合就行，具体元素的值是什么不管
+    {
+        for(int i = 0;i<_parent.size();i++){
+            _parent[i] = i; //首先自指
+        }
+    }
+    
+    //然后依据每个元素的index来进行分类
+
+    int find(int x){ //这里的函数参数都应该是索引，不应该是索引对应的值
+        if (x==_parent[x])
+            return x;
+        return _parent[x] = find(_parent[x]);
+    }
+    void merge(int x,int y){
+        int rootx = find(x);
+        int rooty = find(y);
+        if (rootx==rooty)
+            return;
+        if (_rank[rootx]>_rank[rooty]){
+            _parent[rooty] = rootx;
+            _rank[rootx]+=_rank[rooty];
+        }
+        else{
+            _parent[rootx] = rooty;
+            _rank[rooty]+=_rank[rootx];
+        }
+    }
+    int getSize(int x){
+        return _rank[find(x)];
+    }
+
+
+private:
+    vector<int> _parent; //在parent中索引为index的值就是索引为index的元素的父元素所在index
+    vector<int> _rank; //同样是一个子树的结点大小
+};
+
+
+class Solution128 {
+public:
+    int solveMethod1(vector<int> & nums){ //用排序和单调栈的方法 时间复杂度是nlogn，空间复杂度是n
+        if (nums.empty())
+            return 0;
+        sort(nums.begin(),nums.end());
+        stack<int> sta;
+        int MAX = INT_MIN;
+        int count = 0;
+        for (int i = 0;i<nums.size();i++){
+            while(!sta.empty() && sta.top()+1!=nums[i]){
+                sta.pop();
+                count--;
+            }
+            sta.push(nums[i]);
+            count++;
+            if (count>MAX){
+                MAX = count;
+            }
+        }
+        return MAX;
+    }
+    int solveMethod2(vector<int>& nums){ //仍然是先排序然后计数
+        if (nums.empty())
+            return 0;
+        sort(nums.begin(),nums.end());
+        int MAX = INT_MIN;
+        int curLen = 1;
+        for (int i = 0;i<nums.size()-1;i++){
+            if (nums[i+1]==nums[i]+1){
+                curLen++;
+            }
+            else if (nums[i+1]==nums[i]){ //这个容易遗漏掉
+                continue;
+            }
+            else{
+                if (curLen>MAX){
+                    MAX = curLen;
+                }
+                curLen = 1; //需要重头开始计数
+            }
+        }
+        if (curLen>MAX){ //这个容易遗漏掉，可能会出现一直不更新MAX的情况
+            MAX = curLen;
+        }
+        return MAX;
+    }
+    int solveMethod3(vector<int>& nums){
+        //借助哈希表，时间复杂度就是n，空间复杂度也是n
+        //这个不好从一开始往出想，但是想明白了很简单
+        if (nums.empty())
+            return 0;
+        unordered_set<int> SET;
+        for(int n:nums){
+            SET.insert(n);
+        }
+        int MAX = INT_MIN;
+        for (int n:SET){
+            if (SET.find(n-1)!=SET.end()){ 
+                //如果比他小一个的找到了，那就直接跳过.因为从比他小一个的数开始计算肯定大于从该数开始计算的值
+                continue;
+            }
+            else{
+                int i = 1;
+                while(SET.find(n+i)!=SET.end()){
+                    i++;
+                }
+                if (i>MAX){
+                    MAX = i;
+                }
+            }
+        }
+        return MAX;
+    }
+    int solveMethod4(vector<int>& nums){
+        //用并查集来做
+        if (nums.empty())
+            return 0;
+        unordered_map<int,int> MAP;
+        int index = 0;
+        for (int n:nums){
+            MAP[n] = index++;
+        } //一方面这个是用来去重的，另一方面这个要建立一个index与值的对应关系
+
+        UnionFind1 UNION(index);
+        int res = 1;
+        for(auto& m:MAP){
+            auto found = MAP.find(m.first+1);
+            if (found!=MAP.end()){
+                UNION.merge(m.second,found->second); //把这两个下标的元素合并为一类
+                res = max(res,UNION.getSize(m.second));
+            }
+        }
+        return res;
+    }
+    int longestConsecutive(vector<int>& nums) {
+        return solveMethod4(nums);
+        return solveMethod3(nums);
+        return solveMethod2(nums);
+    }
+};
