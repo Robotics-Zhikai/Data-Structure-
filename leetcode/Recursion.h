@@ -149,3 +149,151 @@ public:
 
 
 */
+
+//这个仍然是递归的写法简单不易出错
+//  Definition for singly-linked list.
+ struct ListNode {
+     int val;
+     ListNode *next;
+     ListNode() : val(0), next(nullptr) {}
+     ListNode(int x) : val(x), next(nullptr) {}
+     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ };
+ 
+class Solution2 {
+public:
+    ListNode* solveMethod1(ListNode* l1,ListNode* l2){
+        //这个写的有重复代码，不是很好
+        ListNode* cur1 = l1;
+        ListNode* cur2 = l2;
+        ListNode* curres = nullptr;
+        ListNode* res = nullptr;
+        int step = 0;
+        while(cur1!=nullptr && cur2!=nullptr){
+            int sum = cur1->val+cur2->val+step;
+            int cur = 0;
+            if (sum>=10){
+                cur = sum-10;
+                step = 1;
+            }
+            else{
+                cur = sum;
+                step = 0;
+            }
+            ListNode* newNode = new ListNode(cur);
+            if (curres!=nullptr){
+                curres->next = newNode;
+            }
+            else{
+                res = newNode;
+            }
+            curres = newNode;
+            cur1 = cur1->next;
+            cur2 = cur2->next;
+        }
+        if (cur1!=cur2){
+            ListNode* curfinal = (cur1==nullptr)?cur2:cur1;
+            while(curfinal!=nullptr){
+                int sum = curfinal->val+step;
+                int cur = 0;
+                if (sum>=10){
+                    cur = sum-10;
+                    step = 1;
+                }
+                else{
+                    cur = sum;
+                    step = 0;
+                }
+                ListNode* newNode = new ListNode(cur);
+                if (curres!=nullptr){
+                    curres->next = newNode;
+                }
+                curres = newNode;
+                curfinal = curfinal->next;
+            }
+        }
+        if (step==1){ //这里的这个进位容易忘记写！！
+            if (curres!=nullptr)
+                curres->next = new ListNode(step);
+            else
+                res = new ListNode(step);
+        }
+        return res;
+    }
+    ListNode* solveMethod2(ListNode* l1,ListNode* l2){
+        //合并在一起，代码写的不冗余
+        ListNode* cur1 = l1;
+        ListNode* cur2 = l2;
+        ListNode* curres = nullptr;
+        ListNode* res = nullptr;
+        int step = 0;
+        while(cur1!=nullptr || cur2!=nullptr){
+            int sum = 0;
+            if (cur1!=nullptr&&cur2!=nullptr){
+                sum = cur1->val+cur2->val+step;
+            }
+            else if (cur1!=nullptr){
+                sum = cur1->val+step;
+            }
+            else if (cur2!=nullptr){
+                sum = cur2->val+step;
+            }
+            int cur = 0;
+            if (sum>=10){
+                cur = sum-10;
+                step = 1;
+            }
+            else{
+                cur = sum;
+                step = 0;
+            }
+            ListNode* newNode = new ListNode(cur);
+            if (curres!=nullptr){
+                curres->next = newNode;
+            }
+            else{
+                res = newNode;
+            }
+            curres = newNode;
+            if (cur1!=nullptr)
+                cur1 = cur1->next;
+            if (cur2!=nullptr)
+                cur2 = cur2->next;
+        }
+        if (step==1){ //这里的这个进位容易忘记写！！
+            if (curres!=nullptr)
+                curres->next = new ListNode(step);
+            else
+                res = new ListNode(step);
+        }
+        return res;
+    }
+    ListNode* solveMethod3(ListNode* l1,ListNode* l2, int step){ 
+        //用递归的方式进行求解
+        if (l1==nullptr && l2==nullptr && step==0)
+            return nullptr;
+        int sum = step;
+        if (l1!=nullptr){
+            sum += l1->val;
+        }
+        if (l2!=nullptr){
+            sum += l2->val;
+        }
+        int cur = 0;
+        if (sum>=10){
+            cur = sum-10;
+            step = 1;
+        }
+        else{
+            cur = sum;
+            step = 0;
+        }
+        ListNode* now = new ListNode(cur);
+        now->next = solveMethod3(l1==nullptr?l1:l1->next,l2==nullptr?l2:l2->next,step);
+        return now;
+    }
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        return solveMethod3(l1,l2,0);
+        return solveMethod2(l1,l2);
+    }
+};
