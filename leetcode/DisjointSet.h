@@ -303,3 +303,108 @@ public:
         return solveMethod2(nums);
     }
 };
+
+/*
+547. 省份数量
+有 n 个城市，其中一些彼此相连，另一些没有相连。如果城市 a 与城市 b 直接相连，
+且城市 b 与城市 c 直接相连，那么城市 a 与城市 c 间接相连。
+
+省份 是一组直接或间接相连的城市，组内不含其他没有相连的城市。
+
+给你一个 n x n 的矩阵 isConnected ，其中 isConnected[i][j] = 1 表示第 i 个城市和第 j 个城市直接相连，
+而 isConnected[i][j] = 0 表示二者不直接相连。
+
+返回矩阵中 省份 的数量。
+
+*/
+
+class unionfind{
+public:
+    unionfind(int size):_parent(size,-1),_rank(size,1)
+    {
+        for (int i = 0;i<_parent.size();i++){
+            _parent[i] = i;
+        }
+    }
+    int find(int x){
+        if (x==_parent[x]){
+            return x;
+        }
+        return _parent[x] = find(_parent[x]);
+    }
+    void merge(int x,int y){
+        int rootx = find(x);
+        int rooty = find(y);
+        if (rootx==rooty)
+            return;
+        if (_rank[rootx]>_rank[rooty]){
+            _parent[rooty] = rootx;
+            _rank[rootx]+=_rank[rooty];
+        }
+        else{
+            _parent[rootx] = rooty;
+            _rank[rooty]+=_rank[rootx];
+        }
+    }
+    int getCount(){
+        int res = 0;
+        for(int i = 0;i<_parent.size();i++){
+            if (_parent[i] == i)
+                res++;
+        }
+        return res;
+    }
+
+private:
+    vector<int> _parent;
+    vector<int> _rank;
+
+};
+
+class Solution547 {
+public:
+    bool DFS(vector<vector<int>>& isConnected,int curindex){
+        bool res = 0;
+        for (int i = 0;i<isConnected[curindex].size();i++){
+            if (isConnected[curindex][i]==1){
+                isConnected[curindex][i] = 0;
+                isConnected[i][curindex] = 0;
+                isConnected[i][i] = 0;
+                isConnected[curindex][curindex] = 0;
+                DFS(isConnected,i);
+                res = 1;
+            }
+        }
+        return res;
+    }
+    int solveMethod1(vector<vector<int>>& isConnected){
+        int res = 0;
+        for (int i = 0;i<isConnected.size();i++){
+            if (DFS(isConnected,i)){
+                res++;
+            }
+        }
+        return res;
+    }
+
+    int solveMethod2(vector<vector<int>>& isConnected){
+        //用并查集的方法 速度更快，占用的空间更小
+        //https://leetcode-cn.com/problems/number-of-provinces/solution/jie-zhe-ge-wen-ti-ke-pu-yi-xia-bing-cha-0unne/ 对并查集时间和空间复杂度的分析
+        unionfind UF(isConnected.size());
+        for (int i = 0;i<isConnected.size();i++){
+            for(int j = i;j<isConnected.size();j++){
+                if (isConnected[i][j]==1){
+                    isConnected[i][i] = 0;
+                    isConnected[j][j] = 0;
+                    isConnected[i][j] = 0;
+                    isConnected[j][i] = 0;
+                    UF.merge(i,j);
+                }
+            }
+        }
+        return UF.getCount();
+    }
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        return solveMethod2(isConnected);
+    }
+};
