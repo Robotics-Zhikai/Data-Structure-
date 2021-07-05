@@ -756,3 +756,75 @@ public:
         return root;
     }
 };
+
+
+
+/*
+98. 验证二叉搜索树
+给定一个二叉树，判断其是否是一个有效的二叉搜索树。
+
+假设一个二叉搜索树具有如下特征：
+
+节点的左子树只包含小于当前节点的数。
+节点的右子树只包含大于当前节点的数。
+所有左子树和右子树自身必须也是二叉搜索树。
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+	void DFS(TreeNode* root,vector<int>& res){
+		if(root==nullptr)
+			return;
+		DFS(root->left,res);
+		res.push_back(root->val);
+		DFS(root->right,res);
+	}
+	bool solveMethod1(TreeNode* root){
+		//用二叉搜索树的性质，如果是二叉搜索树的话，中序遍历后数组应该是有序的，否则数组无序表示不是二叉搜索树
+		vector<int> res;
+		DFS(root,res);
+		for(int i = 0;i<res.size()-1;i++){
+			if (res[i+1]<=res[i])
+				return false;
+		}
+		return true;
+	}
+	bool solveMethod2(TreeNode* root,long int lower,long int upper){
+		//这个能抽象到的话很简单，但是问题是抽象不出来带入lower和upper的递归 多看看！！！
+		if (root==nullptr)
+			return true;
+		if (root->val<=lower || root->val>=upper)
+			return false;
+		return solveMethod2(root->left,lower,root->val) && solveMethod2(root->right,root->val,upper);
+	}
+	bool isValidBST(TreeNode* root){
+		return solveMethod2(root,LONG_MIN,LONG_MAX);
+	}
+	
+    // bool isValidBST(TreeNode* root) {
+	// 	if (root==nullptr){
+	// 		return true;
+	// 	}
+	// 	if (root->left!=nullptr){
+	// 		if (root->left->val>=root->val)
+	// 			return false;
+	// 	}
+	// 	if (root->right!=nullptr){
+	// 		if (root->right->val<=root->val)
+	// 			return false;
+	// 	}
+	// 	return isValidBST(root->left) && isValidBST(root->right);
+    // } //不能按照这样来做，这样的话不能分辨[5,4,6,null,null,3,7]这种情况 必须得加lower和upper做一个界限
+};
