@@ -782,7 +782,7 @@ public:
  *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
  * };
  */
-class Solution {
+class Solution98 {
 public:
 	void DFS(TreeNode* root,vector<int>& res){
 		if(root==nullptr)

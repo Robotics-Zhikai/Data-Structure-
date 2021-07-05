@@ -311,7 +311,7 @@ public:
 
 */
 
-class Solution {
+class Solution394 {
 public:
     bool isNum(char c){
         if (c>='0' && c<='9')
