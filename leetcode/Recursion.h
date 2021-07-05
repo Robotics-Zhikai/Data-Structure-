@@ -297,3 +297,97 @@ public:
         return solveMethod2(l1,l2);
     }
 };
+
+
+/*
+394. 字符串解码
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的输入。
+
+*/
+
+class Solution {
+public:
+    bool isNum(char c){
+        if (c>='0' && c<='9')
+            return true;
+        else
+            return false;
+    }
+    string solveMethod1(string s){
+        //非递归方法得到的 容易想到 但是也容易出错
+        string sta;
+        stack<char> tmp;
+        stack<char> numtmp;
+        for (int i = 0;i<s.size();i++){
+            char cur = s[i];
+            sta.push_back(s[i]);
+            if (cur==']'){
+                do{
+                    if (sta.back()!=']' && sta.back()!='['){
+                        tmp.push(sta.back());
+                    }
+                    sta.pop_back();
+                }while(!sta.empty() && !isNum(sta.back()));
+
+                while(!sta.empty() && isNum(sta.back())){
+                    numtmp.push(sta.back());
+                    sta.pop_back();
+                }
+                string NUM = "";
+                while(!numtmp.empty()){
+                    NUM.push_back(numtmp.top());
+                    numtmp.pop();
+                }
+                int times = atoi(NUM.c_str()); //这里容易出错，容易忽略掉数可能是由多位组成
+
+                string storage = "";
+                while(!tmp.empty()){
+                    storage.push_back(tmp.top());
+                    tmp.pop();
+                }
+                for (int t = 0;t<times;t++){
+                    sta= sta+storage;
+                }
+            }
+        }
+        return sta;
+    }
+    int index = 0;
+    
+    string solveMethod2(string & s){
+        //用递归的方式实现，注意提出去那个index，不好抽象到递归形式，这个多复习一下！！
+        string res;
+        int times = 0;
+        while(index<s.size()){
+            if (isNum(s[index])){
+                times = 10 * times + (s[index]-'0') ;
+            }
+            else if (!isNum(s[index])&&s[index]!='['&&s[index]!=']'){
+                res.push_back(s[index]);
+            }
+            else if (s[index]=='['){
+                index++;
+                string tmp = solveMethod2(s);
+                for(int i = 0;i<times;i++){
+                    res+=tmp;
+                }
+                times = 0;
+            }
+            else if (s[index]==']'){
+                break;
+            }
+            index++;
+        }
+        return res;
+    }
+    
+    string decodeString(string s) {
+        return solveMethod2(s);
+    }
+};
