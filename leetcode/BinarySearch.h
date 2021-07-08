@@ -9,7 +9,8 @@
 整数数组 nums 按升序排列，数组中的值 互不相同 。
 
 在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，
-使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。
+使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]
+（下标 从 0 开始 计数）。
 例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
 
 给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
@@ -105,6 +106,100 @@ public:
         return -1;
     }
     int search(vector<int>& nums, int target) {
+        return solveMethod2(nums,target);
+    }
+};
+
+
+/*
+34. 在排序数组中查找元素的第一个和最后一个位置
+给定一个按照升序排列的整数数组 nums，和一个目标值 target。找出给定目标值在数组中的开始位置和结束位置。
+
+如果数组中不存在目标值 target，返回 [-1, -1]。
+
+进阶：
+
+你可以设计并实现时间复杂度为 O(log n) 的算法解决此问题吗？
+
+*/
+
+class Solution34 {
+public:
+    vector<int> solveMethod1(vector<int>& nums,int target){
+        int l = 0;
+        int r = nums.size(); //仍然是前闭后开
+        int mid = (l+r)/2;
+        while(l!=r){
+            if (nums[mid]>target){
+                r = mid;
+            }
+            else if (nums[mid]<target){
+                l = mid+1;
+            }
+            else{
+                break;
+            }
+            mid = (l+r)/2;
+        }
+        if (l==r){ 
+            //l意味着target必然在>=l的地方，r意味着target必然在<r的地方，然后如果l=r说明就肯定没有
+            return vector<int>{-1,-1};
+        }
+        int low = 0;
+        int high = nums.size()-1;
+        for(int i = mid;i>=0;i--){
+            if (nums[i]!=target){
+                low = i+1;
+                break;
+            }
+        }
+        for (int i = mid;i<nums.size();i++){
+            if (nums[i]!=target){
+                high = i-1;
+                break;
+            }
+        }
+        return vector<int>{low,high};
+    }
+    vector<int> solveMethod2(vector<int>& nums,int target){
+        if (nums.empty()){
+            return vector<int>{-1,-1};
+        }
+        int l = 0;
+        int r = nums.size()-1; //这里看成是前闭后闭的不容易出错
+        int mid = (l+r)/2;
+        int low ,high;
+        while(l!=r){ //还是这里二分容易出错 这里是寻找target的第一个值
+            if (nums[mid]<target){
+                l = mid+1;
+            }
+            else if (nums[mid]>=target){
+                r = mid;
+            }
+            mid = (l+r)/2;
+        }
+        if (l>=nums.size() || nums[l]!=target){
+            return vector<int>{-1,-1};
+        }
+        low = l;
+        
+        l = 0;
+        r = nums.size(); //但是这里就不能看成是前闭后闭，因为看成前闭后开就很好写
+        mid = (l+r)/2;
+        while(l!=r){ //这里是寻找第一个比target大的索引
+            if (nums[mid]>target){
+                r = mid;
+            }
+            else if (nums[mid]<=target){
+                l = mid + 1;
+            }
+            mid = (l+r)/2;
+        }
+        high = l-1;
+
+        return vector<int>{low,high};
+    }
+    vector<int> searchRange(vector<int>& nums, int target) {
         return solveMethod2(nums,target);
     }
 };
