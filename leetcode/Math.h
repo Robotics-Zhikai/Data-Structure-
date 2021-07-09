@@ -157,4 +157,35 @@ public:
 
 };
 
+/*
+48. 旋转图像
+给定一个 n × n 的二维矩阵 matrix 表示一个图像。请你将图像顺时针旋转 90 度。
 
+你必须在 原地 旋转图像，这意味着你需要直接修改输入的二维矩阵。请不要 使用另一个矩阵来旋转图像。
+
+
+*/
+
+class Solution48 {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        //先经过列变换，然后再翻折，就得到了顺时针旋转的矩阵
+        //也可以先定义一个临时储存的变量，然后再进行挨个的转移赋值
+        //https://leetcode-cn.com/problems/rotate-image/solution/xuan-zhuan-tu-xiang-by-leetcode-solution-vu3m/
+        if (matrix.empty())
+            return;
+        for (int j = 0;j<matrix[0].size()/2;j++){
+            for (int i = 0;i<matrix.size();i++){
+                swap(matrix[i][j],matrix[i][matrix[0].size()-j-1]);
+            }
+        }
+
+        for (int i = 0;i<matrix.size();i++){
+            int midX = i;
+            int midY = matrix[i].size()-i-1;
+            for (int j = 0;j<matrix[i].size()-i;j++){
+                swap(matrix[i][j],matrix[i+midY-j][midY]);
+            }
+        }
+    }
+};
