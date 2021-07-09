@@ -960,3 +960,63 @@ public:
         return dp[nums.size()-1];
     }
 };
+
+
+/*
+62. 不同路径
+一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。
+
+问总共有多少条不同的路径？
+
+*/
+class Solution62 {
+public:
+	int count = 0;
+    
+    void DFS(vector<vector<int>>& isvist,int i,int j){
+		if (i==isvist.size()-1 && !isvist.empty() && j==isvist[0].size()-1){
+			count++;
+		}
+		isvist[i][j] = 1;
+		if (i<isvist.size()-1){
+            if (isvist[i+1][j]==0)
+			    DFS(isvist,i+1,j);
+		}
+		if (!isvist.empty() && j<isvist[0].size()-1){
+			if (isvist[i][j+1]==0)
+                DFS(isvist,i,j+1);
+		}
+		isvist[i][j] = 0;
+	}
+    int solveMethod1(int m, int n){ //用DFS的方法，需要计算重复的，很低效，对大规模的直接超时
+        vector<vector<int>> isvist(m,vector<int>(n,0));
+		count = 0;
+		DFS(isvist,0,0);
+		return count;
+    }
+
+    int solveMethod2(int m,int n){
+        //用动态规划的方法做就不超时了
+        vector<vector<int>> dp(m,vector<int>(n,0));
+        dp[m-1][n-1] = 1;
+        for (int j = n-2;j>=0;j--){
+            dp[m-1][j] = dp[m-1][j+1]; 
+        }
+        for (int i = m-2;i>=0;i--){
+            dp[i][n-1] = 1;
+        }
+        for (int i = m-2;i>=0;i--){
+            for (int j = n-2;j>=0;j--){
+                dp[i][j] = dp[i+1][j]+dp[i][j+1];
+            }
+        }
+        return dp[0][0];
+    }
+    //还可以用组合数学的方式，就是高中数学
+
+    int uniquePaths(int m, int n) {
+        return solveMethod2(m,n);
+    }
+};
