@@ -828,3 +828,162 @@ public:
 	// 	return isValidBST(root->left) && isValidBST(root->right);
     // } //不能按照这样来做，这样的话不能分辨[5,4,6,null,null,3,7]这种情况 必须得加lower和upper做一个界限
 };
+
+
+
+
+/*
+208. 实现 Trie (前缀树)
+Trie（发音类似 "try"）或者说 前缀树 是一种树形数据结构，用于高效地存储和检索字符串数据集中的键。
+这一数据结构有相当多的应用情景，例如自动补完和拼写检查。
+
+请你实现 Trie 类：
+
+Trie() 初始化前缀树对象。
+void insert(String word) 向前缀树中插入字符串 word 。
+boolean search(String word) 如果字符串 word 在前缀树中，返回 true（即，在检索之前已经插入）；否则，返回 false 。
+boolean startsWith(String prefix) 如果之前已经插入的字符串 word 的前缀之一为 prefix ，返回 true ；否则，返回 false 。
+
+*/
+
+// class Trie {
+// public:
+//     /** Initialize your data structure here. */
+//     Trie() {
+
+//     }
+    
+//     /** Inserts a word into the trie. */
+//     void insert(string word) {
+//         for(int i = 0;i<word.size();i++){
+//             if (data.size()==i){
+//                 data.push_back(map<char,bool>{{word[i],0}});
+//             }
+//             else{
+//                 if (data[i].find(word[i])==data[i].end()){
+//                     data[i].insert({word[i],0});
+//                 }
+//             }
+//             if (i==word.size()-1){
+//                 data[i][word[i]] = true;
+//             }
+//         }
+//     }
+    
+//     /** Returns if the word is in the trie. */
+//     bool search(string word) {
+//         if (data.size()<word.size()){
+//             return false;
+//         }
+//         for (int i = 0;i<word.size();i++){
+//             auto found = data[i].find(word[i]);
+//             if (found==data[i].end()){
+//                 return false;
+//             }
+//         }
+//         int i = word.size()-1;
+//         return data[i][word[i]];
+//     }
+    
+//     /** Returns if there is any word in the trie that starts with the given prefix. */
+//     bool startsWith(string prefix) {
+//         if (data.size()<prefix.size()){
+//             return false;
+//         }
+//         for (int i = 0;i<prefix.size();i++){
+//             auto found = data[i].find(prefix[i]);
+//             if (found==data[i].end()){
+//                 return false;
+//             }
+//         }
+//         // int i = prefix.size()-1;
+//         // if (data[i][prefix[i]]==true){
+//         //     return false;
+//         // }
+//         return true;
+//     }
+
+// private:
+//     vector<map<char,bool>> data;
+// };
+//上边注释掉的这个是失败的写法，没有把各个节点真正表示成树的数据结构
+
+
+class Trie {
+public:
+    /** Initialize your data structure here. */
+    Trie():treehead(new node()) {
+
+    }
+    
+    /** Inserts a word into the trie. */
+    void insert(string word) {
+        shared_ptr<node> cur = treehead;
+        for(auto &c:word){
+            cur = cur->ADDchild(c);
+        }
+        cur->isfinal = true;
+    }
+    
+    /** Returns if the word is in the trie. */
+    bool search(string word) {
+        shared_ptr<node> cur = treehead;
+        for(auto &c:word){
+            cur = cur->FINDchild(c);
+            if (cur==nullptr){
+                return false;
+            }
+        }
+        return cur->isfinal;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    bool startsWith(string prefix) {
+        shared_ptr<node> cur = treehead;
+        for(auto &c:prefix){
+            cur = cur->FINDchild(c);
+            if (cur==nullptr){
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    class node{
+    public:
+        node(char cin):c(cin){}
+        node() = default;
+        shared_ptr<node> ADDchild(char c){
+            if (children.find(c)!=children.end()){
+                return children[c];
+            }
+            shared_ptr<node> newchild(new node(c));
+            children[c] = newchild;
+            return children[c];
+        }
+        shared_ptr<node> FINDchild(char c){
+            if (children.find(c)==children.end()){
+                return nullptr;
+            }
+            return children[c];
+        }
+        char CHAR(){
+            return c;
+        }
+
+        bool isfinal = false;
+    private:
+        char c;
+        map<char,shared_ptr<node>> children; //儿子节点
+    };
+    shared_ptr<node> treehead; //如果不用智能指针，那么执行时间直接减半，占用的空间也减小很多
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
