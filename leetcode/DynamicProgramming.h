@@ -1077,3 +1077,44 @@ public:
 
 
 
+/*
+221. 最大正方形
+在一个由 '0' 和 '1' 组成的二维矩阵内，找到只包含 '1' 的最大正方形，并返回其面积。
+
+*/
+
+class Solution221 {
+public:
+    int maximalSquare(vector<vector<char>>& matrix) {
+        //用动态规划的方法做，时间复杂度是n*n 
+        if (matrix.empty()){
+            return 0;
+        }
+        int m = matrix.size();
+        int n = matrix[0].size();
+        vector<vector<int>> dp(m,vector<int>(n,0)); //dp存储的是边长，dp[i][j]表示以i,j为左下角的最大边长
+        for (int j = 0;j<n;j++){
+            dp[0][j] = matrix[0][j]-'0';
+        }
+        for (int i = 0;i<m;i++){
+            dp[i][n-1] = matrix[i][n-1]-'0';
+        }
+        for (int i = 1;i<m;i++){
+            for (int j = n-2;j>=0;j--){
+                if (matrix[i][j]=='1'){
+                    dp[i][j] = min(min(dp[i-1][j],dp[i-1][j+1]),min(dp[i][j+1],dp[i-1][j+1]))+1;
+					//主要应该理解这个式子，这里的空间复杂度可以进一步优化
+                }   
+            }
+        }
+        int MAX = INT_MIN;
+        for (int i = 0;i<dp.size();i++){
+            for (int j = 0;j<dp[i].size();j++){
+                if (dp[i][j]>MAX){
+                    MAX = dp[i][j];
+                }
+            }
+        }
+        return MAX*MAX; //返回的应该是面积
+    }
+};
