@@ -1020,3 +1020,60 @@ public:
         return solveMethod2(m,n);
     }
 };
+
+
+/*
+152. 乘积最大子数组
+给你一个整数数组 nums ，请你找出数组中乘积最大的连续子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。
+*/
+
+class Solution152 {
+public:
+    int solveMethod1(vector<int>& nums){
+        //用这种dp就直接超时了，其实就是个暴力
+        vector<vector<int>> dp(nums.size(),vector<int>(nums.size(),0)); 
+        //dp[i][j]表示[i,j]区间内的连续子数组的乘积
+        for (int i = 0;i<nums.size();i++){
+            dp[i][i] = nums[i];
+        }
+        for (int len = 1;len<nums.size();len++){
+            for (int i = 0;i<nums.size()-len;i++){
+                dp[i][i+len] = dp[i][i+len-1]*nums[i+len];
+                dp[i+len][i] = dp[i][i+len];
+            }
+        }
+        int res = INT_MIN;
+        for (int i = 0;i<nums.size();i++){
+            for (int j = 0;j<nums.size();j++){
+                if (dp[i][j]>res){
+                    res = dp[i][j];
+                }
+            }
+        }
+        return res;
+    }
+    int solveMethod2(vector<int>& nums){
+        //第一次写的时候只弄了一个dp，然后发现是不够的，因为考虑乘积的话可能负负得正会更大，因此MAX和MIN都需要记录
+		//尽量把dp数组弄成一维的，也就是抽象成一维的
+        vector<int> dpMAX(nums.size(),0); //由于是连续数组，因此考虑dpMAX[i]是包括nums[i]的连续数组最大值
+        vector<int> dpMIN(nums.size(),0);  //由于是连续数组，因此考虑dpMIN[i]是包括nums[i]的连续数组最小值
+        dpMAX[0] = nums[0];
+        for (int i = 1;i<nums.size();i++){
+            dpMAX[i] = max(max(dpMAX[i-1]*nums[i],dpMIN[i-1]*nums[i]),nums[i]);
+            dpMIN[i] = min(min(dpMAX[i-1]*nums[i],dpMIN[i-1]*nums[i]),nums[i]); //可以根据这个式子优化到常数空间复杂度
+        }
+        int MAX = INT_MIN;
+        for(int i = 0;i<dpMAX.size();i++){
+            if (dpMAX[i]>MAX){
+                MAX = dpMAX[i];
+            }
+        }
+        return MAX;
+    }
+    int maxProduct(vector<int>& nums) {
+        return solveMethod2(nums);
+    }
+};
+
+
+
