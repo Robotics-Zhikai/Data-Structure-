@@ -1165,3 +1165,105 @@ public:
         return solveMethod2(nums);
     }
 };
+
+
+/*
+279. 完全平方数
+给定正整数 n，找到若干个完全平方数（比如 1, 4, 9, 16, ...）使得它们的和等于 n。
+你需要让组成和的完全平方数的个数最少。
+
+给你一个整数 n ，返回和为 n 的完全平方数的 最少数量 。
+
+完全平方数 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数自乘的积。
+例如，1、4、9 和 16 都是完全平方数，而 3 和 11 不是。
+
+*/
+
+class Solution279 {
+public:
+    bool isTwiceNum(int num){
+        double tmp = sqrt(num);
+        if (static_cast<double>(static_cast<int>(tmp)) == tmp){
+            return true;
+        }
+        return false;
+    }
+    int solveMethod1(int n){
+        //N^2的时间复杂度
+        vector<int> dp(n+1,0);
+        dp[1] = 1;
+        for (int i = 2;i<=n;i++){
+            if (isTwiceNum(i)){
+                dp[i] = 1;
+            }
+            else{
+                int MIN = INT_MAX;
+                for(int j = 1;j<i/2+1;j++){ //这个逐个遍历，直接超时了
+                    if (dp[j]+dp[i-j]<MIN){
+                        MIN = dp[j]+dp[i-j];
+                    }
+                }
+                dp[i] = MIN;
+            }
+        }
+        return dp[n];
+    }
+    int  solveMethod2(int n){
+        //n^1.5的时间复杂度
+        vector<int> dp(n+1,0);
+        dp[1] = 1;
+        for (int i = 2;i<=n;i++){
+            if (isTwiceNum(i)){
+                dp[i] = 1;
+            }
+            else{
+                int MIN = INT_MAX;
+                for(int j = 1;j*j<i;j++){ //这个认为最小值肯定是在完全数中去找
+                    if (dp[j*j]+dp[i-j*j]<MIN){ 
+                        MIN = dp[j*j]+dp[i-j*j];
+                    }
+                }
+                dp[i] = MIN;
+            }
+        }
+        return dp[n];
+    }
+    int solveMethod3(int n){
+        //也可以用BFS做，最先层序遍历到累加值的就是最少数量
+        //无论是从时间还是从空间复杂度还是从代码编写的复杂程度相较于动态规划方法没有一丝优势
+        //重点是要想通本题是如何抽象到BFS的。本质上其实就是一个树搜索的剪枝回溯
+        class node{
+        public:
+            node(int in,int accu,int level):i(in),accumulate(accu),level(level){}
+            int i;
+            int accumulate;
+            int level;
+        };
+        queue<node> que;
+        que.push(node(0,0,0));
+        while(!que.empty()){
+            node & tmp = que.front();
+            for(int i = 1;;i++){
+                int curAcc = tmp.accumulate+i*i;
+                if (curAcc<n){
+                    que.push(node(i,curAcc,tmp.level+1));
+                }
+                else if (curAcc==n){
+                    return tmp.level+1;
+                }
+                else {
+                    break;
+                }
+            }
+            que.pop();
+        }
+        return 0;
+    }
+    int numSquares(int n) {
+        return solveMethod3(n);
+        return solveMethod2(n);
+    }
+};
+
+
+
