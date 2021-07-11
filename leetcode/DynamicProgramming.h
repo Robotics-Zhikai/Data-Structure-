@@ -1118,3 +1118,50 @@ public:
         return MAX*MAX; //返回的应该是面积
     }
 };
+
+
+
+/*
+238. 除自身以外数组的乘积
+给你一个长度为 n 的整数数组 nums，其中 n > 1，返回输出数组 output ，
+其中 output[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积。
+
+*/
+
+class Solution238 {
+public:
+    vector<int> solveMethod1(vector<int>& nums){
+        //n的时间复杂度，n的空间复杂度
+        vector<int> L(nums.size(),1);
+        vector<int> R(nums.size(),1);
+        for(int i = 1;i<nums.size();i++){
+            L[i] = L[i-1]*nums[i-1]; //有点像动态规划了
+        }
+        for(int i = nums.size()-2;i>=0;i--){
+            R[i] = R[i+1]*nums[i+1];
+        }
+        vector<int> res(nums.size(),0);
+        for (int i = 0;i<res.size();i++){
+            res[i] = L[i]*R[i];
+        }
+        return res;
+    }
+    vector<int> solveMethod2(vector<int>& nums){
+        //按照题目中的定义，n的时间复杂度，1的空间复杂度
+        //实际上就是先把没有经过空间优化的代码写出来，然后看能不能空间优化一波
+        vector<int> R(nums.size(),1);
+        for(int i = nums.size()-2;i>=0;i--){
+            R[i] = R[i+1]*nums[i+1];
+        }
+        int LastL = 1;
+        R[0] = LastL*R[0];
+        for(int i = 1;i<nums.size();i++){
+            LastL = LastL*nums[i-1];
+            R[i] = R[i]*LastL;
+        }
+        return R;
+    }
+    vector<int> productExceptSelf(vector<int>& nums) {
+        return solveMethod2(nums);
+    }
+};
