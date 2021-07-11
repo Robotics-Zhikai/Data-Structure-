@@ -1266,4 +1266,98 @@ public:
 };
 
 
+/*
+309. 最佳买卖股票时机含冷冻期
+给定一个整数数组，其中第 i 个元素代表了第 i 天的股票价格 。?
 
+设计一个算法计算出最大利润。在满足以下约束条件下，你可以尽可能地完成更多的交易（多次买卖一支股票）:
+
+你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+卖出股票后，你无法在第二天买入股票 (即冷冻期为 1 天)。
+
+*/
+class Solution309 {
+public:
+    int MAX = INT_MIN;
+    bool stateBought = 0;
+    int stateSell = -1; 
+    void DFS(vector<int>& prices,int index,int& sum){
+        if (index == prices.size()){
+            if (sum>MAX){
+                MAX = sum;
+            }
+            return;
+        }
+        int sellstorage;
+        bool buystorage;
+
+        if (stateBought){
+            DFS(prices,index+1,sum); //可以卖出，也可以什么都不做
+
+            sellstorage = stateSell; //注意保存变量
+            buystorage = stateBought;
+
+            sum+=prices[index]; //卖出
+            stateSell = index;
+            stateBought = 0;
+            DFS(prices,index+1,sum);
+            sum-=prices[index];
+
+            stateSell = sellstorage;
+            stateBought = buystorage;
+        }
+        else{
+            if (stateSell!=-1 && index-stateSell==1){
+                DFS(prices,index+1,sum); //冷冻期
+            }
+            else{
+                DFS(prices,index+1,sum);//可以买入，也可以什么都不做
+
+                sellstorage = stateSell;
+                buystorage = stateBought;
+
+                sum-=prices[index]; //买入
+                stateBought = 1;
+                DFS(prices,index+1,sum);
+                sum+=prices[index];
+
+                stateSell = sellstorage;
+                stateBought = buystorage;
+            }
+        }
+    }
+    int solveMethod1(vector<int>& prices){ //用DFS直接超时了，运行是正确的
+        int sum = 0;
+        DFS(prices,0,sum);
+        return MAX;
+    }
+    int solveMethod2(vector<int>& prices){
+        //dp[i][0] 第i天结束后持有股票，此时的最大利润
+        //dp[i][1] 第i天结束后不持有股票且进入冷冻期，此时的最大利润
+        //dp[i][2] 第i天结束后不持有股票且没有进入冷冻期，此时的最大利润  主要是这三个物理意义不好想
+        //dp[i][0] = max(dp[i-1][0],dp[i-1][2]-prices[i]) 把物理意义列出来就很自然能得到这三个递推式了
+        //dp[i][1] = dp[i-1][0]+prices[i]
+        //dp[i][2] = max(dp[i-1][2],dp[i-1][1])
+        //dp[0][0] = 1
+        //dp[0][1] = INT_MIN
+        //dp[0][2] = INT_MIN
+        vector<vector<int>> dp(prices.size(),vector<int>(3,INT_MIN));
+        dp[0][0] = -prices[0];
+        dp[0][2] = 0;
+        //不会出现dp[0][1]的情况
+        if (prices.size()>=2){
+            dp[1][0] = max(-prices[0],-prices[1]);
+            dp[1][1] = -prices[0]+prices[1];
+            dp[1][2] = 0;
+        }
+        for(int i = 2;i<prices.size();i++){
+            dp[i][0] = max(dp[i-1][0],dp[i-1][2]-prices[i]);
+            dp[i][1] = dp[i-1][0]+prices[i];
+            dp[i][2] = max(dp[i-1][2],dp[i-1][1]);
+        }
+        return max(max(dp[prices.size()-1][0],dp[prices.size()-1][1]),dp[prices.size()-1][2]);
+    }
+    int maxProfit(vector<int>& prices) {
+        return solveMethod2(prices);
+    }
+};
