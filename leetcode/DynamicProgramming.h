@@ -1463,3 +1463,101 @@ public:
         return solveMethod2(prices);
     }
 };
+
+
+/*
+647. 回文子串
+给定一个字符串，你的任务是计算这个字符串中有多少个回文子串。
+
+具有不同开始位置或结束位置的子串，即使是由相同的字符组成，也会被视作不同的子串。
+*/
+
+class Solution647 {
+public:
+	void count(int midL,int midR,int& res,const string& s){
+		for(int j = 0;midL-j>=0 && midR+j<s.size();j++){
+			if (s[midL-j]==s[midR+j]){
+				res++;
+			}
+			else{
+				break;
+			}
+		}
+	}
+	int solveMethod1(string s){
+		//回文子串要不是奇数，要不是偶数，然后中心要不是一个元素，要不就是两个元素
+		//因此枚举所有单中心和双中心的回文子串
+        //空间复杂度为1 时间复杂度为n^2
+        int res = 0;
+		int midL,midR;
+        for(int i = 0;i<s.size();i++){
+			midL = i;
+			midR = i; 
+            count(midL,midR,res,s);
+			if (i!=s.size()-1){
+				midL = i;
+				midR = midL+1;
+				count(midL,midR,res,s);
+			}
+        }
+        return res;
+	}
+	int solveMethod2(string s){
+        //用动态规划的方法做，时间复杂度和空间复杂度均为n^2
+		vector<vector<bool>> dp(s.size(),vector<bool>(s.size(),0)); //dp[i][j]表示[i,j]子串是否是回文子串
+		for(int i = 0;i<s.size();i++){
+			dp[i][i] = 1;
+		}
+		for (int i = 0;i<s.size()-1;i++){
+			if (s[i]==s[i+1]){
+				dp[i][i+1] = 1;
+			}
+		}
+		for(int len = 3;len<=s.size();len++){
+			for(int i = 0;i<s.size()-len+1;i++){
+				if (s[i]==s[i+len-1]&&dp[i+1][i+len-1-1]){
+					dp[i][i+len-1] = 1;
+				}
+			}
+		}
+		int res = 0;
+		for(int i = 0;i<dp.size();i++){
+			for(int j = 0;j<dp[i].size();j++){
+				if (dp[i][j]){
+					res++;
+				}
+			}
+		}
+		return res;
+	}
+	/*
+	C语言 动态规划 dp[j]表示从j位置到当前遍历到的字符位置i是否为回文字符串
+
+	int countSubstrings(char * s){
+		int len = strlen(s);
+		int* dp = (int*)malloc(sizeof(int)*len);
+		int cnt= 0;
+		
+		for(int i = 0; i < len; i++){
+			dp[i] = 1;
+			cnt++;
+			for(int j = 0; j < i; j++){
+				if(s[j] == s[i] && dp[j+1] == 1){
+					dp[j]= 1;
+					cnt++;
+				}else{
+					dp[j] = 0;
+				}
+			}
+		}
+		
+		return cnt;
+	}
+
+	//另一种动态规划的方法  没太看懂。。。。。。
+	*/
+
+    int countSubstrings(string s){
+        return solveMethod2(s);
+    }
+};
