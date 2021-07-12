@@ -959,6 +959,62 @@ public:
         }
         return dp[nums.size()-1];
     }
+	int rob210712(vector<int>& nums){
+		vector<int> dp(nums.size(),0); //[0,i]个房间范围内偷的最大数目
+		dp[0] = nums[0];
+		for (int i = 1;i<nums.size();i++){
+			if (i==1){
+				dp[i] = max(nums[0],nums[1]);
+			}
+			else{
+				dp[i] = max(dp[i-2]+nums[i],dp[i-1]);
+			}
+		}
+		return dp[nums.size()-1];
+	}
+};
+
+/*
+213. 打家劫舍 II
+你是一个专业的小偷，计划偷窃沿街的房屋，每间房内都藏有一定的现金。
+这个地方所有的房屋都 围成一圈 ，这意味着第一个房屋和最后一个房屋是紧挨着的。
+同时，相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警 。
+
+给定一个代表每个房屋存放金额的非负整数数组，计算你 在不触动警报装置的情况下 ，今晚能够偷窃到的最高金额。
+
+*/
+class Solution213 {
+public:
+   	int rob210712(vector<int>& nums){ //直接调用打家劫舍I的方法即可
+           //可以优化成常数的空间复杂度
+		if (nums.empty()){
+			return 0;
+		}
+		vector<int> dp(nums.size(),0); //[0,i]个房间范围内偷的最大数目
+		dp[0] = nums[0];
+		for (int i = 1;i<nums.size();i++){
+			if (i==1){
+				dp[i] = max(nums[0],nums[1]);
+			}
+			else{
+				dp[i] = max(dp[i-2]+nums[i],dp[i-1]);
+			}
+		}
+		return dp[nums.size()-1];
+	}
+    int rob(vector<int>& nums) {
+        if(nums.size()==1)//这个容易漏掉 
+            return nums[0];
+		vector<int> nums1;
+		vector<int> nums2;
+        for(int i = 0;i<nums.size()-1;i++){
+			nums1.push_back(nums[i]);
+		}
+		for(int i = 1;i<nums.size();i++){
+			nums2.push_back(nums[i]);
+		}
+		return max(rob210712(nums1),rob210712(nums2)); //不偷最后一个房间或者不偷第一个房间，然后取最大值即可
+    }
 };
 
 
