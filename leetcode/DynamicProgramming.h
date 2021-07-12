@@ -1017,6 +1017,52 @@ public:
     }
 };
 
+/*
+337. 打家劫舍 III
+在上次打劫完一条街道之后和一圈房屋后，小偷又发现了一个新的可行窃的地区。
+这个地区只有一个入口，我们称之为“根”。 除了“根”之外，每栋房子有且只有一个“父“房子与之相连。
+一番侦察之后，聪明的小偷意识到“这个地方的所有房屋的排列类似于一棵二叉树”。 
+如果两个直接相连的房子在同一天晚上被打劫，房屋将自动报警。
+
+计算在不触动警报的情况下，小偷一晚能够盗取的最高金额。
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution337 {
+public:
+void DFS(TreeNode* root,map<TreeNode*,int>& dp){
+		if (root==nullptr){
+			return;
+		}
+		DFS(root->left,dp);
+		DFS(root->right,dp);
+		//dp[root] 没有root，只有两个子节点；有root，
+		dp[root] = 
+				max(dp[root->left]+dp[root->right],
+				root->val+
+				dp[root->left!=nullptr?root->left->left:nullptr]+dp[root->left!=nullptr?root->left->right:nullptr]+
+				dp[root->right!=nullptr?root->right->left:nullptr]+dp[root->right!=nullptr?root->right->right:nullptr]);
+				//这个递推式还是比较容易想到的
+	}
+    int rob(TreeNode* root) {
+		//n的空间复杂度和n的时间复杂度 再配合hashmap和后序遍历
+		map<TreeNode*,int> dp;
+		dp[nullptr] = 0;
+		DFS(root,dp);
+		return dp[root];
+    }
+};
+
 
 /*
 62. 不同路径
