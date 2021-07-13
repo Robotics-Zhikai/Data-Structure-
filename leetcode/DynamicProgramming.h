@@ -1561,3 +1561,105 @@ public:
         return solveMethod2(s);
     }
 };
+
+
+/*
+322. 零钱兑换
+给定不同面额的硬币 coins 和一个总金额 amount。
+编写一个函数来计算可以凑成总金额所需的最少的硬币个数。
+如果没有任何一种硬币组合能组成总金额，返回 -1。
+
+你可以认为每种硬币的数量是无限的。
+
+*/
+
+class Solution322 {
+public:
+	int solveMethod1(vector<int>& coins, int amount){
+		//BFS做，直接超出了限制
+		if (amount == 0){
+			return 0;
+		}
+		sort(coins.begin(),coins.end());
+		class node{
+		public:
+			node(int acc,int level):acc(acc),level(level){}
+			int acc;
+			int level;
+		};
+		queue<node> que;
+		que.push(node(0,0));
+		while(!que.empty()){
+			node& front = que.front();
+			for(auto &c:coins){
+				if (front.acc+c<amount){
+					que.push(node(front.acc+c,front.level+1));
+				}
+				else if (front.acc+c>amount){
+					break;
+				}
+				else{
+					return front.level+1;
+				}
+			}
+			que.pop();
+		}
+		return -1;
+	}
+	int solveMethod2(vector<int>& coins, int amount){
+		//这个dp还是超时
+		vector<int> dp(amount+1,-1);
+		dp[0] = 0;
+		for(auto&c:coins){
+			if (c<dp.size())
+				dp[c] = 1;
+		}
+		for(int i = 1;i<dp.size();i++){
+			if (dp[i]==-1){
+				int MIN = INT_MAX;
+				for(int j = 1;j<i/2+1;j++){
+					int tmp = dp[i-j]+dp[j];
+					if (dp[i-j]>=0 && dp[j]>=0 && tmp<MIN){ //注意与method3对应的相同位置处进行对比 是没必要逐个进行计算的
+						MIN = tmp;
+					}
+				}
+				if (MIN == INT_MAX){
+					dp[i] = -1;
+				}
+				else{
+					dp[i] = MIN;
+				}
+			}
+		}
+		return dp[amount];
+	}
+	int solveMethod3(vector<int>& coins,int amount){
+		//这个不超时，直接ac了
+		vector<int> dp(amount+1,-1);
+		dp[0] = 0;
+		for(auto&c:coins){
+			if (c<dp.size())
+				dp[c] = 1;
+		}
+		for(int i = 1;i<dp.size();i++){
+			if (dp[i]==-1){
+				int MIN = INT_MAX;
+				for(int j = 0;j<coins.size();j++){
+					if (coins[j]<i){
+						if (dp[i-coins[j]]>=0 && dp[i-coins[j]]+1<MIN){
+							MIN = dp[i-coins[j]]+1;
+						}
+					}
+				}
+				if (MIN!=INT_MAX){
+					dp[i] = MIN;
+				}
+			}
+		}
+		return dp[amount];
+	}
+    int coinChange(vector<int>& coins, int amount) {
+        return solveMethod3(coins,amount);
+		return solveMethod2(coins,amount);
+    }
+};
