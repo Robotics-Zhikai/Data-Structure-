@@ -151,3 +151,93 @@ public:
         return solveMethod2(nums,target);
     }
 };
+
+
+
+/*
+560. 和为K的子数组
+给定一个整数数组和一个整数 k，你需要找到该数组中和为 k 的连续的子数组的个数。
+
+示例 1 :
+
+输入:nums = [1,1,1], k = 2
+输出: 2 , [1,1] 与 [1,1] 为两种不同的情况。
+说明 :
+
+数组的长度为 [1, 20,000]。
+数组中元素的范围是 [-1000, 1000] ，且整数 k 的范围是 [-1e7, 1e7]。
+
+
+*/
+
+class Solution560 {
+public:
+    // int subarraySum(vector<int>& nums, int k) { //这里的双指针解法只有在nums肯定有序的时候才可行
+	// 	sort(nums.begin(),nums.end());
+	// 	int Lindex = 0;
+	// 	int Rindex = 0;
+	// 	int cur = 0;
+	// 	int res = 0;
+
+	// 	do{
+	// 		while(Rindex<nums.size()){
+	// 			cur+=nums[Rindex++];
+	// 			if (cur>=k){
+	// 				break;
+	// 			}
+	// 		}
+	// 		if (cur==k){
+	// 			res++;
+	// 		}
+	// 		while(Lindex<Rindex){
+	// 			cur-=nums[Lindex++];
+	// 			if (cur<=k){
+	// 				break;
+	// 			}
+	// 		}
+	// 		if (cur==k){
+	// 			res++;
+	// 		}
+	// 	}while(Rindex!=nums.size());
+	// 	return res;
+    // }
+	int solveMethod1(vector<int>& nums,int k){
+		//n^2的时间复杂度 又超时了
+		vector<int> acc(nums.size()+1,0); //后开
+		acc[0] = 0;
+		for(int i = 1;i<acc.size();i++){
+			acc[i] = acc[i-1]+nums[i-1];
+		}
+		int res = 0;
+		for(int i = 0;i<=nums.size();i++){
+			for(int j = i+1;j<=nums.size();j++){
+				if (acc[j]-acc[i]==k){
+					res++;
+				}
+			}
+		}
+		return res;
+	}
+	int solveMethod2(vector<int>& nums,int k){
+		//这个也太难写了。。。。。。。。。
+		int acc = 0;
+		map<int,int> MAP; //表示对应于某一键值的组合数有多少种
+		int res = 0;
+		for (int i = 0;i<nums.size();i++){
+			acc += nums[i];
+			if (acc==k){
+				res++;
+			}
+
+            if (MAP.find(acc-k)!=MAP.end()){
+                res+=MAP[acc-k];
+            } //这两个if非常难写
+			
+			MAP[acc]++;
+		}
+		return res;
+	}
+	int subarraySum(vector<int>& nums, int k) {
+		return solveMethod2(nums,k);
+	}
+};
