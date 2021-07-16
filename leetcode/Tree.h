@@ -987,3 +987,107 @@ private:
  * bool param_2 = obj->search(word);
  * bool param_3 = obj->startsWith(prefix);
  */
+
+
+
+/*
+112. 路径总和
+给你二叉树的根节点 root 和一个表示目标和的整数 targetSum ，
+判断该树中是否存在 根节点到叶子节点 的路径，这条路径上所有节点值相加等于目标和 targetSum 。
+
+叶子节点 是指没有子节点的节点。
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution112 {
+public:
+	bool HAS = false;
+	void DFS(TreeNode* root,int & curValue,const int& targetSum){
+		if (root==nullptr){
+			return;
+		}
+		curValue+=root->val;
+		if (root->left == nullptr && root->right == nullptr){
+			if (curValue == targetSum){
+				HAS = true;
+				return;
+			}
+		}
+		DFS(root->left,curValue,targetSum);
+		curValue = root->left==nullptr?curValue:curValue-root->left->val;
+		DFS(root->right,curValue,targetSum);
+		curValue = root->right==nullptr?curValue:curValue-root->right->val;
+	}
+    bool hasPathSum(TreeNode* root, int targetSum) {
+		//简单题 比较常规
+		int curValue = 0;
+		DFS(root,curValue,targetSum);
+		return HAS;
+    }
+};
+
+
+
+/*
+113. 路径总和 II
+给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
+
+叶子节点 是指没有子节点的节点。
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution113 {
+public:
+	vector<vector<int>> res;
+	void DFS(TreeNode* root,const int& targetSum,int& curvalue,vector<int>& path){
+		if (root==nullptr){
+			return;
+		}
+		curvalue+=root->val;
+		path.push_back(root->val);
+		if (root->left==nullptr && root->right==nullptr){
+			if (curvalue == targetSum){
+				res.push_back(path);
+				return;
+			}
+		}
+		DFS(root->left,targetSum,curvalue,path);
+		curvalue = root->left==nullptr?curvalue:curvalue-root->left->val;
+		if (root->left!=nullptr) //注意这里容易漏掉
+			path.pop_back();
+		DFS(root->right,targetSum,curvalue,path);
+		curvalue = root->right==nullptr?curvalue:curvalue-root->right->val;
+		if (root->right!=nullptr)
+			path.pop_back();
+	}
+    vector<vector<int>> pathSum(TreeNode* root, int targetSum) {
+		//还是比较常规的
+		res = {};
+		int curvalue = 0;
+		vector<int> path;
+		DFS(root,targetSum,curvalue,path);
+		return res;
+    }
+};
