@@ -241,3 +241,93 @@ public:
 		return solveMethod2(nums,k);
 	}
 };
+
+
+//437跟上边的560是差不多的
+/*
+437. 路径总和 III
+给定一个二叉树，它的每个结点都存放着一个整数值。
+
+找出路径和等于给定数值的路径总数。
+
+路径不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
+
+二叉树不超过1000个节点，且节点数值范围是 [-1000000,1000000] 的整数。
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution437 {
+public:
+    void DFS(TreeNode* root,int& targetSum,int & curSum){
+		if (root==nullptr){
+			return ;
+		}
+		curSum += root->val;
+        if (curSum == targetSum){
+            res++;
+        }
+		DFS(root->left,targetSum,curSum);
+        curSum -= root->left==nullptr?0:root->left->val;
+		DFS(root->right,targetSum,curSum);
+        curSum -= root->right==nullptr?0:root->right->val;
+	}
+	int res = 0;
+    int solveMethod1(TreeNode* root,int targetSum){
+        //这个是O(n^2)的复杂度
+        if(root == nullptr){
+            return 0;
+        }
+        int curSum = 0;
+		DFS(root,targetSum,curSum);
+        pathSum(root->left,targetSum);
+		pathSum(root->right,targetSum);
+		return res;
+    }
+    void DFS(map<int,int>&MAP,TreeNode* root,int targetSum,int& curSum){
+        if (root==nullptr){
+            return;
+        }
+
+        curSum+=root->val;
+        if (curSum == targetSum){
+            res++;
+        }
+		if (MAP.find(curSum-targetSum)!=MAP.end()){
+			res+=MAP[curSum-targetSum];
+		}
+        MAP[curSum]++;
+        DFS(MAP,root->left,targetSum,curSum);
+        if (root->left!=nullptr)
+            MAP[curSum]--;
+        curSum -= root->left==nullptr?0:root->left->val;
+		
+        DFS(MAP,root->right,targetSum,curSum);
+        if (root->right!=nullptr)
+            MAP[curSum]--;
+        curSum -= root->right==nullptr?0:root->right->val;
+		
+
+    }
+    int solveMethod2(TreeNode* root,int targetSum){
+        //还是前缀和，跟在数组上进行前缀和是一样的
+        //这样的话就直接降到了N的复杂度
+		map<int,int> MAP;
+		int curSum = 0;
+		DFS(MAP,root,targetSum,curSum);
+		return res;
+    }
+    int pathSum(TreeNode* root, int targetSum) {
+        return solveMethod2(root,targetSum);
+    }
+};
