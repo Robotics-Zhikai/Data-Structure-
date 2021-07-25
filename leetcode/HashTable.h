@@ -423,3 +423,46 @@ public:
     }
 };
 
+/*
+49. 字母异位词分组
+给定一个字符串数组，将字母异位词组合在一起。可以按任意顺序返回结果列表。
+
+字母异位词指字母相同，但排列不同的字符串。
+
+
+*/
+
+class Solution49 {
+public:
+    vector<vector<string>> solveMethod1(vector<string>& strs){
+        map<vector<int>,vector<string>> MAP;
+        for(auto & str:strs){
+            vector<int> tmp(26,0);
+            for(char c:str){
+                tmp[c-'a']++;
+            }
+            MAP[tmp].push_back(str);
+        }
+        vector<vector<string>> res;
+        for(auto&pair:MAP){
+            res.push_back(pair.second);
+        }
+        return res;
+    }
+    vector<vector<string>> solveMethod2(vector<string>& strs){
+        map<string,vector<string>> MAP;
+        for(auto & str:strs){
+            string tmp = str;
+            sort(tmp.begin(),tmp.end());
+            MAP[tmp].push_back(str);
+        }
+        vector<vector<string>> res;
+        for(auto&pair:MAP){
+            res.push_back(pair.second);
+        }
+        return res;
+    }
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        return solveMethod2(strs);
+    }
+};
