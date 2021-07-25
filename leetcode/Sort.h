@@ -69,3 +69,39 @@ public:
         return res;
     }
 };
+
+
+/*
+56. 合并区间
+以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。
+请你合并所有重叠的区间，并返回一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间。
+
+*/
+class Solution56 {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        sort(intervals.begin(),intervals.end(),[](vector<int>&a,vector<int>&b)->bool{return a[0]<b[0];});
+        //先按照左端点对区间进行排序，然后依次输入区间merge
+        //最终的时间复杂度是nlogn
+        //经过排序后，只要当前的区间不能与前一个区间merge，那么之后的区间也肯定不能与前一个区间merge 算是一种贪心
+        vector<vector<int>> res;
+        for(auto& vec:intervals){
+            if (res.empty()){
+                res.push_back(vec);
+            }
+            else{
+                vector<int>& tmp = res.back();
+                if (vec[0]>=tmp[0] && vec[0]<=tmp[1]){
+                    vector<int> merged = {min(vec[0],tmp[0]),max(vec[1],tmp[1])};
+                    res.pop_back();
+                    res.push_back(merged);
+                }
+                else{
+                    res.push_back(vec);
+                }
+            }
+        }
+        return res;
+
+    }
+};
