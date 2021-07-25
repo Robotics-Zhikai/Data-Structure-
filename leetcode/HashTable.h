@@ -332,3 +332,94 @@ public:
     }
 };
 
+/*
+438. 找到字符串中所有字母异位词
+给定两个字符串 s 和 p，找到 s 中所有 p 的 异位词 的子串，返回这些子串的起始索引。不考虑答案输出的顺序。
+
+异位词 指字母相同，但排列不同的字符串。
+
+*/
+class Solution438 {
+public:
+    bool match(string&s1,string&s2,vector<bool>&isvist,int index2){
+        if (index2==s2.size()){
+            return 1;
+        }
+        for(int i = 0;i<s1.size();i++){
+            if (s1[i]==s2[index2] && isvist[i]==0){
+                isvist[i] = 1;
+                if (match(s1,s2,isvist,index2+1)){
+                    return 1;
+                }
+                else{
+                    return 0;
+                }
+            }
+        }
+        return 0;
+    }
+    vector<int> solveMethod1(string s,string p){
+        //这个直接超时了
+        int sum = 0;
+        for(char&c:p){
+            sum+=(c-'a');
+        }
+        if (p.empty())
+            return {};
+        if (s.size()<p.size()){
+            return {};
+        }
+        int init = -1;
+        vector<int> res;
+        for(int i = 0;i<=s.size()-p.size();i++){
+            if (init==-1){
+                init = 0;
+                for(int j = 0;j<p.size();j++){
+                    init+=(s[j]-'a');
+                }
+            }
+            else{
+                init = init-(s[i-1]-'a')+(s[i+p.size()-1]-'a');
+            }
+            if (init==sum){ //不能单纯看加起来的和是否相等
+                string windowstr(s.begin()+i,s.begin()+i+p.size());
+                vector<bool> isvist(p.size(),0);
+                if (match(windowstr,p,isvist,0)){
+                    res.push_back(i);
+                }
+            }
+        }
+        return res;
+    }
+    vector<int> solveMethod2(string s,string p){
+        vector<int> freqTarget(26,0); //map
+        vector<int> freqCur(26,0);
+        for(char c:p){
+            freqTarget[c-'a']++;
+        }
+        if (s.size()<p.size()){
+            return {};
+        }
+        vector<int> res;
+        for(int i = 0;i<=s.size()-p.size();i++){
+            if (i==0){
+                for(int j = 0;j<p.size();j++){
+                    freqCur[s[j]-'a']++;
+                }
+            }
+            else{
+                freqCur[s[i-1]-'a']--;
+                freqCur[s[i+p.size()-1]-'a']++; //可以直接用hash表，比用DFS判断是否match效率高多了
+            }
+            if (freqCur==freqTarget){ //注意这里vector可以直接看是否相等
+                res.push_back(i);
+            }
+        }
+        return res;
+    }
+
+    vector<int> findAnagrams(string s, string p) {
+        return solveMethod2(s,p);
+    }
+};
+
