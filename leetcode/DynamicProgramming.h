@@ -1666,3 +1666,40 @@ public:
 
 
 
+/*
+416. 分割等和子集
+给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+*/
+class Solution416 {
+public:
+    bool canPartition(vector<int>& nums) {
+        int SUM = 0;
+        for(auto&n:nums){
+            SUM+=n;
+        }
+        if(SUM%2!=0){
+            return 0;
+        }
+        SUM = SUM/2;
+		//最重要的还是要确定dp的含义
+        vector<vector<bool>> dp(nums.size(),vector<bool>(SUM+1,0));//dp[i][j]表示[0,i]元素是否能构成j
+        for(int i = 0;i<dp.size();i++){
+            dp[i][0] = 1;
+        }
+        if (nums[0]<=SUM)
+            dp[0][nums[0]] = 1;
+        for(int i = 1;i<dp.size();i++){
+            for(int j = 0;j<dp[i].size();j++){
+                if (j<nums[i]){
+                    dp[i][j] = dp[i-1][j];
+                }
+                else{
+                    dp[i][j] = max(dp[i-1][j],dp[i-1][j-nums[i]]);
+                }
+            }
+        }
+		//这个能把空间复杂度优化到SUM
+		//然后dp优化到一维
+        return dp[nums.size()-1][SUM];
+    }
+};
