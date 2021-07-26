@@ -1703,3 +1703,76 @@ public:
         return dp[nums.size()-1][SUM];
     }
 };
+
+
+/*
+139. 单词拆分
+给定一个非空字符串 s 和一个包含非空单词的列表 wordDict，判定 s 是否可以被空格拆分为一个或多个在字典中出现的单词。
+
+说明：
+
+拆分时可以重复使用字典中的单词。
+你可以假设字典中没有重复的单词。
+
+*/
+
+//还是比较建议用动态规划去做
+//动态规划跟DFS本质上是一样的原理，只不过动态规划是自底向上的，DFS是自顶向下的
+class Solution139 {
+public:
+    bool solveMethod1(string s,vector<string>& wordDict){
+        //用动态规划的方法做 n^2的时间复杂度 n的空间复杂度
+        set<string> SET;
+        for(auto&str:wordDict){
+            SET.insert(str);
+        }
+        vector<bool> dp(s.size(),0);//dp[i]表示[0,i]区间范围内是否可以符合在字典中出现
+        if (SET.find(s.substr(0,1))!=SET.end()){
+            dp[0] = 1;
+        }
+        for(int i = 1;i<s.size();i++){
+            if (SET.find(s.substr(0,i+1))!=SET.end()){
+                dp[i] = 1;
+            }
+            else{
+                for(int j = 0;j<i;j++){
+                    if (dp[j]&& SET.find(s.substr(j+1,i-(j+1)+1))!=SET.end()){
+                        dp[i] = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        return dp.back();
+    }
+    
+    bool DFS(set<string>&SET,string&s,int index,vector<int>& memory){
+        //基于DFS的记忆化搜索，如果不记忆的话，直接就超出时间限制了
+        if (index==s.size()){
+            return 1;
+        }
+        if (memory[index]!=-1){
+            return memory[index];
+        }
+        for(int i = 1;index+i<=s.size();i++){
+            if (SET.find(s.substr(index,i))!=SET.end() && DFS(SET,s,index+i,memory)){
+                memory[index] = 1;
+                return 1;
+            }
+        }
+        memory[index] = 0;
+        return 0;
+    }
+    bool solveMethod2(string s,vector<string>& wordDict){
+        set<string> SET;
+        for(auto&str:wordDict){
+            SET.insert(str);
+        }
+        vector<int> memory(s.size(),-1);
+        return DFS(SET,s,0,memory);
+    }
+    bool wordBreak(string s, vector<string>& wordDict) {
+        return solveMethod2(s,wordDict);
+
+    }
+};
