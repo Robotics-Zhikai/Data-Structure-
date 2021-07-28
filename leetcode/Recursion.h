@@ -391,3 +391,19 @@ public:
         return solveMethod2(s);
     }
 };
+
+/*
+剑指 Offer 64. 求1+2+…+n
+求 1+2+...+n ，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
+
+
+*/
+class SolutionOffer64 {
+public:
+    int res = 0;
+    int sumNums(int n) {
+        bool x = (n>1) && sumNums(n-1); //短路效应 &&号的左侧为真时还要判断后边的 为假时就不判断后边的了
+        res+=n;
+        return res;
+    }
+};
