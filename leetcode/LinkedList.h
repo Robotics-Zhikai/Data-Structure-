@@ -191,6 +191,64 @@ public:
 
 
 /*
+剑指 Offer 35. 复杂链表的复制
+请实现 copyRandomList 函数，复制一个复杂链表。
+在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。
+
+*/
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+class SolutionOffer35 {
+public:
+    Node* copyRandomList(Node* head) {
+        //线性的时间复杂度，1的空间复杂度
+        //简单一点的话还可以用map
+        //大致思路是把所有复制的新节点添加在旧节点的后边，然后解链
+        Node* cur = head;
+        while(cur!=nullptr){
+            Node* curnext = cur->next;
+            cur->next = new Node(cur->val);
+            cur->next->next = curnext;
+            cur = curnext;
+        }
+        cur = head;
+        while(cur!=nullptr){
+            cur->next->random = cur->random==nullptr?nullptr:cur->random->next;
+            cur = cur->next->next;
+        }
+        cur = head;
+        Node* res = nullptr;
+        while(cur!=nullptr){
+            if (cur==head){
+                res = cur->next;
+            }
+            Node* curnext = cur->next;
+            cur->next = curnext->next;
+            curnext->next = curnext->next==nullptr?nullptr:curnext->next->next;
+            cur = cur->next; 
+        }
+        return res;
+    }
+};
+
+
+
+
+
+/*
 148. 排序链表
 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
 
