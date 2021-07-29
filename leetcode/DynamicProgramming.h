@@ -1862,3 +1862,66 @@ public:
         return vector<double>(dp[n].begin()+n,dp[n].end());
     }
 };
+
+
+/*
+剑指 Offer 63. 股票的最大利润
+假设把某股票的价格按照时间先后顺序存储在数组中，请问买卖该股票一次可能获得的最大利润是多少？
+
+*/
+class SolutionOffer63 {
+public:
+
+    int solveMethod1(vector<int>& prices){
+        //动态规划做，时间复杂度是n，空间复杂度可降到1
+        if (prices.empty()){
+            return 0;
+        }
+        vector<int> dpMAX(prices.size(),0); //dpMAX[i]表示i之后不包括i的最大值
+        vector<int> dpMIN(prices.size(),0); //dpMIN[i]表示i之前包括i的最小值
+        dpMIN[0] = prices[0];
+        for(int i = 1;i<dpMIN.size();i++){
+            if (prices[i]<dpMIN[i-1]){
+                dpMIN[i] = prices[i];
+            }
+            else{
+                dpMIN[i] = dpMIN[i-1];
+            }
+        }
+        dpMAX[prices.size()-1] = INT_MIN;
+        for(int i = prices.size()-2;i>=0;i--){
+            if (prices[i+1]>dpMAX[i+1]){
+                dpMAX[i] = prices[i+1];
+            }
+            else{
+                dpMAX[i] = dpMAX[i+1];
+            }
+        }
+        int res = INT_MIN;
+        for(int i = 0;i<prices.size()-1;i++){
+            if (dpMAX[i]-dpMIN[i]>res){
+                res = dpMAX[i]-dpMIN[i];
+            }
+        }
+        return res<0?0:res;
+    }   
+    int solveMethod2(vector<int>& prices){
+        if (prices.empty()){
+            return 0;
+        }
+        int MIN = prices[0]; //MIN表示之前的最小值
+        int res = INT_MIN;
+        for (int i =1;i<prices.size();i++){
+            if (prices[i]-MIN>res){
+                res = prices[i]-MIN;
+            }
+            if (prices[i]<MIN){
+                MIN = prices[i];
+            }
+        }
+        return res<0?0:res;
+    }
+    int maxProfit(vector<int>& prices) {
+        return solveMethod2(prices);
+    }
+};
