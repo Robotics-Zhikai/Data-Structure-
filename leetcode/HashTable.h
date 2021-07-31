@@ -466,3 +466,46 @@ public:
         return solveMethod2(strs);
     }
 };
+
+
+/*
+面试题3. 数组中重复的数字
+找出数组中重复的数字。
+
+在一个长度为 n 的数组 nums 里的所有数字都在 0～n-1 的范围内。
+数组中某些数字是重复的，但不知道有几个数字重复了，也不知道每个数字重复了几次。请找出数组中任意一个重复的数字。
+*/
+class SolutionOffer3 {
+public:
+    int solveMethod1(vector<int>&nums){
+        //n的时间复杂度，n的空间复杂度
+        unordered_set<int> SET;
+        for(int n:nums){
+            if (SET.find(n)==SET.end())
+                SET.insert(n);
+            else{
+                return n;
+            }
+        }
+        return 0;
+    }
+    int solveMethod2(vector<int>&nums){
+        //n的时间复杂度，1的空间复杂度
+        //https://leetcode-cn.com/problems/shu-zu-zhong-zhong-fu-de-shu-zi-lcof/solution/mian-shi-ti-03-shu-zu-zhong-zhong-fu-de-shu-zi-yua/
+        int i = 0;
+        while(i<nums.size()){
+            if (i==nums[i]){
+                i++;
+                continue;
+            }
+            if (nums[i]==nums[nums[i]]){
+                return nums[i];
+            }
+            swap(nums[i],nums[nums[i]]);
+        }
+        return 0;
+    }
+    int findRepeatNumber(vector<int>& nums) {
+        return solveMethod2(nums);
+    }
+};
