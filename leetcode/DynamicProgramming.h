@@ -959,4 +959,1073 @@ public:
         }
         return dp[nums.size()-1];
     }
+	int rob210712(vector<int>& nums){
+		vector<int> dp(nums.size(),0); //[0,i]个房间范围内偷的最大数目
+		dp[0] = nums[0];
+		for (int i = 1;i<nums.size();i++){
+			if (i==1){
+				dp[i] = max(nums[0],nums[1]);
+			}
+			else{
+				dp[i] = max(dp[i-2]+nums[i],dp[i-1]);
+			}
+		}
+		return dp[nums.size()-1];
+	}
+};
+
+/*
+213. 打家劫舍 II
+你是一个专业的小偷，计划偷窃沿街的房屋，每间房内都藏有一定的现金。
+这个地方所有的房屋都 围成一圈 ，这意味着第一个房屋和最后一个房屋是紧挨着的。
+同时，相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警 。
+
+给定一个代表每个房屋存放金额的非负整数数组，计算你 在不触动警报装置的情况下 ，今晚能够偷窃到的最高金额。
+
+*/
+class Solution213 {
+public:
+   	int rob210712(vector<int>& nums){ //直接调用打家劫舍I的方法即可
+           //可以优化成常数的空间复杂度
+		if (nums.empty()){
+			return 0;
+		}
+		vector<int> dp(nums.size(),0); //[0,i]个房间范围内偷的最大数目
+		dp[0] = nums[0];
+		for (int i = 1;i<nums.size();i++){
+			if (i==1){
+				dp[i] = max(nums[0],nums[1]);
+			}
+			else{
+				dp[i] = max(dp[i-2]+nums[i],dp[i-1]);
+			}
+		}
+		return dp[nums.size()-1];
+	}
+    int rob(vector<int>& nums) {
+        if(nums.size()==1)//这个容易漏掉 
+            return nums[0];
+		vector<int> nums1;
+		vector<int> nums2;
+        for(int i = 0;i<nums.size()-1;i++){
+			nums1.push_back(nums[i]);
+		}
+		for(int i = 1;i<nums.size();i++){
+			nums2.push_back(nums[i]);
+		}
+		return max(rob210712(nums1),rob210712(nums2)); //不偷最后一个房间或者不偷第一个房间，然后取最大值即可
+    }
+};
+
+/*
+337. 打家劫舍 III
+在上次打劫完一条街道之后和一圈房屋后，小偷又发现了一个新的可行窃的地区。
+这个地区只有一个入口，我们称之为“根”。 除了“根”之外，每栋房子有且只有一个“父“房子与之相连。
+一番侦察之后，聪明的小偷意识到“这个地方的所有房屋的排列类似于一棵二叉树”。 
+如果两个直接相连的房子在同一天晚上被打劫，房屋将自动报警。
+
+计算在不触动警报的情况下，小偷一晚能够盗取的最高金额。
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution337 {
+public:
+void DFS(TreeNode* root,map<TreeNode*,int>& dp){
+		if (root==nullptr){
+			return;
+		}
+		DFS(root->left,dp);
+		DFS(root->right,dp);
+		//dp[root] 没有root，只有两个子节点；有root，
+		dp[root] = 
+				max(dp[root->left]+dp[root->right],
+				root->val+
+				dp[root->left!=nullptr?root->left->left:nullptr]+dp[root->left!=nullptr?root->left->right:nullptr]+
+				dp[root->right!=nullptr?root->right->left:nullptr]+dp[root->right!=nullptr?root->right->right:nullptr]);
+				//这个递推式还是比较容易想到的
+	}
+    int rob(TreeNode* root) {
+		//n的空间复杂度和n的时间复杂度 再配合hashmap和后序遍历
+		map<TreeNode*,int> dp;
+		dp[nullptr] = 0;
+		DFS(root,dp);
+		return dp[root];
+    }
+};
+
+
+/*
+62. 不同路径
+一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。
+
+问总共有多少条不同的路径？
+
+*/
+class Solution62 {
+public:
+	int count = 0;
+    
+    void DFS(vector<vector<int>>& isvist,int i,int j){
+		if (i==isvist.size()-1 && !isvist.empty() && j==isvist[0].size()-1){
+			count++;
+		}
+		isvist[i][j] = 1;
+		if (i<isvist.size()-1){
+            if (isvist[i+1][j]==0)
+			    DFS(isvist,i+1,j);
+		}
+		if (!isvist.empty() && j<isvist[0].size()-1){
+			if (isvist[i][j+1]==0)
+                DFS(isvist,i,j+1);
+		}
+		isvist[i][j] = 0;
+	}
+    int solveMethod1(int m, int n){ //用DFS的方法，需要计算重复的，很低效，对大规模的直接超时
+        vector<vector<int>> isvist(m,vector<int>(n,0));
+		count = 0;
+		DFS(isvist,0,0);
+		return count;
+    }
+
+    int solveMethod2(int m,int n){
+        //用动态规划的方法做就不超时了
+        vector<vector<int>> dp(m,vector<int>(n,0));
+        dp[m-1][n-1] = 1;
+        for (int j = n-2;j>=0;j--){
+            dp[m-1][j] = dp[m-1][j+1]; 
+        }
+        for (int i = m-2;i>=0;i--){
+            dp[i][n-1] = 1;
+        }
+        for (int i = m-2;i>=0;i--){
+            for (int j = n-2;j>=0;j--){
+                dp[i][j] = dp[i+1][j]+dp[i][j+1];
+            }
+        }
+        return dp[0][0];
+    }
+    //还可以用组合数学的方式，就是高中数学
+
+    int uniquePaths(int m, int n) {
+        return solveMethod2(m,n);
+    }
+};
+
+
+/*
+152. 乘积最大子数组
+给你一个整数数组 nums ，请你找出数组中乘积最大的连续子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。
+*/
+
+class Solution152 {
+public:
+    int solveMethod1(vector<int>& nums){
+        //用这种dp就直接超时了，其实就是个暴力
+        vector<vector<int>> dp(nums.size(),vector<int>(nums.size(),0)); 
+        //dp[i][j]表示[i,j]区间内的连续子数组的乘积
+        for (int i = 0;i<nums.size();i++){
+            dp[i][i] = nums[i];
+        }
+        for (int len = 1;len<nums.size();len++){
+            for (int i = 0;i<nums.size()-len;i++){
+                dp[i][i+len] = dp[i][i+len-1]*nums[i+len];
+                dp[i+len][i] = dp[i][i+len];
+            }
+        }
+        int res = INT_MIN;
+        for (int i = 0;i<nums.size();i++){
+            for (int j = 0;j<nums.size();j++){
+                if (dp[i][j]>res){
+                    res = dp[i][j];
+                }
+            }
+        }
+        return res;
+    }
+    int solveMethod2(vector<int>& nums){
+        //第一次写的时候只弄了一个dp，然后发现是不够的，因为考虑乘积的话可能负负得正会更大，因此MAX和MIN都需要记录
+		//尽量把dp数组弄成一维的，也就是抽象成一维的
+        vector<int> dpMAX(nums.size(),0); //由于是连续数组，因此考虑dpMAX[i]是包括nums[i]的连续数组最大值
+        vector<int> dpMIN(nums.size(),0);  //由于是连续数组，因此考虑dpMIN[i]是包括nums[i]的连续数组最小值
+        dpMAX[0] = nums[0];
+        for (int i = 1;i<nums.size();i++){
+            dpMAX[i] = max(max(dpMAX[i-1]*nums[i],dpMIN[i-1]*nums[i]),nums[i]);
+            dpMIN[i] = min(min(dpMAX[i-1]*nums[i],dpMIN[i-1]*nums[i]),nums[i]); //可以根据这个式子优化到常数空间复杂度
+        }
+        int MAX = INT_MIN;
+        for(int i = 0;i<dpMAX.size();i++){
+            if (dpMAX[i]>MAX){
+                MAX = dpMAX[i];
+            }
+        }
+        return MAX;
+    }
+    int maxProduct(vector<int>& nums) {
+        return solveMethod2(nums);
+    }
+};
+
+
+
+/*
+221. 最大正方形
+在一个由 '0' 和 '1' 组成的二维矩阵内，找到只包含 '1' 的最大正方形，并返回其面积。
+
+*/
+
+class Solution221 {
+public:
+    int maximalSquare(vector<vector<char>>& matrix) {
+        //用动态规划的方法做，时间复杂度是n*n 
+        if (matrix.empty()){
+            return 0;
+        }
+        int m = matrix.size();
+        int n = matrix[0].size();
+        vector<vector<int>> dp(m,vector<int>(n,0)); //dp存储的是边长，dp[i][j]表示以i,j为左下角的最大边长
+        for (int j = 0;j<n;j++){
+            dp[0][j] = matrix[0][j]-'0';
+        }
+        for (int i = 0;i<m;i++){
+            dp[i][n-1] = matrix[i][n-1]-'0';
+        }
+        for (int i = 1;i<m;i++){
+            for (int j = n-2;j>=0;j--){
+                if (matrix[i][j]=='1'){
+                    dp[i][j] = min(min(dp[i-1][j],dp[i-1][j+1]),min(dp[i][j+1],dp[i-1][j+1]))+1;
+					//主要应该理解这个式子，这里的空间复杂度可以进一步优化
+                }   
+            }
+        }
+        int MAX = INT_MIN;
+        for (int i = 0;i<dp.size();i++){
+            for (int j = 0;j<dp[i].size();j++){
+                if (dp[i][j]>MAX){
+                    MAX = dp[i][j];
+                }
+            }
+        }
+        return MAX*MAX; //返回的应该是面积
+    }
+};
+
+
+
+/*
+238. 除自身以外数组的乘积
+给你一个长度为 n 的整数数组 nums，其中 n > 1，返回输出数组 output ，
+其中 output[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积。
+
+*/
+
+class Solution238 {
+public:
+    vector<int> solveMethod1(vector<int>& nums){
+        //n的时间复杂度，n的空间复杂度
+        vector<int> L(nums.size(),1);
+        vector<int> R(nums.size(),1);
+        for(int i = 1;i<nums.size();i++){
+            L[i] = L[i-1]*nums[i-1]; //有点像动态规划了
+        }
+        for(int i = nums.size()-2;i>=0;i--){
+            R[i] = R[i+1]*nums[i+1];
+        }
+        vector<int> res(nums.size(),0);
+        for (int i = 0;i<res.size();i++){
+            res[i] = L[i]*R[i];
+        }
+        return res;
+    }
+    vector<int> solveMethod2(vector<int>& nums){
+        //按照题目中的定义，n的时间复杂度，1的空间复杂度
+        //实际上就是先把没有经过空间优化的代码写出来，然后看能不能空间优化一波
+        vector<int> R(nums.size(),1);
+        for(int i = nums.size()-2;i>=0;i--){
+            R[i] = R[i+1]*nums[i+1];
+        }
+        int LastL = 1;
+        R[0] = LastL*R[0];
+        for(int i = 1;i<nums.size();i++){
+            LastL = LastL*nums[i-1];
+            R[i] = R[i]*LastL;
+        }
+        return R;
+    }
+    vector<int> productExceptSelf(vector<int>& nums) {
+        return solveMethod2(nums);
+    }
+};
+
+/*
+剑指 Offer 66. 构建乘积数组
+给定一个数组 A[0,1,…,n-1]，请构建一个数组 B[0,1,…,n-1]，
+其中 B[i] 的值是数组 A 中除了下标 i 以外的元素的积, 即 B[i]=A[0]×A[1]×…×A[i-1]×A[i+1]×…×A[n-1]。不能使用除法。
+
+*/
+class SolutionOffer66 {
+public:
+    vector<int> constructArr(vector<int>& a) {
+        vector<int> res(a.size(),1);
+        for(int i = 1;i<res.size();i++){
+            res[i] = res[i-1]*a[i-1];
+        }
+        int S = 1;
+        for(int i = res.size()-2;i>=0;i--){
+            S = S*a[i+1];
+            res[i] = res[i]*S;
+        }
+        return res;
+    }
+};
+
+
+/*
+279. 完全平方数
+给定正整数 n，找到若干个完全平方数（比如 1, 4, 9, 16, ...）使得它们的和等于 n。
+你需要让组成和的完全平方数的个数最少。
+
+给你一个整数 n ，返回和为 n 的完全平方数的 最少数量 。
+
+完全平方数 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数自乘的积。
+例如，1、4、9 和 16 都是完全平方数，而 3 和 11 不是。
+
+*/
+
+class Solution279 {
+public:
+    bool isTwiceNum(int num){
+        double tmp = sqrt(num);
+        if (static_cast<double>(static_cast<int>(tmp)) == tmp){
+            return true;
+        }
+        return false;
+    }
+    int solveMethod1(int n){
+        //N^2的时间复杂度
+        vector<int> dp(n+1,0);
+        dp[1] = 1;
+        for (int i = 2;i<=n;i++){
+            if (isTwiceNum(i)){
+                dp[i] = 1;
+            }
+            else{
+                int MIN = INT_MAX;
+                for(int j = 1;j<i/2+1;j++){ //这个逐个遍历，直接超时了
+                    if (dp[j]+dp[i-j]<MIN){
+                        MIN = dp[j]+dp[i-j];
+                    }
+                }
+                dp[i] = MIN;
+            }
+        }
+        return dp[n];
+    }
+    int  solveMethod2(int n){
+        //n^1.5的时间复杂度
+        vector<int> dp(n+1,0);
+        dp[1] = 1;
+        for (int i = 2;i<=n;i++){
+            if (isTwiceNum(i)){
+                dp[i] = 1;
+            }
+            else{
+                int MIN = INT_MAX;
+                for(int j = 1;j*j<i;j++){ //这个认为最小值肯定是在完全数中去找
+                    if (dp[j*j]+dp[i-j*j]<MIN){ 
+                        MIN = dp[j*j]+dp[i-j*j];
+                    }
+                }
+                dp[i] = MIN;
+            }
+        }
+        return dp[n];
+    }
+    int solveMethod3(int n){
+        //也可以用BFS做，最先层序遍历到累加值的就是最少数量
+        //无论是从时间还是从空间复杂度还是从代码编写的复杂程度相较于动态规划方法没有一丝优势
+        //重点是要想通本题是如何抽象到BFS的。本质上其实就是一个树搜索的剪枝回溯
+        class node{
+        public:
+            node(int in,int accu,int level):i(in),accumulate(accu),level(level){}
+            int i;
+            int accumulate;
+            int level;
+        };
+        queue<node> que;
+        que.push(node(0,0,0));
+        while(!que.empty()){
+            node & tmp = que.front();
+            for(int i = 1;;i++){
+                int curAcc = tmp.accumulate+i*i;
+                if (curAcc<n){
+                    que.push(node(i,curAcc,tmp.level+1));
+                }
+                else if (curAcc==n){
+                    return tmp.level+1;
+                }
+                else {
+                    break;
+                }
+            }
+            que.pop();
+        }
+        return 0;
+    }
+    int numSquares(int n) {
+        return solveMethod3(n);
+        return solveMethod2(n);
+    }
+};
+
+
+/*
+309. 最佳买卖股票时机含冷冻期
+给定一个整数数组，其中第 i 个元素代表了第 i 天的股票价格 。?
+
+设计一个算法计算出最大利润。在满足以下约束条件下，你可以尽可能地完成更多的交易（多次买卖一支股票）:
+
+你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+卖出股票后，你无法在第二天买入股票 (即冷冻期为 1 天)。
+
+*/
+class Solution309 {
+public:
+    int MAX = INT_MIN;
+    bool stateBought = 0;
+    int stateSell = -1; 
+    void DFS(vector<int>& prices,int index,int& sum){
+        if (index == prices.size()){
+            if (sum>MAX){
+                MAX = sum;
+            }
+            return;
+        }
+        int sellstorage;
+        bool buystorage;
+
+        if (stateBought){
+            DFS(prices,index+1,sum); //可以卖出，也可以什么都不做
+
+            sellstorage = stateSell; //注意保存变量
+            buystorage = stateBought;
+
+            sum+=prices[index]; //卖出
+            stateSell = index;
+            stateBought = 0;
+            DFS(prices,index+1,sum);
+            sum-=prices[index];
+
+            stateSell = sellstorage;
+            stateBought = buystorage;
+        }
+        else{
+            if (stateSell!=-1 && index-stateSell==1){
+                DFS(prices,index+1,sum); //冷冻期
+            }
+            else{
+                DFS(prices,index+1,sum);//可以买入，也可以什么都不做
+
+                sellstorage = stateSell;
+                buystorage = stateBought;
+
+                sum-=prices[index]; //买入
+                stateBought = 1;
+                DFS(prices,index+1,sum);
+                sum+=prices[index];
+
+                stateSell = sellstorage;
+                stateBought = buystorage;
+            }
+        }
+    }
+    int solveMethod1(vector<int>& prices){ //用DFS直接超时了，运行是正确的
+        int sum = 0;
+        DFS(prices,0,sum);
+        return MAX;
+    }
+    int solveMethod2(vector<int>& prices){
+        //dp[i][0] 第i天结束后持有股票，此时的最大利润
+        //dp[i][1] 第i天结束后不持有股票且进入冷冻期，此时的最大利润
+        //dp[i][2] 第i天结束后不持有股票且没有进入冷冻期，此时的最大利润  主要是这三个物理意义不好想
+        //dp[i][0] = max(dp[i-1][0],dp[i-1][2]-prices[i]) 把物理意义列出来就很自然能得到这三个递推式了
+        //dp[i][1] = dp[i-1][0]+prices[i]
+        //dp[i][2] = max(dp[i-1][2],dp[i-1][1])
+        //dp[0][0] = 1
+        //dp[0][1] = INT_MIN
+        //dp[0][2] = INT_MIN
+        vector<vector<int>> dp(prices.size(),vector<int>(3,INT_MIN));
+        dp[0][0] = -prices[0];
+        dp[0][2] = 0;
+        //不会出现dp[0][1]的情况
+        if (prices.size()>=2){
+            dp[1][0] = max(-prices[0],-prices[1]);
+            dp[1][1] = -prices[0]+prices[1];
+            dp[1][2] = 0;
+        }
+        for(int i = 2;i<prices.size();i++){
+            dp[i][0] = max(dp[i-1][0],dp[i-1][2]-prices[i]);
+            dp[i][1] = dp[i-1][0]+prices[i];
+            dp[i][2] = max(dp[i-1][2],dp[i-1][1]);
+        }
+        return max(max(dp[prices.size()-1][0],dp[prices.size()-1][1]),dp[prices.size()-1][2]);
+    }
+    int maxProfit(vector<int>& prices) {
+        return solveMethod2(prices);
+    }
+};
+
+
+/*
+647. 回文子串
+给定一个字符串，你的任务是计算这个字符串中有多少个回文子串。
+
+具有不同开始位置或结束位置的子串，即使是由相同的字符组成，也会被视作不同的子串。
+*/
+
+class Solution647 {
+public:
+	void count(int midL,int midR,int& res,const string& s){
+		for(int j = 0;midL-j>=0 && midR+j<s.size();j++){
+			if (s[midL-j]==s[midR+j]){
+				res++;
+			}
+			else{
+				break;
+			}
+		}
+	}
+	int solveMethod1(string s){
+		//回文子串要不是奇数，要不是偶数，然后中心要不是一个元素，要不就是两个元素
+		//因此枚举所有单中心和双中心的回文子串
+        //空间复杂度为1 时间复杂度为n^2
+        int res = 0;
+		int midL,midR;
+        for(int i = 0;i<s.size();i++){
+			midL = i;
+			midR = i; 
+            count(midL,midR,res,s);
+			if (i!=s.size()-1){
+				midL = i;
+				midR = midL+1;
+				count(midL,midR,res,s);
+			}
+        }
+        return res;
+	}
+	int solveMethod2(string s){
+        //用动态规划的方法做，时间复杂度和空间复杂度均为n^2
+		vector<vector<bool>> dp(s.size(),vector<bool>(s.size(),0)); //dp[i][j]表示[i,j]子串是否是回文子串
+		for(int i = 0;i<s.size();i++){
+			dp[i][i] = 1;
+		}
+		for (int i = 0;i<s.size()-1;i++){
+			if (s[i]==s[i+1]){
+				dp[i][i+1] = 1;
+			}
+		}
+		for(int len = 3;len<=s.size();len++){
+			for(int i = 0;i<s.size()-len+1;i++){
+				if (s[i]==s[i+len-1]&&dp[i+1][i+len-1-1]){
+					dp[i][i+len-1] = 1;
+				}
+			}
+		}
+		int res = 0;
+		for(int i = 0;i<dp.size();i++){
+			for(int j = 0;j<dp[i].size();j++){
+				if (dp[i][j]){
+					res++;
+				}
+			}
+		}
+		return res;
+	}
+	/*
+	C语言 动态规划 dp[j]表示从j位置到当前遍历到的字符位置i是否为回文字符串
+
+	int countSubstrings(char * s){
+		int len = strlen(s);
+		int* dp = (int*)malloc(sizeof(int)*len);
+		int cnt= 0;
+		
+		for(int i = 0; i < len; i++){
+			dp[i] = 1;
+			cnt++;
+			for(int j = 0; j < i; j++){
+				if(s[j] == s[i] && dp[j+1] == 1){
+					dp[j]= 1;
+					cnt++;
+				}else{
+					dp[j] = 0;
+				}
+			}
+		}
+		
+		return cnt;
+	}
+
+	//另一种动态规划的方法  没太看懂。。。。。。
+	*/
+
+    int countSubstrings(string s){
+        return solveMethod2(s);
+    }
+};
+
+
+/*
+322. 零钱兑换
+给定不同面额的硬币 coins 和一个总金额 amount。
+编写一个函数来计算可以凑成总金额所需的最少的硬币个数。
+如果没有任何一种硬币组合能组成总金额，返回 -1。
+
+你可以认为每种硬币的数量是无限的。
+
+*/
+
+class Solution322 {
+public:
+	int solveMethod1(vector<int>& coins, int amount){
+		//BFS做，直接超出了限制
+		if (amount == 0){
+			return 0;
+		}
+		sort(coins.begin(),coins.end());
+		class node{
+		public:
+			node(int acc,int level):acc(acc),level(level){}
+			int acc;
+			int level;
+		};
+		queue<node> que;
+		que.push(node(0,0));
+		while(!que.empty()){
+			node& front = que.front();
+			for(auto &c:coins){
+				if (front.acc+c<amount){
+					que.push(node(front.acc+c,front.level+1));
+				}
+				else if (front.acc+c>amount){
+					break;
+				}
+				else{
+					return front.level+1;
+				}
+			}
+			que.pop();
+		}
+		return -1;
+	}
+	int solveMethod2(vector<int>& coins, int amount){
+		//这个dp还是超时
+		vector<int> dp(amount+1,-1);
+		dp[0] = 0;
+		for(auto&c:coins){
+			if (c<dp.size())
+				dp[c] = 1;
+		}
+		for(int i = 1;i<dp.size();i++){
+			if (dp[i]==-1){
+				int MIN = INT_MAX;
+				for(int j = 1;j<i/2+1;j++){
+					int tmp = dp[i-j]+dp[j];
+					if (dp[i-j]>=0 && dp[j]>=0 && tmp<MIN){ //注意与method3对应的相同位置处进行对比 是没必要逐个进行计算的
+						MIN = tmp;
+					}
+				}
+				if (MIN == INT_MAX){
+					dp[i] = -1;
+				}
+				else{
+					dp[i] = MIN;
+				}
+			}
+		}
+		return dp[amount];
+	}
+	int solveMethod3(vector<int>& coins,int amount){
+		//这个不超时，直接ac了
+		vector<int> dp(amount+1,-1);
+		dp[0] = 0;
+		for(auto&c:coins){
+			if (c<dp.size())
+				dp[c] = 1;
+		}
+		for(int i = 1;i<dp.size();i++){
+			if (dp[i]==-1){
+				int MIN = INT_MAX;
+				for(int j = 0;j<coins.size();j++){
+					if (coins[j]<i){
+						if (dp[i-coins[j]]>=0 && dp[i-coins[j]]+1<MIN){
+							MIN = dp[i-coins[j]]+1;
+						}
+					}
+				}
+				if (MIN!=INT_MAX){
+					dp[i] = MIN;
+				}
+			}
+		}
+		return dp[amount];
+	}
+    int coinChange(vector<int>& coins, int amount) {
+        return solveMethod3(coins,amount);
+		return solveMethod2(coins,amount);
+    }
+};
+
+
+
+/*
+416. 分割等和子集
+给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+*/
+class Solution416 {
+public:
+    bool canPartition(vector<int>& nums) {
+        int SUM = 0;
+        for(auto&n:nums){
+            SUM+=n;
+        }
+        if(SUM%2!=0){
+            return 0;
+        }
+        SUM = SUM/2;
+		//最重要的还是要确定dp的含义
+        vector<vector<bool>> dp(nums.size(),vector<bool>(SUM+1,0));//dp[i][j]表示[0,i]元素是否能构成j
+        for(int i = 0;i<dp.size();i++){
+            dp[i][0] = 1;
+        }
+        if (nums[0]<=SUM)
+            dp[0][nums[0]] = 1;
+        for(int i = 1;i<dp.size();i++){
+            for(int j = 0;j<dp[i].size();j++){
+                if (j<nums[i]){
+                    dp[i][j] = dp[i-1][j];
+                }
+                else{
+                    dp[i][j] = max(dp[i-1][j],dp[i-1][j-nums[i]]);
+                }
+            }
+        }
+		//这个能把空间复杂度优化到SUM
+		//然后dp优化到一维
+        return dp[nums.size()-1][SUM];
+    }
+};
+
+
+/*
+139. 单词拆分
+给定一个非空字符串 s 和一个包含非空单词的列表 wordDict，判定 s 是否可以被空格拆分为一个或多个在字典中出现的单词。
+
+说明：
+
+拆分时可以重复使用字典中的单词。
+你可以假设字典中没有重复的单词。
+
+*/
+
+//还是比较建议用动态规划去做
+//动态规划跟DFS本质上是一样的原理，只不过动态规划是自底向上的，DFS是自顶向下的
+class Solution139 {
+public:
+    bool solveMethod1(string s,vector<string>& wordDict){
+        //用动态规划的方法做 n^2的时间复杂度 n的空间复杂度
+        set<string> SET;
+        for(auto&str:wordDict){
+            SET.insert(str);
+        }
+        vector<bool> dp(s.size(),0);//dp[i]表示[0,i]区间范围内是否可以符合在字典中出现
+        if (SET.find(s.substr(0,1))!=SET.end()){
+            dp[0] = 1;
+        }
+        for(int i = 1;i<s.size();i++){
+            if (SET.find(s.substr(0,i+1))!=SET.end()){
+                dp[i] = 1;
+            }
+            else{
+                for(int j = 0;j<i;j++){
+                    if (dp[j]&& SET.find(s.substr(j+1,i-(j+1)+1))!=SET.end()){
+                        dp[i] = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        return dp.back();
+    }
+    
+    bool DFS(set<string>&SET,string&s,int index,vector<int>& memory){
+        //基于DFS的记忆化搜索，如果不记忆的话，直接就超出时间限制了
+        if (index==s.size()){
+            return 1;
+        }
+        if (memory[index]!=-1){
+            return memory[index];
+        }
+        for(int i = 1;index+i<=s.size();i++){
+            if (SET.find(s.substr(index,i))!=SET.end() && DFS(SET,s,index+i,memory)){
+                memory[index] = 1;
+                return 1;
+            }
+        }
+        memory[index] = 0;
+        return 0;
+    }
+    bool solveMethod2(string s,vector<string>& wordDict){
+        set<string> SET;
+        for(auto&str:wordDict){
+            SET.insert(str);
+        }
+        vector<int> memory(s.size(),-1);
+        return DFS(SET,s,0,memory);
+    }
+    bool wordBreak(string s, vector<string>& wordDict) {
+        return solveMethod2(s,wordDict);
+
+    }
+};
+
+
+/*
+剑指 Offer 47. 礼物的最大价值
+在一个 m*n 的棋盘的每一格都放有一个礼物，每个礼物都有一定的价值（价值大于 0）。你可以从棋盘的左上角开始拿格子里的礼物，
+并每次向右或者向下移动一格、直到到达棋盘的右下角。给定一个棋盘及其上面的礼物的价值，请计算你最多能拿到多少价值的礼物？
+
+*/
+class SolutionOffer47 {
+public:
+    int maxValue(vector<vector<int>>& grid) {
+		int m = grid.size();
+		int n = grid[0].size();
+		vector<vector<int>> dp(m,vector<int>(n,0));
+        //空间复杂度可做优化，即直接在grid上修改，这样的话空间复杂度就降到了1
+		dp[0][0] = grid[0][0];
+		for(int j = 1;j<n;j++){
+			dp[0][j] = dp[0][j-1]+grid[0][j];
+		}
+		for(int i = 1;i<m;i++){
+			dp[i][0] = dp[i-1][0]+grid[i][0];
+		}
+		for (int i = 1;i<m;i++){
+			for(int j = 1;j<n;j++){
+				dp[i][j] = max(dp[i-1][j],dp[i][j-1])+grid[i][j];
+			}
+		}
+		return dp[m-1][n-1];
+    }
+};
+
+/*
+剑指 Offer 60. n个骰子的点数
+把n个骰子扔在地上，所有骰子朝上一面的点数之和为s。输入n，打印出s的所有可能的值出现的概率。
+
+ 
+
+你需要用一个浮点数数组返回答案，其中第 i 个元素代表这 n 个骰子所能掷出的点数集合中第 i 小的那个的概率。
+
+
+*/
+
+class SolutionOffer60 {
+public:
+    vector<double> dicesProbability(int n) {
+        //空间复杂度可以降到n
+        //时间复杂度是n^2
+        vector<vector<double>> dp(n+1,vector<double>(6*n+1,0));
+
+        for(int i = 1;i<=6;i++){
+            dp[1][i] = 1.0/6.0;
+        }
+        for (int i = 2;i<=n;i++){
+            for (int j = i;j<=6*i;j++){
+                for (int k = 1;k<=6;k++){
+                    if (j-k>=0){
+                        dp[i][j]+=dp[i-1][j-k]*(1.0/6.0);
+                    }
+                }
+            }
+        }
+        return vector<double>(dp[n].begin()+n,dp[n].end());
+    }
+};
+
+
+/*
+剑指 Offer 63. 股票的最大利润
+假设把某股票的价格按照时间先后顺序存储在数组中，请问买卖该股票一次可能获得的最大利润是多少？
+
+*/
+class SolutionOffer63 {
+public:
+
+    int solveMethod1(vector<int>& prices){
+        //动态规划做，时间复杂度是n，空间复杂度可降到1
+        if (prices.empty()){
+            return 0;
+        }
+        vector<int> dpMAX(prices.size(),0); //dpMAX[i]表示i之后不包括i的最大值
+        vector<int> dpMIN(prices.size(),0); //dpMIN[i]表示i之前包括i的最小值
+        dpMIN[0] = prices[0];
+        for(int i = 1;i<dpMIN.size();i++){
+            if (prices[i]<dpMIN[i-1]){
+                dpMIN[i] = prices[i];
+            }
+            else{
+                dpMIN[i] = dpMIN[i-1];
+            }
+        }
+        dpMAX[prices.size()-1] = INT_MIN;
+        for(int i = prices.size()-2;i>=0;i--){
+            if (prices[i+1]>dpMAX[i+1]){
+                dpMAX[i] = prices[i+1];
+            }
+            else{
+                dpMAX[i] = dpMAX[i+1];
+            }
+        }
+        int res = INT_MIN;
+        for(int i = 0;i<prices.size()-1;i++){
+            if (dpMAX[i]-dpMIN[i]>res){
+                res = dpMAX[i]-dpMIN[i];
+            }
+        }
+        return res<0?0:res;
+    }   
+    int solveMethod2(vector<int>& prices){
+        if (prices.empty()){
+            return 0;
+        }
+        int MIN = prices[0]; //MIN表示之前的最小值
+        int res = INT_MIN;
+        for (int i =1;i<prices.size();i++){
+            if (prices[i]-MIN>res){
+                res = prices[i]-MIN;
+            }
+            if (prices[i]<MIN){
+                MIN = prices[i];
+            }
+        }
+        return res<0?0:res;
+    }
+    int maxProfit(vector<int>& prices) {
+        return solveMethod2(prices);
+    }
+};
+
+
+/*
+剑指 Offer 49. 丑数
+我们把只包含质因子 2、3 和 5 的数称作丑数（Ugly Number）。求按从小到大的顺序的第 n 个丑数。
+*/
+
+class SolutionOffer49 {
+public:
+    int solveMethod1(int n){
+        //用小根堆和去重的set去做
+        auto cmp1 = [](long int a,long int b)->bool{return a>b;};
+        priority_queue<long int,vector<long int>,decltype(cmp1)> pq(cmp1);
+        set<long int> unique;
+        pq.push(1);
+        unique.insert(1);
+        vector<int> factor = {2,3,5};
+        long int top;
+        for(int i = 1;i<=n;i++){
+            top = pq.top();
+            for(int f:factor){
+                if (unique.find(top*f)==unique.end()){
+                    unique.insert(top*f);
+                    pq.push(top*f);
+                }
+            }
+            pq.pop();
+        }
+        return top;
+    }
+    /*
+在已有的丑数序列上每一个数都必须乘2， 乘3， 乘5， 这样才不会漏掉某些丑数。假设已有的丑数序列为[1, 2, 3, ..., n1, n2], 如果单纯的让每个丑数乘2， 乘3， 乘5顺序排列的话肯定会有问题，
+
+比如如果按照这样的顺序排列下去肯定有问题[1*2, 1*3, 1*5, 2*2, 2*3, 2*5, 3*2, 3*3, 3*5, ... , n1 *2, n1 * 3, n1 * 5, n2 * 2, n3* 3, n2 * 5]，因为后面乘2的数据可能会比前面乘3乘5的数据要小，那这个乘2的数应该排在他们的前面， 后面乘3的数据也可能比前面乘5的数据要小，那这个乘3的数应该排在他们的前面。
+
+那怎么办呢，每个数都必须乘2， 乘3， 乘5这样才能保证求出所有的丑数，而且还要保证丑数的顺序，这个改如何同时实现呢？
+
+通过观察网上的各个题解，终于找到了办法，那就是记录每个丑数是否已经被乘2， 乘3， 乘5了， 具体的做法是
+
+设置3个索引a, b, c，分别记录前几个数已经被乘2， 乘3， 乘5了，比如a表示前(a-1)个数都已经乘过一次2了，下次应该乘2的是第a个数；b表示前(b-1)个数都已经乘过一次3了，下次应该乘3的是第b个数；c表示前(c-1)个数都已经乘过一次5了，下次应该乘5的是第c个数；
+
+对于某个状态下的丑数序列，我们知道此时第a个数还没有乘2(有没有乘3或者乘5不知道）， 第b个数还没有乘3(有没有乘2或者乘5不知道），第c个数还没有乘5(有没有乘2或者乘3不知道), 下一个丑数一定是从第a丑数乘2， 第b个数乘3， 第c个数乘5中获得，他们三者最小的那个就是下个丑数。
+
+求得下个丑数后就得判断这个丑数是谁，是某个数通过乘2得到的，还是某个数乘3得到的，又或是说某个数通过乘5得到的。我们可以比较一下这个新的丑数等于究竟是等于第a个丑数乘2, 还是第b个数乘3， 还是第c个数乘5， 通过比较我们肯定可以知道这个新的丑数到底是哪个数通过乘哪个数得到的。假设这个新的丑数是通过第a个数乘2得到的，说明此时第a个数已经通过乘2得到了一个新的丑数，那下个通过乘2得到一个新的丑数的数应该是第(a+1)个数，此时我们可以说前 a 个数都已经乘过一次2了，下次应该乘2的是第 （a+1） 个数, 所以a++；如果新的丑数是通过第b个数乘3得到的, 说明此时第 b个数已经通过乘3得到了一个新的丑数，那下个需要通过乘3得到一个新的丑数的数应该是第(b+1)个数，此时我们可以说前 b 个数都已经乘过一次3了，下次应该乘3的是第 （b+1） 个数, 所以 b++；同理，如果这个这个新的丑数是通过第c个数乘5得到的, 那么c++;
+
+但是注意，如果第a个数乘2后等于第b个数乘3，或者等于第c个数乘5， 说明这个新的丑数是有两种或者三种方式可以得到，这时应该给得到这个新丑数的组合对应的索引都加一，比如新丑数是第a个数乘2后和第b个数乘3得到的，那么 a 和 b都应该加一， 因为此时第a个数已经通过乘2得到了一个新的丑数，第b个数已经通过乘3得到了一个新的丑数, 只不过这两个数相等而已。所以我们给计数器加一的时候不能使用 if else else if， 而应该使用if, if, if, 这样才不会把应该加一的计数器漏掉
+
+经过n次循环，就能得到第n 个丑数了。
+*/
+    int solveMethod2(int n){
+        int a2 = 1;
+        int a3 = 1;
+        int a5 = 1;
+        vector<int> nums(n+1,0);
+        nums[1] = 1;
+        int curi = 1;
+        for(int i = 2;i<nums.size();i++){
+            nums[i] = min(nums[a5]*5,min(nums[a2]*2,nums[a3]*3));
+            if (nums[i]%2==0){
+                a2++;
+            }
+            if (nums[i]%3==0){
+                a3++;
+            }
+            if (nums[i]%5==0){
+                a5++;
+            }
+        }
+        return nums[n];
+    }
+    int nthUglyNumber(int n) {
+        return solveMethod2(n);
+    }
+};
+
+/*
+剑指 Offer 10- II. 青蛙跳台阶问题
+一只青蛙一次可以跳上1级台阶，也可以跳上2级台阶。求该青蛙跳上一个 n 级的台阶总共有多少种跳法。
+
+答案需要取模 1e9+7（1000000007），如计算初始结果为：1000000008，请返回 1。
+
+*/
+class SolutionOffer10_II {
+public:
+    int numWays(int n) {
+        if (n==0){
+            return 1;
+        }
+        else if (n==1){
+            return 1;
+        }
+        else if (n==2){
+            return 2;
+        }
+        vector<int> dp(n+1,0);
+        dp[0] = 0;
+        dp[1] = 1;
+        dp[2] = 2;
+        for(int i = 3;i<=n;i++){
+            dp[i] = ((dp[i-1]%1000000007)+(dp[i-2]%1000000007))%1000000007;
+        }
+        return dp[n];
+    }
 };

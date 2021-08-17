@@ -470,3 +470,34 @@ public:
         
     }
 };
+
+
+/*
+78. 子集
+给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
+
+解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
+
+
+*/
+//也是回溯算法，关键是要抽象到如何用回溯算法解决
+class Solution78 {
+public:
+    vector<vector<int>> result;
+    void DFS(vector<int>& nums,vector<int>& res,int level){
+        if (level==nums.size()){
+            result.push_back(res);
+            return;
+        }
+        res.push_back(nums[level]);
+        DFS(nums,res,level+1);
+        res.pop_back();
+        DFS(nums,res,level+1);
+    }
+    vector<vector<int>> subsets(vector<int>& nums) {
+        result = {};
+        vector<int> res;
+        DFS(nums,res,0);
+        return result;
+    }
+};

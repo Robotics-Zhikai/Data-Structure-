@@ -575,3 +575,74 @@ public:
 
 
 
+/*
+20. 有效的括号
+给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是否有效。
+
+有效字符串需满足：
+
+左括号必须用相同类型的右括号闭合。
+左括号必须以正确的顺序闭合。
+*/
+
+class Solution20 {
+public:
+    bool isValid(string s) {
+        stack<char> sta;
+        //如果s的长度为奇数的话，直接返回false，这样也算是一种剪枝
+        for(char c:s){
+            if (c==')'){
+                while(!sta.empty() && sta.top()!='('){
+                    if (sta.top()=='['||sta.top()=='{'){
+                        return 0;
+                    }
+                    sta.pop();
+                }
+                if (!sta.empty()){
+                    sta.pop();
+                }
+                else{ //注意加这个else的判断
+                    return 0;
+                }
+            }
+            else if (c==']'){
+                while(!sta.empty() && sta.top()!='['){
+                    if (sta.top()=='('||sta.top()=='{'){
+                        return 0;
+                    }
+                    sta.pop();
+                }
+                if (!sta.empty()){
+                    sta.pop();
+                }
+                else{
+                    return 0;
+                }
+            }
+            else if (c=='}'){
+                while(!sta.empty() && sta.top()!='{'){
+                    if (sta.top()=='['||sta.top()=='('){
+                        return 0;
+                    }
+                    sta.pop();
+                }
+                if (!sta.empty()){
+                    sta.pop();
+                }
+                else{
+                    return 0;
+                }
+            }
+            else{
+                sta.push(c);
+            }
+            
+        }
+        if (sta.empty()){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+};

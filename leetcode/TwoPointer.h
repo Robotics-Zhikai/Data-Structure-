@@ -515,3 +515,55 @@ public:
 };
 
 
+/*
+75. 颜色分类
+给定一个包含红色、白色和蓝色，一共 n 个元素的数组，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+
+此题中，我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
+*/
+
+class Solution75 {
+public:
+    void solveMethod1(vector<int>& nums){
+        //并非是一趟扫描排好的
+        vector<int> count(3,0);
+        for (auto &n:nums){
+            count[n]++;
+        }
+        for (int i = 0;i<count[0];i++){
+            nums[i] = 0;
+        }
+        for (int i = count[0];i<count[0]+count[1];i++){
+            nums[i] = 1;
+        }
+        for (int i = count[0]+count[1];i<count[0]+count[1]+count[2];i++){
+            nums[i] = 2;
+        }
+    }
+    void solveMethod2(vector<int>& nums){
+        //用双指针的方法进行一趟扫描排序
+        //https://leetcode-cn.com/problems/sort-colors/solution/yan-se-fen-lei-by-leetcode-solution/
+        //方法二的双指针方法过一遍动画就懂了 这个比较好理解
+        int ptr0 = 0; //指向序列0的下一个位置
+        int ptr1 = 0; //指向序列1的下一个位置
+        for (int i = 0;i<nums.size();i++){
+            if (nums[i]==0){
+                swap(nums[i],nums[ptr0]);
+                if (ptr1 == ptr0){
+                    ptr0++;
+                    ptr1++;
+                }
+                else{
+                    ptr0++;
+                    swap(nums[i],nums[ptr1++]);
+                }
+            }
+            else if (nums[i]==1){
+                swap(nums[i],nums[ptr1++]);
+            }
+        }
+    }
+    void sortColors(vector<int>& nums) {
+        solveMethod2(nums);
+    }
+};
