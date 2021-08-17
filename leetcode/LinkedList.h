@@ -600,7 +600,8 @@ public:
     int _key;
     int _value;
 };
-
+/* pthread_mutex_lock */
+/* pthread_mutex_unlock */
 //一个比较高效的实现 逻辑还是挺简单的
 class LRUCache {
     //用双向链表和哈希表来实现LRU
@@ -684,6 +685,124 @@ private:
             addr->prev->next = addr->next;
             addr->next->prev = addr->prev;
         }
+    }
+};
+
+//线程安全的LRU缓存
+class LRUCacheThreadSafe {
+    //用双向链表和哈希表来实现LRU
+    //最近访问的通过HASHMAP O(1)找到后放在链表的最后，或者找不到时新建一个node加到链表最后
+    //要删除一个最久未使用的数据值时直接删除掉双向链表的头结点
+public:
+    LRUCacheThreadSafe(int capacity):_capacity(capacity) {
+
+    }
+    
+    int get(int key) { //这个可以同时读访问
+
+        pthread_mutex_lock(&mutexreadCount);
+        readCount++;
+        if (readCount==1){
+            pthread_mutex_lock(&mutexWrite);
+        }
+        pthread_mutex_unlock(&mutexreadCount);
+
+        auto found = MAP.find(key);
+        if(found==MAP.end()){
+            return -1;
+        }
+        else{
+            node* foundNode = found->second;
+            eraseNode(foundNode);
+            insertNode(foundNode);
+            return foundNode->_value;
+        }
+
+        pthread_mutex_lock(&mutexreadCount);
+        readCount--;
+        if (readCount==0){
+            pthread_mutex_unlock(&mutexWrite);
+        }
+        pthread_mutex_unlock(&mutexreadCount);
+    }
+    
+    void put(int key, int value) {
+        pthread_mutex_lock(&mutexWrite);
+        writeCount++;
+        if (MAP.find(key)!=MAP.end()){
+            MAP[key]->_value = value;
+            eraseNode(MAP[key]);
+            insertNode(MAP[key]); //注意这个更新数据也算是对数据进行访问
+        }
+        else{
+            node * newnode = new node(key,value);
+            if (MAP.size()<_capacity){
+                insertNode(newnode);
+                MAP[key] = newnode;
+            }
+            else{
+                node * deletenode = firstnode;
+                eraseNode(deletenode);
+                MAP.erase(deletenode->_key);
+                delete deletenode;
+                insertNode(newnode);
+                MAP[key] = newnode;
+            }
+        }
+        writeCount--;
+        pthread_mutex_unlock(&mutexWrite);
+    }
+private:
+    unordered_map<int,node*> MAP;
+    const int _capacity;
+
+    pthread_mutex_t mutex1;
+    
+    pthread_mutex_t mutexWrite;
+
+    pthread_mutex_t mutexreadCount;
+    unsigned int readCount = 0;
+
+    unsigned int writeCount = 0;
+
+    node* lastnode = nullptr;
+    node* firstnode = nullptr;
+
+    void insertNode(node* addr){
+        pthread_mutex_lock(&mutex1);
+        if (lastnode==nullptr){
+            lastnode = addr;
+            firstnode = addr;
+            addr->next = nullptr;
+            addr->prev = nullptr;
+        }
+        else{
+            lastnode->next = addr;
+            addr->next = nullptr;
+            addr->prev = lastnode;
+            lastnode = addr;
+        }
+        pthread_mutex_unlock(&mutex1);
+    }
+    void eraseNode(node* addr){
+        pthread_mutex_lock(&mutex1);
+        if (addr->next==nullptr && addr->prev==nullptr){
+            firstnode = nullptr;
+            lastnode = nullptr;
+        }
+        else if (addr->prev==nullptr){
+            addr->next->prev = nullptr;
+            firstnode = addr->next;
+        }
+        else if (addr->next==nullptr){
+            addr->prev->next = nullptr;
+            lastnode = addr->prev;
+        }
+        else{
+            addr->prev->next = addr->next;
+            addr->next->prev = addr->prev;
+        }
+        pthread_mutex_unlock(&mutex1);
     }
 };
 
