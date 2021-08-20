@@ -76,6 +76,21 @@ public:
         storage.pop_back();
         
     }
+    void DFSreview(vector<int>& nums,vector<bool>& isvisited,vector<int>& storage ){
+        if(storage.size()==nums.size()){
+            res.push_back(storage);
+            return;
+        }
+        for (int i = 0;i<nums.size();i++){
+            if (isvisited[i]==0){
+                isvisited[i] = 1;
+                storage.push_back(nums[i]);
+                DFSreview(nums,isvisited,storage);
+                isvisited[i] = 0;
+                storage.pop_back();
+            }
+        }
+    }
 
     vector<vector<int>> permute(vector<int>& nums) {
         res = {};
