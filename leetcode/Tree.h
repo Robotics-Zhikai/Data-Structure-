@@ -638,6 +638,29 @@ public:
         }
         return nullptr;
     }
+	TreeNode* solveMethod2review(TreeNode* root,TreeNode* p,TreeNode* q){
+		//复习的写
+		if (root==nullptr){
+            return nullptr;
+        }
+        if (root==p || root==q){
+            return root;
+        }
+        
+        TreeNode* left = solveMethod2review(root->left,p,q); //这个其实也不能算作直接是问题的解
+        TreeNode* right = solveMethod2review(root->right,p,q);
+
+        if (left!=nullptr && right!=nullptr){ //通过这几个if去控制返回路径
+            return root;
+        }
+        else if (left!=nullptr && right==nullptr){
+            return left;
+        }
+        else if (left==nullptr && right != nullptr){
+            return right;
+        }
+        return nullptr;
+	}
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
         return solveMethod2(root,p,q);
         return solveMethod1(root,p,q);
@@ -1029,6 +1052,26 @@ public:
 		DFS(root->right,curValue,targetSum);
 		curValue = root->right==nullptr?curValue:curValue-root->right->val;
 	}
+	void DFSreview(TreeNode* root,int& targetSum,int &curnum){
+        if (root==nullptr){
+            return;
+        }
+        curnum+=root->val;
+        if (root->left==nullptr && root->right==nullptr){
+            if (curnum==targetSum){
+                HAS = true;
+            }
+        }
+        
+        DFSreview(root->left,targetSum,curnum);
+        if (root->left){
+            curnum-=root->left->val;
+        }
+        DFSreview(root->right,targetSum,curnum);
+        if (root->right){
+            curnum-=root->right->val;
+        }
+    }
     bool hasPathSum(TreeNode* root, int targetSum) {
 		//简单题 比较常规
 		int curValue = 0;
@@ -1082,6 +1125,29 @@ public:
 		if (root->right!=nullptr)
 			path.pop_back();
 	}
+	void DFSreview(TreeNode* root,int& targetSum,int &curnum,vector<int>& path){
+        if (root==nullptr){
+            return;
+        }
+        curnum+=root->val;
+        path.push_back(root->val);
+        if (root->left==nullptr && root->right==nullptr){
+            if (curnum==targetSum){
+                res.push_back(path);
+            }
+        }
+        
+        DFSreview(root->left,targetSum,curnum,path);
+        if (root->left){
+            path.pop_back();
+            curnum-=root->left->val;
+        }
+        DFSreview(root->right,targetSum,curnum,path);
+        if (root->right){
+            path.pop_back();
+            curnum-=root->right->val;
+        }
+    }
     vector<vector<int>> pathSum(TreeNode* root, int targetSum) {
 		//还是比较常规的
 		res = {};
