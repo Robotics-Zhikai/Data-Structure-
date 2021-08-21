@@ -549,6 +549,27 @@ public:
         root->left = nullptr;
         return root;
     }
+
+	TreeNode* solveMethod2Review(TreeNode* root){
+        if (root==nullptr){
+            return nullptr;
+        }
+        TreeNode* leftListHead = solveMethod2Review(root->left); //这个就直接假设已经转成链表了
+        TreeNode* leftListTail = leftListHead;
+        while(leftListTail!=nullptr && leftListTail->right!=nullptr){
+            leftListTail = leftListTail->right;
+        }
+        TreeNode* rightListHead = solveMethod2Review(root->right);
+        if (leftListTail!=nullptr){
+            leftListTail->right = rightListHead;
+            root->right = leftListHead;
+        }
+        else{
+            root->right = rightListHead;
+        }
+        root->left = nullptr;
+        return root;
+    }
     void flatten(TreeNode* root) {
         solveMethod2(root); //同样的，递归实现代码更简单，而且容易想
     }
@@ -723,6 +744,19 @@ public:
         recur(res,root->left,depth+1);
         recur(res,root->right,depth+1);
     }
+
+	void recurReview(TreeNode* root,int level,vector<vector<int>>& res){
+        if (root==nullptr){
+            return;
+        }
+        if (res.size()<level+1){
+            res.push_back(vector<int>{});
+        }
+        res[level].push_back(root->val);
+        recurReview(root->left,level+1,res);
+        recurReview(root->right,level+1,res);
+    }
+
     vector<vector<int>> solveMethod2(TreeNode* root) {
         //递归实现，代码简单，运行速度块，但是占据的内存相对较大
         vector<vector<int>> res;
@@ -773,6 +807,20 @@ public:
         accumulate = root->val;
         DFS(root->left);
     }
+
+	int sum = 0;
+    TreeNode* convertBSTreview(TreeNode* root) {
+        if (root==nullptr){
+            return nullptr;
+        }
+
+        convertBST(root->right);
+        sum+=root->val;
+        root->val = sum;
+        convertBST(root->left);
+        return root;
+    }
+
     TreeNode* convertBST(TreeNode* root) {
         accumulate = 0;
         DFS(root);
@@ -832,6 +880,15 @@ public:
 			return false;
 		return solveMethod2(root->left,lower,root->val) && solveMethod2(root->right,root->val,upper);
 	}
+	bool solveMethod2review(TreeNode* root,long int lower,long int upper){
+        if (root==nullptr){
+            return true;
+        }
+        if (root->val<=lower || root->val>=upper){
+            return false;
+        }
+        return solveMethod2review(root->right,root->val,upper)&& solveMethod2review(root->left,lower,root->val);
+    }
 	bool isValidBST(TreeNode* root){
 		return solveMethod2(root,LONG_MIN,LONG_MAX);
 	}
