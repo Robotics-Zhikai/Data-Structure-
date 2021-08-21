@@ -2061,3 +2061,56 @@ public:
         return res;
     }
 };
+
+/*
+124. 二叉树中的最大路径和
+路径 被定义为一条从树中任意节点出发，沿父节点-子节点连接，达到任意节点的序列。同一个节点在一条路径序列中 至多出现一次 。
+该路径 至少包含一个 节点，且不一定经过根节点。
+
+路径和 是路径中各节点值的总和。
+
+给你一个二叉树的根节点 root ，返回其 最大路径和 。
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution124 {
+public:
+    int MAX = INT_MIN;
+    void DFS(TreeNode * root){
+        //这个可以类比最大子序和的动态规划
+        if (root==nullptr){
+            return;
+        }
+        if (root->left == nullptr && root->right == nullptr){
+            root->val = root->val;
+        }
+        maxPathSum(root->left);
+        maxPathSum(root->right);
+        
+        int curMAX = (root->left==nullptr?0:root->left->val)+(root->right==nullptr?0:root->right->val)+root->val;
+        if (curMAX>MAX){
+            MAX = curMAX;
+        }
+        root->val=
+            max(max(root->val,root->val+(root->left==nullptr?0:root->left->val)),root->val+(root->right==nullptr?0:root->right->val));
+            //每次调整root->val，root->val表示以当前节点为起点，以该节点为根节点的子树的路径累计值的最大值
+        if (root->val>MAX){ //这个容易漏掉，因为有可能root->val是负值，造成左右侧加起来都不如单侧的
+            MAX = root->val;
+        }
+    }
+    int maxPathSum(TreeNode* root) {
+        DFS(root);
+        return MAX;
+    }
+};
