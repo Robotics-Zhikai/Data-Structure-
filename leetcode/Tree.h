@@ -408,6 +408,9 @@ public:
     unordered_map<int,int> MAP;
     vector<int> pre;
     vector<int> inord;
+    //前序遍历[根节点[左子树节点][右子树节点]]
+    //中序遍历[[左子树节点]根节点[右子树节点]]
+    //核心是要根据上边的这两个遍历特点去写，去计算根节点的位置以及子树的索引范围
     TreeNode* recur(int rootindex,int left,int right){
     //recur的话就是给定根节点在pre中的index，和要构建的以rootindex为根节点的子树在inorder中的索引范围
     //然后递归得到一个构建完成的子树，指向子树的根节点
@@ -430,6 +433,58 @@ public:
         return recur(0,0,inorder.size());
     }
 };
+
+/*
+106. 从中序与后序遍历序列构造二叉树
+根据一棵树的中序遍历与后序遍历构造二叉树。
+
+注意:
+你可以假设树中没有重复的元素。
+
+*/
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+ //中序 [[左子树节点]根节点[右子树节点]]
+ //后序 [[左子树节点][右子树节点]根节点]
+ //核心还是要把这个写出来
+class Solution106 {
+public:
+    vector<int> in;
+    vector<int> post;
+    unordered_map<int,int> MAP;
+    TreeNode* recur(int rootindex,int left,int right){ //[left,right)
+    //recur中，rootindex表示以后序遍历序列rootindex处的节点作为根节点，[left,right)的中序遍历序列范围内的节点作为子树节点范围
+    //跟中序 先序构造树大同小异
+        if (rootindex<0){
+            return nullptr;
+        }
+        if (left==right){
+            return nullptr;
+        }
+        TreeNode* rightnode = recur(rootindex-1,MAP[post[rootindex]]+1,right);
+        TreeNode* leftnode = recur(rootindex-(right-(MAP[post[rootindex]]+1))-1,left,MAP[post[rootindex]]);
+        TreeNode* newnode = new TreeNode(post[rootindex],leftnode,rightnode);
+        return newnode;
+    }
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        for(int i = 0;i<inorder.size();i++){
+            MAP[inorder[i]] = i;
+        }
+        in = inorder;
+        post = postorder;
+        return recur(postorder.size()-1,0,inorder.size());
+    }
+};
+
 
 
 /*
