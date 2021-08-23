@@ -196,4 +196,102 @@ public:
 };
 
 
+/*
+743. 网络延迟时间
+有 n 个网络节点，标记为 1 到 n。
+
+给你一个列表 times，表示信号经过 有向 边的传递时间。 times[i] = (ui, vi, wi)，其中 ui 是源节点，vi 是目标节点，
+ wi 是一个信号从源节点传递到目标节点的时间。
+
+现在，从某个节点 K 发出一个信号。需要多久才能使所有节点都收到信号？如果不能使所有节点收到信号，返回 -1 。
+
+*/
+
+class dijkstra{
+    //注意这个是对节点标号从1开始的
+public:
+    dijkstra(int n,int beginNode,vector<vector<int>>& Edge)
+    :nodeNum(n+1),collected(n+1,false),dist(n+1,INT_MAX),Edge(Edge),path(n+1,-1)
+    {
+        dist[beginNode] = 0;
+    }
+    vector<int>& solve(){
+        // vector<vector<int>> DistIncludeIndex;
+        // for(int i = 0;i<dist.size();i++){
+        //     DistIncludeIndex.push_back(vector<int>{i,dist[i]});
+        //     //每个元素是vector<int>,vector<int>的第一个元素是索引，第二个元素是距离初始点的当前认为的距离
+        // }
+        // auto cmp = [](vector<int>&a,vector<int>&b)->bool{return a[1]>b[1];};
+        // priority_queue<vector<int>,vector<vector<int>>,decltype(cmp)> prique(cmp);
+        // while(1){
+        //     if (prique.empty()){
+        //         break;
+        //     }
+        //     int V = prique.top()[0];
+        //     prique.pop();
+        //     collected[V] = true;
+        //     for(int i = 0;i<Edge.size();i++){
+
+        //     }
+        // }
+        while(1){
+            int V = MinDistIndex(); //在未访问的节点里找到值最小的对应索引
+            if (V==-1){
+                break;
+            }
+            collected[V] = true;
+            for(int i = 0;i<Edge.size();i++){
+                if (Edge[i][0]==V){ //对V的每个邻接点
+                    int W = Edge[i][1];
+                    if (collected[W]==false){
+                        if (dist[V]+Edge[i][2]<dist[W]){
+                            dist[W] = dist[V]+Edge[i][2];
+                            path[W] = V;
+                        }
+                    }
+                }
+            }
+        }
+        return dist;
+    }
+private:
+    int MinDistIndex(){
+        int res = INT_MAX;
+        int index = -1;
+        for(int i = 1;i<dist.size();i++){
+            if (collected[i]==false){
+                if (dist[i]<res){
+                    res = dist[i];
+                    index = i;
+                }
+            }
+        }
+        return index;
+    }
+    int nodeNum;
+
+    vector<bool> collected;
+    // priority_queue<vector<int>,vector<vector<int>>,
+    vector<int> dist; 
+    vector<int> path;
+    vector<vector<int>> Edge;//每行 (ui, vi, wi)，其中 ui 是源节点，vi 是目标节点， wi 是边的权重。
+};
+class Solution743 {
+public:
+    int solveMethod1(vector<vector<int>>& times, int n, int k){
+        dijkstra dij(n,k,times);
+        vector<int> vecint = dij.solve();
+        int res = INT_MIN;
+        for(int i = 1;i<vecint.size();i++){
+            if (vecint[i]>res){
+                res = vecint[i];
+            }
+        }
+        return res==INT_MAX?-1:res;
+    }
+
+    int networkDelayTime(vector<vector<int>>& times, int n, int k) {
+        return solveMethod1(times,n,k);
+    }
+};
 

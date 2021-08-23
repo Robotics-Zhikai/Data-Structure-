@@ -98,6 +98,23 @@ public:
         DFS(grid,isvisit,up,col);
     }
 
+    void DFSreview(vector<vector<char>>& grid,int x,int y){
+        if (grid[x][y]=='0'){
+            return;
+        }
+        else{
+            grid[x][y] = '0';
+            if (x+1<grid.size())
+                DFSreview(grid,x+1,y);
+            if (x-1>=0)
+                DFSreview(grid,x-1,y);
+            if (y-1>=0)
+                DFSreview(grid,x,y-1);
+            if (y+1<grid[0].size())
+                DFSreview(grid,x,y+1);
+        }
+    }
+
     int solveMethod1(vector<vector<char>>& grid){
         if (grid.size()==0)
             return 0;
@@ -281,7 +298,7 @@ public:
         if (nums.empty())
             return 0;
         unordered_map<int,int> MAP;
-        int index = 0;
+        int index = 0;//index作为并查集存放的一系列元素数字
         for (int n:nums){
             MAP[n] = index++;
         } //一方面这个是用来去重的，另一方面这个要建立一个index与值的对应关系
