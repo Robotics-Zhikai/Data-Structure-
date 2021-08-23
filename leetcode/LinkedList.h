@@ -852,3 +852,57 @@ public:
         return cur1;
     }
 };
+
+
+/*
+剑指 Offer 24. 反转链表
+定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class SolutionOffer24 {
+public:
+    ListNode* HEAD = nullptr;
+    ListNode* recur(ListNode* head){
+        if (head==nullptr){
+            return nullptr;
+        }
+        if (head->next==nullptr){
+            HEAD = head;
+            return head;
+        }
+        recur(head->next)->next = head;
+        return head;
+    }
+    ListNode* solveMethod1(ListNode* head){
+        if (head == nullptr){
+            return nullptr;
+        }
+        recur(head)->next = nullptr;
+        return HEAD;
+    }
+    ListNode* solveMethod2(ListNode* head){
+        ListNode* cur = head;
+        ListNode* last = nullptr;
+        while(cur!=nullptr){
+            ListNode* next = cur->next;
+            cur->next = last;
+            last = cur;
+            cur = next;
+        }
+        return last;
+    }
+    ListNode* reverseList(ListNode* head) {
+        return solveMethod2(head);
+    }
+};
+
+
+

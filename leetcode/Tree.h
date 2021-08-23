@@ -286,6 +286,31 @@ public:
 		return res;
 	}
 
+    void DFSreview(TreeNode* root,int target,vector<int>& path,int& sum){
+        if(root==nullptr){
+            return;
+        }
+        
+        path.push_back(root->val);
+        sum+=root->val;
+        if (root->left == nullptr && root->right==nullptr){
+            if (sum==target){
+                res.push_back(path);
+            }
+        }
+        //if (sum<target){ //不能这样剪枝，因为可能存在负值
+            DFSreview(root->left,target,path,sum);
+            DFSreview(root->right,target,path,sum);
+        //}
+        path.pop_back();
+        sum-=root->val;
+    }
+    vector<vector<int>> review(){
+        int sum = 0;
+        DFSreview(root,target,path,sum);
+        return res;
+    }
+
 	vector<vector<int>> pathSum(TreeNode* root, int target)
 	{
 		//return pathSumStack(root, target); //4ms 19.4MB 97.81% 67.98%
