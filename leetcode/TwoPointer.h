@@ -493,7 +493,7 @@ public:
                 index = i;
                 break;
             }
-        } //逆序找到第一个降序的数
+        } //逆序找到第一个升序的数
         if (index!=-1){
             for (int i = nums.size()-1;i>index;i--){
                 if (nums[i]>nums[index]){
@@ -540,6 +540,28 @@ public:
             nums[i] = 2;
         }
     }
+    void solveMethod2Review(vector<int>& nums){
+        int ptr0 = 0;
+        int ptr1 = 0;
+        for(int i = 0;i<nums.size();i++){
+            if (nums[i]==0){
+                swap(nums[i],nums[ptr0]);
+                if (ptr0==ptr1){
+                    ptr0++;
+                    ptr1++; 
+                    //只要有ptr0++的地方必然有ptr1++，没有ptr0++的地方也有ptr1++的存在，因此ptr1肯定大于ptr0
+                }
+                else{
+                    ptr0++;
+                    swap(nums[i],nums[ptr1++]);
+                }
+            }
+            else if (nums[i]==1){
+                swap(nums[i],nums[ptr1++]);
+            }
+        }
+    }
+    
     void solveMethod2(vector<int>& nums){
         //用双指针的方法进行一趟扫描排序
         //https://leetcode-cn.com/problems/sort-colors/solution/yan-se-fen-lei-by-leetcode-solution/

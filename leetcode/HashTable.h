@@ -90,6 +90,39 @@ public:
 */
 class Solution1 {
 public:
+    vector<int> solveMethod1Review(vector<int>& nums, int target){
+        vector<vector<int>> numsindex;
+        for(int i = 0;i<nums.size();i++){
+            numsindex.push_back(vector<int>{nums[i],i});
+        }
+        sort(numsindex.begin(),numsindex.end(),[](vector<int>&a,vector<int>&b)->bool{return a[0]<b[0];});
+        int left = 0;
+        int right = nums.size()-1;
+        vector<int > res;
+        while(left<right){
+            if (numsindex[left][0]+numsindex[right][0]<target){
+                do{
+                    left++;
+                }while(left<numsindex.size() && numsindex[left][0]==numsindex[left-1][0]);
+            }
+            else if (numsindex[left][0]+numsindex[right][0]>target){
+                do{
+                    right--;
+                }while(right>=0 && numsindex[right][0]==numsindex[right+1][0]);
+            }
+            else{
+                res = vector<int>{numsindex[left][1],numsindex[right][1]};
+                do{
+                    left++;
+                }while(left<numsindex.size() && numsindex[left][0]==numsindex[left-1][0]);
+                do{
+                    right--;
+                }while(right>=0 && numsindex[right][0]==numsindex[right+1][0]);
+            }
+        }
+
+        return res;
+    }
     vector<int> solveMethod1(vector<int>& nums, int target){
         //这个是用nlogn的时间复杂度，n的空间复杂度
         //跟三数之和用到的方法差不多
@@ -133,6 +166,19 @@ public:
         }
         return {};
     }
+    vector<int> solveMethod2Review(vector<int>&nums,int target){
+        map<int,int> MAP;
+        for(int i = 0;i<nums.size();i++){
+            MAP[nums[i]] = i;
+        }
+        for(int i = 0;i<nums.size();i++){
+            if (MAP.find(target-nums[i])!=MAP.end() && MAP[target-nums[i]]!=i){
+                return vector<int>{i,MAP[target-nums[i]]};
+            }
+        }
+        return {};
+    }
+
     vector<int> solveMethod3(vector<int>& nums, int target){
         //两数之和肯定有两个数，按照下边的方法求解
         unordered_map<int,int> MAP;

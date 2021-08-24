@@ -86,6 +86,39 @@ public:
 */
 class SolutionOffer32_III {
 public:
+    vector<vector<int>> levelOrderReview(TreeNode* root){
+        if (root==nullptr){
+            return {};
+        }
+        queue<TreeNode*> que;
+        que.push(root);
+        int level = 0;
+        vector<vector<int>> res;
+        vector<int> temp;
+        while(!que.empty()){
+            int size = que.size();
+            temp.clear();
+            for(int i = 0;i<size;i++){
+                TreeNode* front = que.front();
+                int frontval = front->val;
+                que.pop();
+                temp.push_back(frontval);
+                if (front->left!=nullptr){
+                    que.push(front->left);
+                }
+                if (front->right!=nullptr){
+                    que.push(front->right);
+                }
+            }
+            if (level%2==1){
+                reverse(temp.begin(),temp.end());
+            }
+            res.push_back(temp);
+            level++;
+        }
+        return res;
+    }
+    //下边的这两个栈的实现极易出错 还是最好不要用这个
 	vector<vector<int>> levelOrder(TreeNode* root) { //之字形打印
 		int level = 0;
 		vector<vector<int>> result;
@@ -165,6 +198,17 @@ public:
 		}
 		return root;
 	}
+    TreeNode* mirrorTreeReview(TreeNode* root){
+        if (root==nullptr){
+            return nullptr;
+        }
+        mirrorTreeReview(root->left);
+        mirrorTreeReview(root->right);
+        TreeNode* swap = root->left;
+        root->left = root->right;
+        root->right = swap;
+        return root;
+    }
 	TreeNode* mirrorTree(TreeNode* root) {
 		//return mirrorTreeRecur(root);
 		return mirrorTreeQueue(root); //用队列的方法时间复杂度与用递归的方法差不多；空间复杂度比递归的方法还大一点
