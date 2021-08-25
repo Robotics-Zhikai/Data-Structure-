@@ -2202,3 +2202,55 @@ public:
         return max(max(dp[end][0],dp[end][1]),max(dp[end][2],dp[end][3]));
     }
 };
+
+/*
+188. 买卖股票的最佳时机 IV
+给定一个整数数组 prices ，它的第 i 个元素 prices[i] 是一支给定的股票在第 i 天的价格。
+
+设计一个算法来计算你所能获取的最大利润。你最多可以完成 k 笔交易。
+
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+
+*/
+class Solution188 {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+        if (prices.empty()){ //防止出现prices为空的情况
+            return 0;
+        }
+        vector<vector<int>> dp(prices.size(),vector<int>(2*k,0));
+        //1 2 3 4 5 6 7 8 ... k
+        //dp[i][0] 第i天第一次持有的最大利润
+        //dp[i][1] 第i天第一次持有后不持有的最大利润
+        //dp[i][2] 第i天第二次持有的最大利润
+        //dp[i][3] 第i天第二次持有后不持有的最大利润
+        //dp[i][4] 第i天第三次持有的最大利润
+        //dp[i][5] 第i天第三次持有后不持有的最大利润
+        for(int i = 0;i<k;i++){
+            dp[0][i*2] = -prices[0];
+        }
+        for(int i = 1;i<prices.size();i++){
+            for(int j = 0;j<2*k;j++){
+                if (j==0){
+                    dp[i][j] = max(dp[i-1][j],-prices[i]);
+                }
+                else{
+                    if (j%2==1){
+                        dp[i][j] = max(dp[i-1][j],dp[i-1][j-1]+prices[i]);
+                    }
+                    else{
+                        dp[i][j] = max(dp[i-1][j],dp[i-1][j-1]-prices[i]);
+                    }
+                }
+            }
+        }
+        int res = INT_MIN;
+        int end = dp.size()-1;
+        for(int i = 0;i<dp[end].size();i++){
+            if (dp[end][i]>res){
+                res = dp[end][i];
+            }
+        }
+        return res<0?0:res; //之所以有这个问号表达式，是为了防止出现k=0的情况
+    }
+};
