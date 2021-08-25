@@ -2167,3 +2167,38 @@ public:
         return max(*(dpHave.end()-1),*(dpNothave.end()-1));
     }
 };
+
+
+/*
+123. 买卖股票的最佳时机 III
+给定一个数组，它的第 i 个元素是一支给定的股票在第 i 天的价格。
+
+设计一个算法来计算你所能获取的最大利润。你最多可以完成 两笔 交易。
+
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+*/
+//状态dp
+class Solution123 {
+public:
+    int maxProfit(vector<int>& prices) {
+        vector<vector<int>> dp(prices.size(),vector<int>(4,0)); 
+        //dp[i][0] 第i天第一次持有的最大利润
+        //dp[i][1] 第i天第一次持有后不持有的最大利润
+        //dp[i][2] 第i天第二次持有的最大利润
+        //dp[i][3] 第i天第二次持有后不持有的最大利润
+        dp[0][0] = -prices[0];
+        dp[0][1] = 0; //dp[0][1] dp[0][2] dp[0][3] 这三个初始值不太好直观理解~只是设置成这几个初始值后，max肯定不会选中这几个没有意义的初始值
+        dp[0][2] = -prices[0]; 
+        dp[0][3] = 0;
+        for(int i = 1;i<prices.size();i++){
+            dp[i][0] = max(dp[i-1][0],-prices[i]);
+            dp[i][1] = max(dp[i-1][1],dp[i-1][0]+prices[i]);
+            dp[i][2] = max(dp[i-1][2],dp[i-1][1]-prices[i]);
+            dp[i][3] = max(dp[i-1][3],dp[i-1][2]+prices[i]);
+
+            //cout<<dp[i][0]<<" "<<dp[i][1]<<" "<<dp[i][2]<<" "<<dp[i][3]<<endl;
+        }
+        int end = prices.size()-1;
+        return max(max(dp[end][0],dp[end][1]),max(dp[end][2],dp[end][3]));
+    }
+};
