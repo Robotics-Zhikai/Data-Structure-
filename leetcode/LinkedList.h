@@ -813,8 +813,92 @@ private:
  * obj->put(key,value);
  */
 
+class LRUCacheReview {
+public:
+    LRUCache(int capacity):cap(capacity) {
 
-
+    }
+    
+    int get(int key) {
+        if(MAP.find(key)!=MAP.end()){
+            eraseNode(MAP[key]);
+            insertNode(MAP[key]);
+            return MAP[key]->value;
+        }
+        return -1;    
+    }
+    
+    void put(int key, int value) {
+        if (MAP.find(key)!=MAP.end()){
+            MAP[key]->value = value;
+            eraseNode(MAP[key]);
+            insertNode(MAP[key]);
+        }
+        else{
+            node* newnode = new node(key,value);
+            if (cur==cap){
+                node* before = listHead;
+                MAP.erase(listHead->key);
+                eraseNode(listHead);
+                delete before;
+            }
+            else{
+                cur++;
+            }
+            insertNode(newnode);
+            MAP[key] = newnode;
+        }
+    }
+private:
+    class node{
+    public:
+        node(int key,int value):key(key),value(value){}
+        int key;
+        int value;
+        node* next;
+        node* prev;
+    };
+    void insertNode(node* nodeptr){
+        if (nodeptr==nullptr){
+            return;
+        }
+        if (listTail==nullptr){
+            listHead = nodeptr;
+            listTail = nodeptr;
+            listHead->prev = nullptr;
+            listHead->next = nullptr;
+        }
+        else{
+            listTail->next = nodeptr;
+            nodeptr->prev = listTail;
+            nodeptr->next = nullptr;
+            listTail = nodeptr;
+        }
+    }
+    void eraseNode(node* nodeptr){
+        if (nodeptr->prev == nullptr && nodeptr->next == nullptr){
+            listHead = nullptr;
+            listTail = nullptr;
+        }
+        else if (nodeptr->prev == nullptr){
+            listHead = listHead->next;
+            listHead->prev = nullptr;
+        }
+        else if (nodeptr->next == nullptr){
+            listTail = listTail->prev;
+            listTail->next = nullptr;
+        }
+        else{
+            nodeptr->prev->next = nodeptr->next;
+            nodeptr->next->prev = nodeptr->prev;
+        }
+    }
+    node* listHead = nullptr;
+    node* listTail = nullptr;
+    int cap;
+    int cur = 0;
+    unordered_map<int,node*> MAP;
+};
 
 /*
 160. œ‡Ωª¡¥±Ì
