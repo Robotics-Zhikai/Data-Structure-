@@ -2142,3 +2142,28 @@ public:
         return res<0?0:res;
     }
 };
+
+
+/*
+122. 买卖股票的最佳时机 II
+给定一个数组 prices ，其中 prices[i] 是一支给定股票第 i 天的价格。
+
+设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
+
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+
+*/
+class Solution122 {
+public:
+    int maxProfit(vector<int>& prices) {
+        vector<int> dpHave(prices.size(),0);//dpHave[i]表示第i天持有股票时的最大利润
+        vector<int> dpNothave(prices.size(),0);//dpNothave[i]表示第i天不持有股票时的最大利润
+        dpHave[0] = -prices[0];
+        dpNothave[0] = 0;
+        for(int i = 1;i<prices.size();i++){
+            dpHave[i] = max(dpHave[i-1],dpNothave[i-1]-prices[i]);
+            dpNothave[i] = max(dpNothave[i-1],dpHave[i-1]+prices[i]);
+        }
+        return max(*(dpHave.end()-1),*(dpNothave.end()-1));
+    }
+};
