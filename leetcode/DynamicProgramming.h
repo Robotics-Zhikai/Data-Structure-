@@ -162,6 +162,60 @@ public:
 		}
 		return dp[n - 1][A]; //由于原问题已经转化了，所以与S无关了！！！！！！
 	}
+
+
+	int review(vector<int>& nums,int S){
+        //注意要把这个问题转化成一个01背包问题
+        int sum = 0;
+        for(int e:nums){
+            sum+=e;
+        }
+        vector<vector<int>> dp(nums.size(),vector<int>(sum+1,0));
+        if (nums[0]!=0){
+            dp[0][nums[0]] = 1; 
+            dp[0][0] = 1;
+        }
+        else{
+            dp[0][0] = 2; //要注意这个初始化时候的特殊情况！！！！
+        }
+        
+		//下边这个完全可以去掉，不需要按照这种形式去初始化
+        // for(int i = 0;i<nums.size();i++){
+        //     if (nums[i]!=0){
+        //         dp[i][nums[i]] = 1;
+        //         dp[i][0] = 1;
+        //     }
+        //     else{
+        //         dp[i][0] = 2; //要注意这个初始化时候的特殊情况！！！！
+        //     }
+        // }
+        for(int i = 1;i<nums.size();i++){
+            for(int j = 0;j<=sum;j++){ //j要从0开始
+                if (j<nums[i]){
+                    dp[i][j] = dp[i-1][j];
+                }
+                else{
+                    dp[i][j] = dp[i-1][j]+dp[i-1][j-nums[i]];
+                }
+               // cout<<dp[i][j]<<" ";
+            }
+            //cout<<endl;
+        }
+        //a+b = sum
+        //a-b = target
+        //2a=sum+target
+        //a = (sum+target)/2;
+        if ((sum+S)%2==1){
+            return 0;
+        }
+        int target = (sum+S)/2;
+        if (target>sum || target<0){
+            return 0;
+        }
+        return dp[dp.size()-1][target];
+    }
+
+
 	//也是一个01背包问题，按照01背包问题的思路去想，但是不同的是这个相当于所有的物品都得装，
 	//因此不能把dp[][]看做是不等式，只能看做等式
 	//除了用动态规划，还可以用其他方法
@@ -261,6 +315,47 @@ public:
 		}
 		return dp2D[m][n];
 	}
+    int review(vector<string>& strs,int m,int n){
+        vector<vector<vector<int>>> dp(strs.size(),vector<vector<int>>(m+1,vector<int>(n+1,0)));
+        int zeroNum = 0;
+        int oneNum = 0;
+        for(char c:strs[0]){
+            if (c=='0'){
+                zeroNum++;
+            }
+            else if (c=='1'){
+                oneNum++;
+            }
+        }
+        for(int i = zeroNum;i<=m;i++){
+            for (int j = oneNum;j<=n;j++){
+                dp[0][i][j] = 1; //一定要注意这个初始化！！！！！！！！！！！！！！！！！
+            }
+        }
+        for(int i = 1;i<strs.size();i++){
+            int zeroNum = 0;
+            int oneNum = 0;
+            for(char c:strs[i]){
+                if (c=='0'){
+                    zeroNum++;
+                }
+                else if (c=='1'){
+                    oneNum++;
+                }
+            }
+
+            for(int j = 0;j<=m;j++){
+                for(int k = 0;k<=n;k++){
+                    if (j>=zeroNum && k>=oneNum) 
+                        dp[i][j][k] = max(dp[i-1][j][k],dp[i-1][j-zeroNum][k-oneNum]+1);
+                    else
+                        dp[i][j][k] = dp[i-1][j][k];
+                }
+            }
+           
+        }
+        return dp[dp.size()-1][m][n];
+    }
 
 	//这是一个01背包问题 字符串集合中的每一个字符串是否放入
 	//和基本的01背包问题的区别是本题有两个约束条件，因此初始情况下有三维
@@ -1481,6 +1576,26 @@ public:
         }
         return max(max(dp[prices.size()-1][0],dp[prices.size()-1][1]),dp[prices.size()-1][2]);
     }
+	int solveMethod2Review(vector<int>& prices){
+        //dp[i][0] 第i天结束后持有股票的最大利润
+        //dp[i][1] 第i天结束后不持有股票且不处于冷冻期的最大利润
+        //dp[i][2] 第i天结束后不持有股票且开始进入冷冻期的最大利润
+        //dp[i][3] 第i天结束后不持有股票且第i天处于冷冻期的最大利润
+        //按这样的理解方式好理解一些
+        vector<vector<int>> dp(prices.size(),vector<int>(4,0));
+        dp[0][0] = -prices[0];
+        dp[0][1] = 0;
+        dp[0][2] = 0;
+        dp[0][3] = 0;
+        for(int i = 1;i<prices.size();i++){
+            dp[i][0] = max(max(dp[i-1][0],dp[i-1][1]-prices[i]),dp[i-1][3]-prices[i]);
+            dp[i][1] = max(dp[i-1][1],dp[i-1][3]);
+            dp[i][2] = dp[i-1][0]+prices[i];
+            dp[i][3] = dp[i-1][2];
+        }
+        int end = prices.size()-1;
+        return max(max(dp[end][0],dp[end][1]),max(dp[end][2],dp[end][3]));
+    }
     int maxProfit(vector<int>& prices) {
         return solveMethod2(prices);
     }
@@ -1694,6 +1809,36 @@ public:
 */
 class Solution416 {
 public:
+	bool solveMethod1Review(vector<int>& nums){
+        double sum = 0;
+        for(int i = 0;i<nums.size();i++){
+            sum+=nums[i];
+        }
+        if (sum/2!=(int)(sum/2)){
+            return false;
+        }
+        sum = sum/2;
+        vector<vector<bool>> dp(nums.size(),vector<bool>(sum+1,0)); //dp[i][j]表示[0,i]元素是否能构成j
+        for(int i = 0;i<nums.size();i++){
+            dp[i][0] = 1;
+            if (nums[i]<=sum)
+                dp[i][nums[i]] = 1;
+        }
+        for(int i = 1;i<nums.size();i++){
+            for(int j = 1;j<=sum;j++){
+                if (dp[i-1][j]==1){
+                    dp[i][j] = 1;
+                }
+                else if (j>=nums[i] && dp[i-1][j-nums[i]]){
+                    dp[i][j] = 1;
+                }
+                if (j==sum&&dp[i][j]==1){
+                    return 1;
+                }
+            }
+        }
+        return 0;
+    }
     bool canPartition(vector<int>& nums) {
         int SUM = 0;
         for(auto&n:nums){
@@ -2095,8 +2240,8 @@ public:
         if (root->left == nullptr && root->right == nullptr){
             root->val = root->val;
         }
-        maxPathSum(root->left);
-        maxPathSum(root->right);
+        DFS(root->left);
+        DFS(root->right);
         
         int curMAX = (root->left==nullptr?0:root->left->val)+(root->right==nullptr?0:root->right->val)+root->val;
         if (curMAX>MAX){
@@ -2252,5 +2397,55 @@ public:
             }
         }
         return res<0?0:res; //之所以有这个问号表达式，是为了防止出现k=0的情况
+    }
+};
+
+/*
+1049. 最后一块石头的重量 II
+有一堆石头，用整数数组 stones 表示。其中 stones[i] 表示第 i 块石头的重量。
+
+每一回合，从中选出任意两块石头，然后将它们一起粉碎。假设石头的重量分别为 x 和 y，且 x <= y。那么粉碎的可能结果如下：
+
+如果 x == y，那么两块石头都会被完全粉碎；
+如果 x != y，那么重量为 x 的石头将会完全粉碎，而重量为 y 的石头新重量为 y-x。
+最后，最多只会剩下一块 石头。返回此石头 最小的可能重量 。如果没有石头剩下，就返回 0。
+
+*/
+class Solution1049 {
+public:
+    int lastStoneWeightII(vector<int>& stones) {
+        //这个重点是要转化成一个01背包问题，然后确定正确的初始值
+        //要返回最小的可能重量，就尽可能的以总重量的一半为约束，重量为最大化的代价
+        int half = 0;
+        for(int e:stones){
+            half+=e;
+        }
+        int sum = half;
+        half = half/2;
+        vector<vector<int>> dp(stones.size(),vector<int>(half+1,0));
+        for(int j = 0;j<=half;j++){
+            if (j>=stones[0])
+                dp[0][j] = stones[0];
+        }
+        for(int i = 0;i<stones.size();i++){
+            dp[i][0] = 0;
+            if (stones[i]<=half){
+                dp[i][stones[i]] = stones[i];
+            }
+        }
+
+        for(int i = 1;i<stones.size();i++){
+            for(int j = 1;j<=half;j++){
+                if (j<stones[i]){
+                    dp[i][j] = dp[i-1][j];
+                }
+                else{
+                    dp[i][j] = max(dp[i-1][j],dp[i-1][j-stones[i]]+stones[i]);
+                }
+            }
+        }
+
+        //61 57 40 35 32 27 
+        return abs(sum-2*dp[dp.size()-1][half]);
     }
 };
