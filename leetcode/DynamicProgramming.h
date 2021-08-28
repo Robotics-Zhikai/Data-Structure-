@@ -1478,6 +1478,20 @@ public:
         }
         return 0;
     }
+    int solveMethod3Review(int n){
+        vector<int> dp(n+1,0);
+        dp[1] = 1;
+        for(int i = 2;i<=n;i++){
+            int MIN = INT_MAX;
+            for(int j = 1;j*j<=i ;j++){
+                if (dp[i-j*j]+1<MIN){
+                    MIN = dp[i-j*j]+1;
+                }
+            }
+            dp[i] = MIN;
+        }
+        return dp[n];
+    }
     int numSquares(int n) {
         return solveMethod3(n);
         return solveMethod2(n);
@@ -1795,13 +1809,72 @@ public:
 		}
 		return dp[amount];
 	}
+    int solveMethod3Review(vector<int>& coins,int amount){
+        vector<int> dp(amount+1,-1);
+        dp[0] = 0;
+        for(int i = 0;i<coins.size();i++){
+            if (coins[i]<=amount) //注意这里容易出错
+                dp[coins[i]] = 1;
+        }
+        for(int i = 1;i<=amount;i++){
+            int MIN = INT_MAX;
+            for(int j = 0;j<coins.size();j++){
+                if (i>=coins[j]){
+                    if (dp[i-coins[j]]!=-1 && dp[i-coins[j]]+1<MIN){
+                        MIN = dp[i-coins[j]]+1;
+                    }
+                }
+            }
+            if (MIN == INT_MAX){
+                dp[i] = -1;
+            }
+            else{
+                dp[i] = MIN;
+            }
+        }
+        return dp[amount];
+    }
     int coinChange(vector<int>& coins, int amount) {
         return solveMethod3(coins,amount);
 		return solveMethod2(coins,amount);
     }
 };
 
+/*
+518. 零钱兑换 II
+给你一个整数数组 coins 表示不同面额的硬币，另给一个整数 amount 表示总金额。
 
+请你计算并返回可以凑成总金额的硬币组合数。如果任何硬币组合都无法凑出总金额，返回 0 。
+
+假设每一种面额的硬币有无限个。 
+
+题目数据保证结果符合 32 位带符号整数。
+*/
+class Solution518 {
+public:
+    int change(int amount, vector<int>& coins) {
+        //https://leetcode-cn.com/problems/coin-change-2/solution/ling-qian-dui-huan-ii-er-wei-zhuan-yi-we-4ywa/
+        //用上边的这个方法可以从二维降到一维
+        vector<vector<int>> dp(coins.size(),vector<int>(amount+1,0));
+        //dp[i][j]表示选前i个硬币，凑出金额为j的组合数量
+        for(int i = 0;i<=amount;i++){
+            if (i%coins[0]==0)
+                dp[0][i] = 1;
+        }
+        for(int i = 1;i<coins.size();i++){
+            for(int j = 0;j<=amount;j++){
+                dp[i][j] = dp[i-1][j]; //不选coins[i]
+                int selectcoins = coins[i];
+                while(j>=selectcoins){
+                    dp[i][j]+=dp[i-1][j-selectcoins]; //选大于等于1个coins[i]
+                    selectcoins+=coins[i]; //一定要注意这个递推式
+                }
+               // cout<<"dp["<<i<<"]["<<j<<"]"<<"="<<dp[i][j]<<endl;
+            }
+        }
+        return dp[coins.size()-1][amount];
+    }
+};
 
 /*
 416. 分割等和子集
@@ -2447,5 +2520,45 @@ public:
 
         //61 57 40 35 32 27 
         return abs(sum-2*dp[dp.size()-1][half]);
+    }
+};
+
+
+/*
+377. 组合总和 Ⅳ
+给你一个由 不同 整数组成的数组 nums ，和一个目标整数 target 。请你从 nums 中找出并返回总和为 target 的元素组合的个数。
+
+题目数据保证答案符合 32 位整数范围。
+*/
+class Solution377 {
+public:
+    // int res = 0;
+    // void DFS(vector<int>& nums,int index,int target,int&cur){
+    //     if (cur>target){
+    //         return;
+    //     }
+    //     if (cur==target){
+    //         res++;
+    //         return;
+    //     }
+    //     for(int i = index;i<nums.size();i++){
+    //         cur+=nums[i];
+    //         DFS(nums,index+1,target,cur);
+    //         cur-=nums[i];
+    //     }
+    // }
+    //不能用DFS，因为一个元素可能选择两次
+    int combinationSum4(vector<int>& nums, int target) {
+        vector<int> dp(target+1,0);//dp[i] 总和为i的元素组合的个数
+        dp[0] = 1;
+
+        for(int i = 1;i<=target;i++){
+            for(int e:nums){
+                if (e<=i){ //考虑是要求一个排列数，那么假设某一个数处于最后一位，枚举所有可能处在最后一位的数
+                    dp[i]+=dp[i-e];
+                }
+            }
+        }
+        return dp[target];
     }
 };
