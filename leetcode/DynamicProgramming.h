@@ -2928,3 +2928,63 @@ public:
         return s.size()-LCS+t.size()-LCS;
     }
 };
+
+
+/*
+72. 编辑距离
+给你两个单词 word1 和 word2，请你计算出将 word1 转换成 word2 所使用的最少操作数 。
+
+你可以对一个单词进行如下三种操作：
+
+插入一个字符
+删除一个字符
+替换一个字符
+*/
+
+class Solution72 {
+public:
+    int minDistance(string word1, string word2) {
+        if (word1.empty() || word2.empty()){
+            return abs((int)word1.size()-(int)word2.size());
+        }
+        vector<vector<int>> dp(word1.size(),vector<int>(word2.size(),0));
+        //dp[i][j]表示word1[0,i]和word2[0,j]的最少操作数
+        if(word1[0]==word2[0]){
+            dp[0][0] = 0;
+        }
+        else{
+            dp[0][0] = 1;
+        }
+
+        for(int i = 1;i<word2.size();i++){
+            if (word2[i]==word1[0]){ 
+                //这里的初始化一定要注意，等于的情况时直接赋值，不应该是dp[0][i] = dp[0][i-1]+1
+                dp[0][i] = i; //表示直接把他前边的都删掉
+            }
+            else{
+                dp[0][i] = dp[0][i-1]+1;
+            }
+        }
+        for(int i = 1;i<word1.size();i++){
+            if (word1[i]==word2[0]){
+                dp[i][0] = i;
+            }
+            else{
+                dp[i][0] = dp[i-1][0]+1;
+            }
+        }
+        for(int i = 1;i<word1.size();i++){
+            for(int j = 1;j<word2.size();j++){
+                if (word1[i]==word2[j]){
+                    //dp[i][j] = dp[i-1][j-1]; //这里的递推式一定要注意，容易出错
+                    dp[i][j] = min(min(dp[i-1][j]+1,dp[i][j-1]+1),dp[i-1][j-1]);
+                    //包括插入一个字符 删除一个字符 和替换一个字符
+                }
+                else{
+                    dp[i][j] = min(min(dp[i-1][j],dp[i][j-1]),dp[i-1][j-1])+1;
+                }
+            }
+        }
+        return dp[word1.size()-1][word2.size()-1];
+    }
+};
