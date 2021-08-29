@@ -2879,3 +2879,52 @@ public:
         return solveMethod2(s,t);
     }
 };
+
+
+/*
+583. 两个字符串的删除操作
+给定两个单词 word1 和 word2，找到使得 word1 和 word2 相同所需的最小步数，每步可以删除任意一个字符串中的一个字符。
+*/
+class Solution583 {
+public:
+    int minDistance(string word1, string word2) {
+        string s = word1;
+        string t = word2;
+        vector<vector<int>> dp(s.size(),vector<int>(t.size(),0));
+        //dp[i][j]表示s[0,i]和t[0,j]的最长公共子序列
+        for(int i = 0;i<t.size();i++){
+            if (s[0]==t[i]){
+                dp[0][i] = 1;
+            }
+            else{
+                if (i>0){
+                    dp[0][i] = dp[0][i-1];
+                }
+            }
+        }
+        for(int i = 0;i<s.size();i++){
+            if (s[i]==t[0]){
+                dp[i][0] = 1;
+            }
+            else{
+                if (i>0){
+                    dp[i][0] = dp[i-1][0];
+                }
+            }
+        }
+
+        for(int i = 1;i<s.size();i++){
+            for(int j = 1;j<t.size();j++){
+                if (s[i]==t[j]){
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }
+                else{
+                    dp[i][j] = max(dp[i-1][j],dp[i][j-1]);
+                }
+            }
+        }
+        int LCS = dp[s.size()-1][t.size()-1];
+        //关键是如何把原问题转化到最长公共子序列问题上
+        return s.size()-LCS+t.size()-LCS;
+    }
+};
