@@ -1731,7 +1731,33 @@ public:
 
 	//另一种动态规划的方法  没太看懂。。。。。。
 	*/
-
+    int solveMethod2Review(string s){
+        vector<vector<bool>> dp(s.size(),vector<bool>(s.size(),0));
+        for(int i = 0;i<s.size();i++){
+            dp[i][i] = 1;
+        }
+        for(int i = 0;i<s.size()-1;i++){
+            if (s[i]==s[i+1]){
+                dp[i][i+1] = 1;
+            }
+        }
+        for(int len = 3;len<=s.size();len++){
+            for(int i = 0;i<s.size()-(len-1);i++){
+                if (s[i]==s[i+len-1]&& dp[i+1][i+len-2]){
+                    dp[i][i+len-1] = 1;
+                }
+            }
+        }
+        int res = 0;
+        for(int i = 0;i<dp.size();i++){
+            for(int j = 0;j<dp[i].size();j++){
+                if (dp[i][j]==1){
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
     int countSubstrings(string s){
         return solveMethod2(s);
     }
@@ -2288,6 +2314,20 @@ public:
 */
 class Solution53 {
 public:
+    int review(vector<int>& nums){
+        vector<int> dp(nums.size(),0);
+        dp[0] = nums[0];
+        for(int i = 1;i<nums.size();i++){
+            dp[i] = max(nums[i],dp[i-1]+nums[i]);
+        }
+        int res = INT_MIN;
+        for(int e:dp){
+            if (e>res){
+                res = e;
+            }
+        }
+        return res;
+    }
     int maxSubArray(vector<int>& nums) {
         vector<int> dp(nums.size(),0);
         dp[0] = nums[0];
@@ -2705,5 +2745,50 @@ public:
             }
         }
         return res;
+    }
+};
+
+
+/*
+516. 最长回文子序列
+给你一个字符串 s ，找出其中最长的回文子序列，并返回该序列的长度。
+
+子序列定义为：不改变剩余字符顺序的情况下，删除某些字符或者不删除任何字符形成的一个序列。
+*/
+class Solution516 {
+public:
+    int longestPalindromeSubseq(string s) {
+        vector<vector<int>> dp(s.size(),vector<int>(s.size(),0));
+        for(int i = 0;i<s.size();i++){
+            dp[i][i] = 1;
+        }
+        for(int i = 0;i<s.size()-1;i++){
+            if (s[i]==s[i+1]){
+                dp[i][i+1] = 2;
+            }
+            else{
+                dp[i][i+1] = 1;
+            }
+        }
+        for(int len = 3;len<=s.size();len++){
+            for(int i = 0;i<s.size()-(len-1);i++){
+                if (s[i]==s[i+len-1]){
+                    dp[i][i+len-1] = dp[i+1][i+len-2]+2;
+                }
+                else{
+                    dp[i][i+len-1] = max(dp[i][i+len-2],dp[i+1][i+len-1]);
+                }
+            }
+        }
+        int res = INT_MIN;
+        for(int i = 0;i<dp.size();i++){
+            for(int j = 0;j<dp[i].size();j++){
+                if (dp[i][j]>res){
+                    res = dp[i][j];
+                }
+            }
+        }
+        return res;
+
     }
 };
