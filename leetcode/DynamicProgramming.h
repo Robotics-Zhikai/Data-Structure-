@@ -2636,3 +2636,74 @@ public:
         return dp[text1.size()-1][text2.size()-1];
     }
 };
+
+/*
+674. 最长连续递增序列
+给定一个未经排序的整数数组，找到最长且 连续递增的子序列，并返回该序列的长度。
+
+连续递增的子序列 可以由两个下标 l 和 r（l < r）确定，如果对于每个 l <= i < r，
+都有 nums[i] < nums[i + 1] ，那么子序列 [nums[l], nums[l + 1], ..., nums[r - 1], nums[r]] 就是连续递增子序列。
+
+*/
+class Solution674 {
+public:
+    int findLengthOfLCIS(vector<int>& nums) {
+        vector<int> dp(nums.size(),0);
+        dp[0] = 1;
+        for(int i = 1;i<nums.size();i++){
+            if (nums[i]>nums[i-1]){
+                dp[i] = dp[i-1]+1;
+            }
+            else{
+                dp[i] = 1;
+            }
+        }
+        int res = INT_MIN;
+        for(int i = 0;i<dp.size();i++){
+            if (dp[i]>res){
+                res = dp[i];
+            }
+        }
+        return res;
+    }
+};
+
+
+/*
+718. 最长重复子数组
+给两个整数数组 A 和 B ，返回两个数组中公共的、长度最长的子数组的长度。
+*/
+class Solution718 {
+public:
+    int findLength(vector<int>& nums1, vector<int>& nums2) {
+        //dp[i][j]表示nums1的以i结尾和nums2的以j结尾的最长公共子数组长度 注意跟最长公共子序列区分
+        vector<vector<int>> dp(nums1.size(),vector<int>(nums2.size(),0));
+        for(int i = 0;i<nums1.size();i++){
+            if (nums1[i]==nums2[0]){
+                dp[i][0] = 1;
+            }
+        }
+        for(int i = 0;i<nums2.size();i++){
+            if (nums1[0]==nums2[i]){
+                dp[0][i] = 1;
+            }
+        }
+        for(int i = 1;i<nums1.size();i++){
+            for(int j = 1;j<nums2.size();j++){
+                if (nums1[i]==nums2[j]){
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }
+            }
+        }
+
+        int res = INT_MIN;
+        for(int i = 0;i<dp.size();i++){
+            for(int j = 0;j<dp[i].size();j++){
+                if (dp[i][j]>res){
+                    res = dp[i][j];
+                }
+            }
+        }
+        return res;
+    }
+};
