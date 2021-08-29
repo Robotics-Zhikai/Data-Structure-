@@ -989,4 +989,37 @@ public:
 };
 
 
-
+/*
+剑指 Offer 06. 从尾到头打印链表
+输入一个链表的头节点，从尾到头反过来返回每个节点的值（用数组返回）。
+*/
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class SolutionOffer06 {
+public:
+    ListNode* reverse(ListNode* head){
+        if (head->next==nullptr){
+            return head;
+        }
+        ListNode* reverseTail = reverse(head->next);
+        reverseTail->next = head;
+        res.push_back(reverseTail->val);
+        return head;
+    }
+    vector<int> res;
+    vector<int> reversePrint(ListNode* head) {
+        if (head == nullptr){
+            return {};
+        }
+        ListNode* tail = reverse(head);
+        tail->next = nullptr;
+        res.push_back(tail->val);
+        return res;
+    }
+};
