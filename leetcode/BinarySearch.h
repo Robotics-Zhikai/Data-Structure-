@@ -110,6 +110,43 @@ public:
     }
 };
 
+/*
+剑指 Offer 11. 旋转数组的最小数字
+把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。
+输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。
+例如，数组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。  
+*/
+class SolutionOffer11 {
+public:
+    int review(vector<int>& numbers){
+        int left = 0;
+        int right = numbers.size()-1;
+        int mid = (left+right)/2;
+        while(left<right){
+            if (numbers[mid]>numbers[right]){
+                left = mid+1;
+            }
+            else if (numbers[mid]<numbers[right]){
+                right = mid;
+            }
+            else {
+                right--; //注意这个等于情况的处理
+            }
+            mid = (left+right)/2;
+        }
+        
+        return numbers[left];
+    }
+    int minArray(vector<int>& numbers) {
+        return review(numbers);
+        for (int i = 0;i<numbers.size()-1;i++){
+            if (numbers[i]>numbers[i+1]){
+                return numbers[i+1];
+            }
+        }
+        return numbers[0];
+    }
+};
 
 /*
 34. 在排序数组中查找元素的第一个和最后一个位置
