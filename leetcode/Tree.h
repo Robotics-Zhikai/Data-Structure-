@@ -1381,3 +1381,44 @@ public:
         }
     }
 };
+
+
+
+/*
+剑指 Offer 28. 对称的二叉树
+请实现一个函数，用来判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
+
+例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+*/
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class SolutionOffer28 {
+public:
+    bool recur(TreeNode* first,TreeNode* second){
+        if (first==nullptr && second==nullptr){
+            return 1;
+        }
+        else if (first==nullptr || second==nullptr){
+            return 0;
+        }
+        if (first->val == second->val){
+            if (recur(first->left,second->right) && recur(first->right,second->left)){
+                return 1;
+            }
+        }
+        return 0;
+    }
+    bool isSymmetric(TreeNode* root) {
+        if (root==nullptr){
+            return 1;
+        }
+        return recur(root->left,root->right);
+    }
+};
