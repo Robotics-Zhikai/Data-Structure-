@@ -1422,3 +1422,72 @@ public:
         return recur(root->left,root->right);
     }
 };
+
+
+
+/*
+剑指 Offer 54. 二叉搜索树的第k大节点
+给定一棵二叉搜索树，请找出其中第k大的节点。
+*/
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class SolutionOffer54 {
+public:
+    int num = 0;
+    int res = 0;
+    bool recur(TreeNode* root,int k){
+        if (root==nullptr){
+            return false;
+        }
+        if (recur(root->right,k)){
+            return true;
+        }
+        num++;
+        if (num == k){
+            res = root->val;
+            return true;
+        }
+        if (recur(root->left,k)){
+            return true;
+        }
+        return false;
+    }
+    int kthLargest(TreeNode* root, int k) {
+        recur(root,k);
+        return res;
+    }
+};
+
+
+/*
+剑指 Offer 68 - I. 二叉搜索树的最近公共祖先
+给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+
+百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，
+最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+
+*/
+class SolutionOffer68I {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (root==nullptr){
+            return nullptr;
+        }
+        if (root->val>p->val && root->val>q->val){
+            return lowestCommonAncestor(root->left,p,q);
+        }
+        else if (root->val<p->val && root->val<q->val){
+            return lowestCommonAncestor(root->right,p,q);
+        }
+        else{
+            return root;
+        }
+    }
+};
