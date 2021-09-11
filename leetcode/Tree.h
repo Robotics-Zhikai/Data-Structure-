@@ -1527,3 +1527,126 @@ public:
         return nullptr;
     }
 };
+
+/*
+剑指 Offer 37. 序列化二叉树
+请实现两个函数，分别用来序列化和反序列化二叉树。
+
+你需要设计一个算法来实现二叉树的序列化与反序列化。
+这里不限定你的序列 / 反序列化算法执行逻辑，
+你只需要保证一个二叉树可以被序列化为一个字符串并且将这个字符串反序列化为原始的树结构。
+
+提示：输入输出格式与 LeetCode 目前使用的方式一致，详情请参阅 LeetCode 序列化二叉树的格式。
+你并非必须采取这种方式，你也可以采用其他的方法解决这个问题。
+
+*/
+class CodecOffer37 {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if (root==nullptr){
+            return "";
+        }
+        queue<TreeNode*> que;
+        que.push(root);
+        vector<string> vecstr;
+        //搞成层序遍历
+        while(!que.empty()){
+            TreeNode* front = que.front();
+            que.pop();
+            if (front==nullptr){
+                vecstr.push_back(string("null"));
+                // cout<<"null"<<endl;
+            }
+            else{
+                vecstr.push_back(to_string(front->val));
+                // cout<<to_string(front->val)<<endl;
+                que.push(front->left);
+                que.push(front->right);
+            }
+        }
+        while(!vecstr.empty() && *(vecstr.end()-1)==string("null")){
+            vecstr.pop_back();
+        }
+        string res;
+        for(auto str:vecstr){
+            // cout<<str<<endl;
+            for(char c:str){
+                res.push_back(c);
+            }
+            res.push_back(',');
+        }
+        return res;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if (data.empty()){
+            return nullptr;
+        }
+        
+        vector<string> vecstr;
+        string cur;
+        for(char c:data){
+            if (c!=','){
+                cur.push_back(c);
+            }
+            else{
+                //cout<<cur<<endl;
+                vecstr.push_back(cur);
+                cur.clear();
+            }
+        } 
+        vector<TreeNode*> vecnode;
+        for(auto str:vecstr){
+            if (str==string("null")){
+                vecnode.push_back(nullptr);
+            }
+            else{
+                vecnode.push_back(new TreeNode(atoi(str.c_str())));
+            }
+        }
+
+        int validIndex = 0;
+        int childIndex = 1;
+        //这里还是用双指针的方法解决的
+        for(validIndex=0;validIndex<vecnode.size();validIndex++){
+            
+            if (vecnode[validIndex]==nullptr){
+                // cout<<"null"<<endl;
+                continue;
+            }
+            // cout<<vecnode[validIndex]->val<<endl;
+            if (childIndex<vecnode.size()){
+                vecnode[validIndex]->left = vecnode[childIndex];
+                childIndex++;
+            }
+            if (childIndex<vecnode.size()){
+                vecnode[validIndex]->right = vecnode[childIndex];
+                childIndex++;
+            }
+        }
+
+        //不要用完全二叉树判断下标，是不行的
+        // for(int i = 0;i<vecnode.size();i++){
+        //     if (vecnode[i]==nullptr){
+        //         continue;
+        //     }
+        //     //cout<<vecnode[i]->val<<endl;
+        //     int lchild = i*2+1;
+        //     if (lchild<vecnode.size()){
+        //         vecnode[i]->left = vecnode[lchild];
+        //     }
+        //     int rchild = lchild+1;
+        //     if (rchild<vecnode.size()){
+        //         vecnode[i]->right = vecnode[rchild];
+        //     }
+        // }
+        return vecnode[0];
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec;
+// codec.deserialize(codec.serialize(root));
