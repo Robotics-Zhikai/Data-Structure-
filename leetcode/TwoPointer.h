@@ -649,3 +649,42 @@ public:
         return res;
     }
 };
+
+
+/*
+209. 长度最小的子数组
+给定一个含有 n 个正整数的数组和一个正整数 target 。
+
+找出该数组中满足其和 ≥ target 的长度最小的 连续子数组 [numsl, numsl+1, ..., numsr-1, numsr] ，
+并返回其长度。如果不存在符合条件的子数组，返回 0 。
+
+*/
+
+class Solution209 {
+public:
+    int minSubArrayLen(int target, vector<int>& nums) {
+        //n的时间复杂度 滑动窗口 双指针 先不断增大 然后再不断减小 右边界负责增大 左边界负责减小
+        int left = 0;
+        int right = 0;
+        int res = INT_MAX;
+
+        int sum = 0;
+
+        while(right<nums.size() && left<=right){
+            while(right<nums.size() && sum<target){
+                sum+=nums[right++];
+            }
+
+            while(left<=right && sum>=target){
+            
+                if (right-left < res){
+                    res = right-left;
+                }
+                sum-=nums[left++];
+            }
+        }
+        return res==INT_MAX?0:res;
+        
+        
+    }
+};
