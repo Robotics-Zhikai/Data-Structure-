@@ -882,6 +882,38 @@ public:
 		return findkbig(nums, k);
 
 	}
+	
+	int review(vector<int>& nums,int k){
+        return nums[recur(nums,0,nums.size(),k)];
+    }
+    int recur(vector<int>& nums,int left,int right,int k){
+        if (left>=right){
+            return -1;
+        }
+        int pivot = nums[left];
+        int leftindex = left+1;
+        int rightindex = right-1;
+        while(leftindex<=rightindex){
+            if (nums[rightindex]<=pivot){
+                swap(nums[leftindex++],nums[rightindex]);
+            }
+            else{
+                rightindex--;
+            }
+        }
+        
+        swap(nums[left],nums[rightindex]);
+        if(nums.size()-rightindex == k){
+            return rightindex;
+        }
+        else if(nums.size()-rightindex>k){
+            return recur(nums,rightindex+1,right,k);
+        }
+        else {
+            return recur(nums,left,rightindex,k);
+        }
+    }
+
 
 	int findkbig(vector<int> &num, int k)
 	{
