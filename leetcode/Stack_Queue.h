@@ -442,6 +442,29 @@ public:
         }
         return res;
     }
+    vector<int> solveMethod2Review(vector<int>& temperatures){
+        vector<int> res(temperatures.size(),0);
+        stack<int> staindex;
+        for(int i = 0;i<temperatures.size();i++){
+            if (staindex.empty()){
+                staindex.push(i);
+            }
+            else{
+                if (temperatures[i]<=temperatures[staindex.top()]){
+                    staindex.push(i);
+                }
+                else{
+                    while(!staindex.empty() && temperatures[i]>temperatures[staindex.top()]){
+                        int top = staindex.top();
+                        res[top] = i-top;
+                        staindex.pop();
+                    }
+                    staindex.push(i);
+                }
+            }
+        }
+        return res;
+    }
     vector<int> dailyTemperatures(vector<int>& temperatures) {
         return solveMethod2(temperatures);
     }
