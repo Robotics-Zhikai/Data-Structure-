@@ -147,3 +147,87 @@ public:
         return solveMethod2(nums);
     }
 };
+
+
+/*
+621. 任务调度器
+给你一个用字符数组 tasks 表示的 CPU 需要执行的任务列表。
+其中每个字母表示一种不同种类的任务。任务可以以任意顺序执行，并且每个任务都可以在 1 个单位时间内执行完。
+在任何一个单位时间，CPU 可以完成一个任务，或者处于待命状态。
+
+然而，两个 相同种类 的任务之间必须有长度为整数 n 的冷却时间，
+因此至少有连续 n 个单位时间内 CPU 在执行不同的任务，或者在待命状态。
+
+你需要计算完成所有任务所需要的 最短时间 。
+
+*/
+class Solution621 {
+public:
+    int wrongMethod1(vector<char>& tasks,int n){
+        //错误的解法，想法是不考虑剩余有多少任务，就是单纯的不同任务一个一个完成，然后采用模拟的方法
+        map<char,int> MAPcount;
+        map<char,int> MAPlastOccur;
+        for(char c:tasks){
+            MAPcount[c]++;
+            MAPlastOccur[c] = -1;
+        }
+
+        int time = 0;
+        int countZero = 0;
+        while(countZero!=MAPcount.size()){
+            countZero = 0;
+            for(auto & ele:MAPcount){
+                if (ele.second==0){
+                    countZero++;
+                    continue;
+                }
+                while(1){
+                    time++;
+                    if (ele.second>0){
+                        if (MAPlastOccur[ele.first]==-1 || time-MAPlastOccur[ele.first]>n){
+                            ele.second--;
+                            MAPlastOccur[ele.first] = time;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return time;
+    }
+    int solveMethod2(vector<char>& tasks,int n){
+        //证明了一定存在一种总时间最少的方法，是通过不断地选择不在冷却中并且剩余执行次数最多的那个任务得到的
+        map<char,int> MAPcount;
+        map<char,int> MAPNexti;
+        for(char c:tasks){
+            MAPcount[c]++;
+            MAPNexti[c] = 1;
+        }
+        int time = 0;
+        int zeroCount = 0;
+        while(zeroCount!=MAPcount.size()){
+            time++;
+            int MAXcount = INT_MIN;
+            char MAXindex = 0;
+            zeroCount = 0;
+            for(auto & ele:MAPcount){
+                if (ele.second==0){
+                    zeroCount++;
+                    continue;
+                }
+                if (ele.second>0 && ele.second>MAXcount && MAPNexti[ele.first]<=time){
+                    MAXcount = ele.second;
+                    MAXindex = ele.first;
+                }
+            }
+            if (MAXindex!=0){
+                MAPcount[MAXindex]--;
+                MAPNexti[MAXindex] = time+n+1;
+            }
+        }
+        return time-1;
+    }
+    int leastInterval(vector<char>& tasks, int n) {
+        return solveMethod2(tasks,n);
+    }
+};
