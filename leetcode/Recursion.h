@@ -386,6 +386,52 @@ public:
         }
         return res;
     }
+
+    string review(string s){
+        stack<char> Sta;
+        stack<char> Statmp;
+        for(char c:s){
+            if (c!=']'){
+                Sta.push(c);
+            }
+            else{
+                while(Sta.top()!='['){
+                    Statmp.push(Sta.top());
+                    Sta.pop();
+                }
+                Sta.pop(); //弹出'['
+
+                string NUMstr;
+                while(!Sta.empty() && Sta.top()>='0' && Sta.top()<='9'){
+                    NUMstr.push_back(Sta.top());
+                    Sta.pop();
+                }
+                reverse(NUMstr.begin(),NUMstr.end());
+                int num = atoi(NUMstr.c_str());//弹出重复次数
+
+                string strtmp;
+                while(!Statmp.empty()){
+                    strtmp.push_back(Statmp.top());
+                    Statmp.pop();
+                }
+                for(int i = 0;i<num;i++){
+                    for(char c1:strtmp){
+                        Sta.push(c1);
+                    }
+                }
+            }
+        }
+        while(!Sta.empty()){
+            Statmp.push(Sta.top());
+            Sta.pop();
+        }
+        string res;
+        while(!Statmp.empty()){
+            res.push_back(Statmp.top());
+            Statmp.pop();
+        }
+        return res;
+    }
     
     string decodeString(string s) {
         return solveMethod2(s);
