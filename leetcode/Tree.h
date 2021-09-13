@@ -1650,3 +1650,44 @@ public:
 // Your Codec object will be instantiated and called as such:
 // Codec codec;
 // codec.deserialize(codec.serialize(root));
+
+
+/*
+111. 二叉树的最小深度
+给定一个二叉树，找出其最小深度。
+
+最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+
+说明：叶子节点是指没有子节点的节点。
+
+*/
+class Solution111 {
+public:
+    //也可以用广度优先搜索，最先搜到的叶子节点的深度最小
+    int MIN = INT_MAX;
+    int res = 0;
+    void recur(TreeNode* root){
+        if (root==nullptr){
+            return;
+        }
+        res++;
+        if (root->left==nullptr && root->right==nullptr){
+            if (res<MIN){
+                MIN = res;
+            }
+        }
+        else{
+            recur(root->left);
+            recur(root->right);
+        }
+        res--;
+    }
+
+    int minDepth(TreeNode* root) {
+        if (root==nullptr){
+            return 0;
+        }
+        recur(root);
+        return MIN;
+    }
+};
