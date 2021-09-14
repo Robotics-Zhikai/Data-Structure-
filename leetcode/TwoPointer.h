@@ -180,6 +180,33 @@ public:
 
 class Solution3 {
 public:
+    int review(string s){
+        if (s.empty()){
+            return 0;
+        }
+        int left = 0;
+        int right = 0;
+        unordered_set<char> SET;
+        int res = INT_MIN;
+
+        while(right<s.size()){
+            while(right<s.size() && SET.find(s[right])==SET.end()){
+                SET.insert(s[right]);
+                right++;
+            }
+            res = max(res,right-left);
+            if(right<s.size()){
+                while(SET.find(s[right])!=SET.end()){
+                    SET.erase(s[left]);
+                    left++;
+                }
+                SET.insert(s[right]);
+                right++;
+                res = max(res,right-left);
+            }
+        }
+        return res;
+    }
     int lengthOfLongestSubstring(string s) { //一遍过，一开始想的就是双指针的方法
         if (s.empty())
             return 0;
