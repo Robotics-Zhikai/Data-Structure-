@@ -686,6 +686,43 @@ public:
 
 		return merge_TWO_Lists(leftnodeptr, rightnodeptr);
 	}
+
+
+	ListNode* mergeTWOreview(ListNode* L,ListNode* R){
+        if (L==nullptr && R==nullptr){
+            return nullptr;
+        }
+        else if (L==nullptr){
+            return R;
+        }
+        else if (R == nullptr){
+            return L;
+        }
+
+        if (L->val<=R->val){
+            L->next = mergeTWOreview(L->next,R);
+            return L;
+        }
+        else{
+            R->next = mergeTWOreview(L,R->next);
+            return R;
+        }
+
+    }
+    ListNode* mergeKListsReview(vector<ListNode*>& lists,int L,int R) {
+        if (L==R){
+            return nullptr;
+        }
+        if (L+1==R){
+            return lists[L];
+        }
+        if (L+2==R){
+            return mergeTWOreview(lists[L],lists[L+1]);
+        }
+
+        return mergeTWOreview( mergeKListsReview(lists,L,(R+L)/2),mergeKListsReview(lists,(L+R)/2,R) );
+    }
+	
 	ListNode* mergeKLists(vector<ListNode*>& lists) {
 
 		return divide(lists);
