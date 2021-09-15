@@ -105,3 +105,45 @@ public:
 
     }
 };
+
+
+/*
+912. 排序数组
+给你一个整数数组 nums，请你将该数组升序排列。
+
+快速排序
+*/
+class Solution912 {
+public:
+    void sortsub(vector<int>& nums,int L,int R){
+        if (L==R){
+            return;
+        }
+        int pivot = nums[L];
+        int left = L+1;
+        int right = R-1;
+        while(left<=right){
+            if (nums[left]>pivot){
+                swap(nums[left],nums[right]);
+                right--;
+            }
+            else if (nums[left]<=pivot){
+                left++;
+            }
+            else if (nums[right]<pivot){
+                swap(nums[left],nums[right]);
+                left++;
+            }
+            else if (nums[right]>=pivot){
+                right--;
+            }
+        }
+        swap(nums[L],nums[right]);
+        sortsub(nums,L,right);
+        sortsub(nums,right+1,R);
+    }
+    vector<int> sortArray(vector<int>& nums) {
+        sortsub(nums,0,nums.size());
+        return nums;
+    }
+};
