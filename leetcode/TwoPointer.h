@@ -513,6 +513,31 @@ public:
 //如果不做的话可能面试时候想不到，因此要多复习这里的思路
 class Solution31 {
 public:
+    void review(vector<int>& nums){
+        int guaiindex = 0;
+        for(int i = nums.size()-1;i>0;i--){
+            if (nums[i-1]<nums[i]){
+                guaiindex = i;
+                break;
+            }
+        }
+        if (guaiindex==0){
+            reverse(nums.begin(),nums.end());
+        }
+        else{
+            int swapindex = guaiindex;
+            for(int i = guaiindex;i<nums.size();i++){
+                if (nums[i]>nums[guaiindex-1]){
+                    swapindex = i;
+                }
+                else{
+                    break;
+                }
+            }
+            swap(nums[swapindex],nums[guaiindex-1]);
+            reverse(nums.begin()+guaiindex,nums.end());
+        }
+    }
     void nextPermutation(vector<int>& nums) {
         int index = -1;
         for(int i = nums.size()-2;i>=0;i--){
