@@ -1691,3 +1691,50 @@ public:
         return MIN;
     }
 };
+
+
+/*
+103. 二叉树的锯齿形层序遍历
+给定一个二叉树，返回其节点值的锯齿形层序遍历。（即先从左往右，再从右往左进行下一层遍历，以此类推，层与层之间交替进行）。
+*/
+
+class Solution103 {
+public:
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        if (root==nullptr){
+            return {};
+        }
+        queue<TreeNode*> que;
+        
+        que.push(root);
+        int level = 0;
+
+        int numcur = 1;
+        vector<vector<int>> res;
+
+        while(!que.empty()){
+            level++;
+            int levelnum = numcur;
+            numcur = 0;
+            vector<int> curvec;
+            for(int i = 0;i<levelnum;i++){
+                TreeNode* front = que.front();
+                que.pop();
+                curvec.push_back(front->val);
+                if (front->right!=nullptr){
+                    que.push(front->right);
+                    numcur++;
+                }
+                if (front->left!=nullptr){
+                    que.push(front->left);
+                    numcur++;
+                }
+            }
+            if (level%2==1){
+                reverse(curvec.begin(),curvec.end());
+            }
+            res.push_back(curvec);
+        }
+        return res;
+    }
+};
