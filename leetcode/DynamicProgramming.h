@@ -929,6 +929,37 @@ public:
         }
         return sum;
     }
+    int MyselfReview(vector<int>& height){
+        int curLeft = 0;
+        int splitWater = 0;
+        int res = 0;
+        for(int i = 1;i<height.size();i++){
+            if (height[i]>=height[curLeft]){
+                curLeft = i;
+                res+=splitWater;
+                splitWater = 0;
+            }
+            else{
+                splitWater+=height[curLeft]-height[i];
+            }
+        }
+        if(curLeft!=height.size()-1){
+            int storage = curLeft;
+            curLeft = height.size()-1;
+            splitWater = 0;
+            for(int i = curLeft-1;i>=storage;i--){
+                if (height[i]>=height[curLeft]){
+                    curLeft = i;
+                    res+=splitWater;
+                    splitWater = 0;
+                }
+                else{
+                    splitWater+=height[curLeft]-height[i];
+                }
+            }
+        }
+        return res;
+    }
     int Twoptr(vector<int>& height) //双指针的方法
     {
         int ans = 0;
