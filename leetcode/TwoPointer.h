@@ -740,3 +740,52 @@ public:
         
     }
 };
+
+
+/*
+349. 两个数组的交集
+给定两个数组，编写一个函数来计算它们的交集。
+
+*/
+class Solution349 {
+public:
+    vector<int> solveMethod1(vector<int>& nums1, vector<int>& nums2) {
+        unordered_set<int> SET1;
+        unordered_set<int> SET2;
+        for(int n:nums1){
+            SET1.insert(n);
+        }
+        for(int n:nums2){
+            SET2.insert(n);
+        }
+        vector<int> res;
+        for(int n:SET1){
+            if (SET2.find(n)!=SET2.end()){
+                res.push_back(n);
+            }
+        }
+        return res;
+    }
+    vector<int> solveMethod2(vector<int>& nums1, vector<int>& nums2) {
+        sort(nums1.begin(),nums1.end());
+        sort(nums2.begin(),nums2.end());
+        int pointer1 = 0;
+        int pointer2 = 0;
+        vector<int> res;
+        while(pointer2<nums2.size() && pointer1<nums1.size()){
+            bool flag = 0;
+            while(pointer1<nums1.size() && nums1[pointer1]<=nums2[pointer2]){
+                if (nums1[pointer1]==nums2[pointer2] && !flag){
+                    flag = 1;
+                    res.push_back(nums2[pointer2]);
+                }
+                pointer1++;
+            }
+            pointer2++;
+        }
+        return res;
+    }
+    vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+        return solveMethod2(nums1,nums2);
+    }
+};
