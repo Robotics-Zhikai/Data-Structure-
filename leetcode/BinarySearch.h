@@ -105,10 +105,44 @@ public:
         
         return -1;
     }
+
+    int review(vector<int>& nums, int target) {
+        //逐一枚举就行 注意要利用nums中各元素互不相同这一条件
+        int left = 0;
+        int right = nums.size()-1;
+        while(left<=right){
+            int mid = (left+right)/2;
+            if (nums[mid] == target){
+                return mid;
+            }
+            else if (nums[mid]>=nums[0] && nums[mid]<target){
+                left = mid + 1;
+            }
+            else if (nums[mid]>target && target>=nums[0]){
+                right = mid - 1;
+            }
+            else if (nums[mid]<nums[0] && target>=nums[0]){
+                right = mid - 1;
+            }
+            else if (target<nums[0] && nums[mid]<target){
+                left = mid + 1;
+            }
+            else if (target<nums[0] && nums[mid]>=nums[0]){
+                left = mid + 1;
+            }
+            else if (target<nums[0] && nums[mid]>target){
+                right = mid - 1;
+            }
+        }
+        return -1;
+    }
+
     int search(vector<int>& nums, int target) {
         return solveMethod2(nums,target);
     }
 };
+
+
 
 /*
 剑指 Offer 11. 旋转数组的最小数字
