@@ -392,7 +392,7 @@ public:
         }
         return dp[grid.size()-1][grid[0].size()-1];
     }
-    
+
 	int inf = 99999;
 	int minPathSum(vector<vector<int>>& grid) {
 		if (grid.empty())
@@ -2416,6 +2416,22 @@ public:
  */
 class Solution124 {
 public:
+    int DFSreview(TreeNode* root){
+        if (root==nullptr){
+            return 0;
+        }
+        
+        int left = DFSreview(root->left);
+        int right = DFSreview(root->right);
+        int cur = max(max(max(left+right+root->val,root->val),left+root->val),right+root->val);
+        MAX = max(cur,MAX);
+        return max(max(left,right)+root->val,root->val);
+    }
+    int review(TreeNode* root){
+        DFSreview(root);
+        return MAX;
+    }
+    
     int MAX = INT_MIN;
     void DFS(TreeNode * root){
         //这个可以类比最大子序和的动态规划
