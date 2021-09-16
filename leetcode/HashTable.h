@@ -677,3 +677,66 @@ public:
         return true;
     }
 };
+
+
+/*
+73. 矩阵置零
+给定一个 m x n 的矩阵，如果一个元素为 0 ，则将其所在行和列的所有元素都设为 0 。请使用 原地 算法。
+
+进阶：
+
+一个直观的解决方案是使用  O(mn) 的额外空间，但这并不是一个好的解决方案。
+一个简单的改进方案是使用 O(m + n) 的额外空间，但这仍然不是最好的解决方案。
+你能想出一个仅使用常量空间的解决方案吗？
+*/
+class Solution73 {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        bool firstcolZero = 0;
+        bool firstrowZero = 0;
+        for(int i=0;i<matrix.size();i++){
+            if (matrix[i][0]==0){
+                firstcolZero = 1;
+                break;
+            }
+        }
+        for(int j = 0;j<matrix[0].size();j++){
+            if (matrix[0][j]==0){
+                firstrowZero = 1;
+                break;
+            }
+        }
+        for(int i = 1;i<matrix.size();i++){
+            for(int j = 1;j<matrix[i].size();j++){
+                if (matrix[i][j]==0){
+                    matrix[i][0] = 0;//矩阵的第一行和第一列分别负责标记对应的列和行是否是0
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+        for(int i=1;i<matrix.size();i++){
+            if (matrix[i][0]==0){
+                for(int j = 1;j<matrix[i].size();j++){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        for(int j = 1;j<matrix[0].size();j++){
+            if (matrix[0][j]==0){
+                for(int i = 1;i<matrix.size();i++){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        if (firstcolZero){
+            for(int i = 0;i<matrix.size();i++){
+                matrix[i][0] = 0;
+            }
+        }
+        if (firstrowZero){
+            for(int j = 0;j<matrix[0].size();j++){
+                matrix[0][j] = 0;
+            }
+        }
+    }
+};
