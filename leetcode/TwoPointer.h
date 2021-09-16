@@ -789,3 +789,57 @@ public:
         return solveMethod2(nums1,nums2);
     }
 };
+
+/*
+18. 四数之和
+给你一个由 n 个整数组成的数组 nums ，和一个目标值 target 。
+请你找出并返回满足下述全部条件且不重复的四元组 [nums[a], nums[b], nums[c], nums[d]] ：
+
+0 <= a, b, c, d < n
+a、b、c 和 d 互不相同
+nums[a] + nums[b] + nums[c] + nums[d] == target
+你可以按 任意顺序 返回答案 。
+
+*/
+class Solution18 {
+public:
+    vector<vector<int>> fourSum(vector<int>& nums, int target) {
+        if (nums.size()<4){
+            return {};
+        }
+        sort(nums.begin(),nums.end());
+        vector<vector<int>> res;
+        for(int i = 0;i<nums.size()-3;i++){
+            if (i>0 && nums[i]==nums[i-1]){
+                continue;
+            }
+            for(int j = i+1;j<nums.size()-2;j++){
+                if (j>i+1 && nums[j]==nums[j-1]){
+                    continue;
+                }
+                int newtarget = target-(nums[i]+nums[j]);
+                int left = j+1;
+                int right = nums.size()-1;
+                
+                while(left<right){
+                    if (nums[left]+nums[right]<newtarget){
+                        left++;
+                    }
+                    else if (nums[left]+nums[right]>newtarget){
+                        right--;
+                    }
+                    else{
+                        if (left>j+1 && nums[left]==nums[left-1] && right<nums.size()-1 && nums[right]==nums[right+1]){
+                        }
+                        else{
+                            res.push_back(vector<int>{nums[i],nums[j],nums[left],nums[right]});
+                        }
+                        left++;
+                        right--;
+                    }
+                }
+            }
+        }
+        return res;
+    }
+};
