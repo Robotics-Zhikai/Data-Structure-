@@ -314,6 +314,27 @@ public:
         }
         return res;
     }
+    int review(vector<int>& nums){
+        if (nums.empty()){
+            return 0;
+        }
+        unordered_set<int> SET;
+        for(int n:nums){
+            SET.insert(n);
+        }
+        int res = INT_MIN;
+        for(int n:SET){
+            if (SET.find(n-1)!=SET.end()){
+                continue;
+            }
+            int i = 1;
+            while(SET.find(n+i)!=SET.end()){
+                i++;
+            }
+            res = max(res,i);
+        }
+        return res;
+    }
     int longestConsecutive(vector<int>& nums) {
         return solveMethod4(nums);
         return solveMethod3(nums);
