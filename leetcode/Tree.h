@@ -1738,3 +1738,96 @@ public:
         return res;
     }
 };
+
+
+/*
+820. 单词的压缩编码
+单词数组 words 的 有效编码 由任意助记字符串 s 和下标数组 indices 组成，且满足：
+
+words.length == indices.length
+助记字符串 s 以 '#' 字符结尾
+对于每个下标 indices[i] ，s 的一个从 indices[i] 开始、到下一个 '#' 字符结束（但不包括 '#'）的 子字符串 恰好与 words[i] 相等
+给你一个单词数组 words ，返回成功对 words 进行编码的最小助记字符串 s 的长度 。
+*/
+//就是一个前缀树
+
+
+class Solution820 {
+private:
+
+class node{
+private:
+    node* children[26];
+public:
+    bool endofword = 0;
+    int level = 0;
+    bool isleaf = 1;
+    node(){
+        for(int i = 0;i<26;i++){
+            children[i] = nullptr;
+        }
+    }
+    node* putchild(char c,bool endofword){
+        isleaf = 0;
+        int index = c-'a';
+        if (children[index]!=nullptr){
+            children[index]->endofword = endofword; 
+        }
+        else{
+            children[index] = new node;
+            children[index]->endofword = endofword;
+            children[index]->level = level+1;
+        }
+        return children[index];
+    }
+};
+
+public:
+    int solveMethod1(vector<string>& words){
+        set<string> SET;
+        for(string& str:words){
+            SET.insert(str);
+        }
+        for(const string& str:SET){
+            for(int i = 1;i<str.size();i++){
+                string substr = str.substr(i,str.size()-i);
+                if (SET.count(substr)==1){
+                    SET.erase(substr);
+                }
+            }
+        }
+        int res = 0;
+        for(const string& str:SET){
+            res+=str.size();
+            res++;
+        }
+        return res;
+    }
+    
+
+    int solveMethod2(vector<string>& words){
+        node * head = new node;
+        unordered_set<node*> SET;
+        for(string& str:words){
+            node* cur = head;
+            for(int i = str.size()-1;i>0;i--){
+                cur = cur->putchild(str[i],0);
+            }
+            if (str.size()>0){
+                cur = cur->putchild(str[0],1);
+            }
+            SET.insert(cur); //插入单词的最后字符所在的node*
+        }
+        int res = 0;
+        for(node* ele:SET){
+            if (ele->isleaf){
+                res+=ele->level;
+                res++;
+            }
+        }
+        return res;
+    }
+    int minimumLengthEncoding(vector<string>& words) {
+        return solveMethod2(words);
+    }
+};
