@@ -610,6 +610,52 @@ public:
 
 class Solution20 {
 public:
+
+    bool isValidreview(string s) {
+        stack<char> sta;
+        for(char c:s){
+            if (c!=')' && c!=']' && c!='}'){
+                sta.push(c);
+            }
+            else{
+                if (c==')'){
+                    while(!sta.empty() && sta.top()!='('){
+                        if (sta.top()=='[' || sta.top()=='{'){
+                            return 0;
+                        }
+                        sta.pop();
+                    }
+                }
+                else if (c==']'){
+                    while(!sta.empty() && sta.top()!='['){
+                        if (sta.top()=='(' || sta.top()=='{'){
+                            return 0;
+                        }
+                        sta.pop();
+                    }
+                }
+                else if (c=='}'){
+                    while(!sta.empty() && sta.top()!='{'){
+                        if (sta.top()=='(' || sta.top()=='['){
+                            return 0;
+                        }
+                        sta.pop();
+                    }
+                }
+                if (sta.empty()){
+                    return 0;
+                }
+                sta.pop();
+            }
+        }
+        if (sta.empty()){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+
     bool isValid(string s) {
         stack<char> sta;
         //如果s的长度为奇数的话，直接返回false，这样也算是一种剪枝
