@@ -90,3 +90,35 @@ public:
         return ' ';
     }
 };
+
+
+/*
+14. 最长公共前缀
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 ""。
+*/
+class Solution14 {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        if (strs.empty()){
+            return "";
+        }
+        if (strs.size()==1){
+            return strs[0];
+        }
+        int index = 0;
+        while(1){
+            int i = 1;
+            for(;i<strs.size();i++){
+                if (index>=strs[i].size() || strs[i][index]!=strs[i-1][index]){
+                    break;
+                }
+            }
+            if (i!=strs.size()){
+                return strs[0].substr(0,index);
+            }
+            index++;
+        }
+    }
+};
