@@ -1152,3 +1152,48 @@ public:
         return PrevFIRST;
     }
 };
+
+
+/*
+82. 删除排序链表中的重复元素 II
+存在一个按升序排列的链表，给你这个链表的头节点 head ，请你删除链表中所有存在数字重复情况的节点，
+只保留原始链表中 没有重复出现 的数字。
+
+返回同样按升序排列的结果链表。
+*/
+class Solution82 {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if (head==nullptr){
+            return head;
+        }
+        ListNode* res = head;
+
+        ListNode* prev = nullptr;
+        ListNode* mid = head;
+        ListNode* next = mid->next;
+
+        while(next!=nullptr){
+            while(next!=nullptr && mid->val==next->val){
+                next = next->next;
+            }
+            if (next!=mid->next){
+                if (prev==nullptr){
+                    res = next;
+                }
+                else{
+                    prev->next = next;
+                }
+                mid = next;
+                next = mid==nullptr?nullptr:mid->next;
+            }
+            else{
+                prev = mid;
+                mid = next;
+                next = next->next;
+            }
+        }
+        return res;
+
+    }
+};
