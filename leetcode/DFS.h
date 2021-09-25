@@ -237,3 +237,47 @@ private:
     int Count = 0;
 };
 
+/*
+329. 矩阵中的最长递增路径
+给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。
+
+对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
+*/
+class Solution329 {
+public:
+    int res = INT_MIN;
+    //有了下边的这个lower，很容易编写代码
+    int DFS(vector<vector<int>>& storage,vector<vector<int>>& matrix,int i,int j,int lower){
+        //DFS返回值的含义就是最长递增路径
+        if (i<0 || i>=matrix.size() || j<0 || j>=matrix[0].size()){
+            return 0;
+        }
+        if (matrix[i][j]<=lower){
+            return 0;
+        }
+        int thismax = 0;
+        if (storage[i][j]==-1){
+            thismax = max(max(DFS(storage,matrix,i+1,j,matrix[i][j]),DFS(storage,matrix,i-1,j,matrix[i][j]))
+        ,max(DFS(storage,matrix,i,j+1,matrix[i][j]),DFS(storage,matrix,i,j-1,matrix[i][j])))+1;
+            storage[i][j] = thismax;
+        }
+        else{
+            thismax = storage[i][j];
+        }
+        res = max(res,thismax);
+        return thismax;
+    }
+    int longestIncreasingPath(vector<vector<int>>& matrix) {
+        // vector<vector<bool>> isvisit(matrix.size(),vector<int>(matrix[0].size(),0));
+        //因为是最长递增路径，所以不可能出现搜索路径交叉的情况
+        vector<vector<int>> storage(matrix.size(),vector<int>(matrix[0].size(),-1));//记忆化搜索
+        for(int i = 0;i<matrix.size();i++){
+            for(int j = 0;j<matrix[i].size();j++){
+                if (storage[i][j]==-1){ //这又剪枝了很多
+                    DFS(storage,matrix,i,j,INT_MIN);
+                }
+            }
+        }
+        return res;
+    }
+};
