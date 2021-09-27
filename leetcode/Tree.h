@@ -1831,3 +1831,82 @@ public:
         return solveMethod2(words);
     }
 };
+
+
+/*
+1302. 层数最深叶子节点的和
+给你一棵二叉树的根节点 root ，请你返回 层数最深的叶子节点的和 。
+*/
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution1302 {
+public:
+    int maxlevel = INT_MIN;
+    int res = 0;
+    void DFSlevel(TreeNode* root,int&level){
+        if (root==nullptr){
+            return;
+        }
+        level++;
+        maxlevel = max(level,maxlevel);
+        DFSlevel(root->left,level);
+        DFSlevel(root->right,level);
+        level--;
+    }
+    void DFS(TreeNode* root,int & level){
+        if (root==nullptr){
+            return;
+        }
+        level++;
+        if (level==maxlevel){
+            res+=root->val;
+        }
+        DFS(root->left,level);
+        DFS(root->right,level);
+        level--;
+    }
+
+    int solveMethod1(TreeNode* root){ //这个得扫两遍，太低效了
+        int level = 0;
+        DFSlevel(root,level);
+        DFS(root,level);
+        return res;
+    }
+
+    int maxdepth = 0;
+    int originnum = 0;
+    void DFSmethod2(TreeNode* root,int & level){
+        if (root==nullptr){
+            return;
+        }
+        level++;
+        if (level>maxdepth){
+            maxdepth = level;
+            originnum = root->val;
+        }
+        else if (level==maxdepth){
+            originnum+=root->val;
+        }
+        DFSmethod2(root->left,level);
+        DFSmethod2(root->right,level);
+        level--;
+    }
+    int solveMethod2(TreeNode* root){
+        int level = 0;
+        DFSmethod2(root,level);
+        return originnum;
+    }
+
+    int deepestLeavesSum(TreeNode* root) {
+        return solveMethod2(root);
+    }
+};
