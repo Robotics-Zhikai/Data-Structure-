@@ -8,6 +8,95 @@
 //https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/
 class Solution4 {
 public:
+
+	double solveMethod1review(vector<int>& nums1, vector<int>& nums2){
+        int left0 = 0;
+        int left1 = 0;
+        int loc0 = -1;
+        int loc1 = -1;
+        if ((nums1.size()+nums2.size())%2==0){
+            loc0 = (nums1.size()+nums2.size())/2;
+            loc1 = loc0-1;
+        }
+        else{
+            loc0 = (nums1.size()+nums2.size()-1)/2;
+        }
+        vector<double> vec;
+        while(left0<nums1.size() && left1<nums2.size()){
+            int direction = 0;
+            if (nums1[left0]<=nums2[left1]){
+                direction = 1;
+                left0++;
+            }
+            else if (nums1[left0]>nums2[left1]){
+                direction = 2;
+                left1++;
+            }
+            int curindex =  left1+left0-1;
+            if (curindex==loc0 || curindex==loc1){
+                if (direction==1){
+                    vec.push_back(nums1[left0-1]);
+                }
+                else if (direction==2){
+                    vec.push_back(nums2[left1-1]);
+                }
+            }
+        }
+        while(left0<nums1.size()){
+            left0++;
+            int curindex =  left1+left0-1;
+            if (curindex==loc0 || curindex==loc1){
+                vec.push_back(nums1[left0-1]);
+            }
+        }
+        while(left1<nums2.size()){
+            left1++;
+            int curindex =  left1+left0-1;
+            if (curindex==loc0 || curindex==loc1){
+                vec.push_back(nums2[left1-1]);
+            }
+        }
+        if(vec.size()==1){
+            return vec[0];
+        }
+        else{
+            return (vec[0]+vec[1])/2;
+        }
+    }
+
+    double recurreview(vector<int>& nums1,vector<int>& nums2,int begin1,int begin2,int k){
+        //nums1以begin1为初始，num2以begin2为初始，返回第k大的数
+        if(begin1>=nums1.size()){
+            return nums2[begin2+k-1];
+        }
+        if (begin2>=nums2.size()){
+            return nums1[begin1+k-1];
+        }
+        if(k==1){
+            return min(nums1[begin1],nums2[begin2]);
+        }
+
+        int cur1 = begin1 + k/2-1;
+        int cur2 = begin2 + k/2-1;
+        int val1 = (cur1<nums1.size())?nums1[cur1]:INT_MAX;
+        int val2 = (cur2<nums2.size())?nums2[cur2]:INT_MAX;
+        /*
+赋予最大值的意思只是说如果第一个数组的K/2不存在，则说明这个数组的长度小于K/2，那么另外一个数组的前K/2个我们是肯定不要的。给你举个例子，加入第一个数组长度是2，第二个数组长度是12，则K为7，K/2为3，因为第一个数组长度小于3，则无法判断中位数是否在其中，而第二个数组的前3个肯定不是中位数！故当K/2不存在时，将其置为整数型最大值，这样就可以继续下一次循环
+        */
+        if (val1<val2){
+            return recurreview(nums1,nums2,cur1+1,begin2,k-k/2);
+        }
+        else{
+            return recurreview(nums1,nums2,begin1,cur2+1,k-k/2);
+        }
+    }
+    double solveMethod2review(vector<int>& nums1, vector<int>& nums2){
+        return (recurreview(nums1,nums2,0,0,(nums1.size()+nums2.size()+1)/2)
+                    +recurreview(nums1,nums2,0,0,(nums1.size()+nums2.size()+2)/2))/2;
+
+    }
+
+	
 	double findMedianSortedArrays_On(vector<int>& nums1, vector<int>& nums2) //O(m+n)复杂度的算法，可以剪枝 但是速度没有本质上的提升
 	{
 		vector<int> mergevec(nums1.size() + nums2.size());
