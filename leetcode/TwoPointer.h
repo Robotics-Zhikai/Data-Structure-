@@ -889,3 +889,69 @@ public:
         return valid;
     }
 };
+
+
+/*
+696. 计数二进制子串
+给定一个字符串 s，计算具有相同数量 0 和 1 的非空（连续）子字符串的数量，并且这些子字符串中的所有 0 和所有 1 都是连续的。
+
+重复出现的子串要计算它们出现的次数。
+
+*/
+class Solution696 {
+public:
+    int solveMethod1(string s){
+        //这个虽然加了一些剪枝，但是还是超时了
+        int left = 0;
+        int right = 0;
+        int res = 0;
+
+        while(left<s.size()){
+            while(left<s.size() && right<s.size() && s[left]==s[right]){
+                right++;
+            }
+            int num0 = right-left;
+
+            int left1 = right;
+            int right1 = left1;
+            while(left1<s.size() && right1<s.size() && s[left1]==s[right1]){
+                right1++;
+                if (right1-left1==num0){
+                    break;
+                }
+            }
+            int num1 = right1-left1;
+
+            if (num0==num1){
+                res+=num0;
+                left = right;
+            }
+            else{
+                left++;
+            }
+            right = left;
+        }
+        return res;
+    }
+    int solveMethod2(string s){
+        vector<int> vec;
+        int left = 0;
+        int right = left;
+
+        while(left<s.size()){
+            while(right<s.size() && s[left]==s[right]){
+                right++;
+            }
+            vec.push_back(right-left);
+            left = right;
+        }
+        int res = 0;
+        for(int i = 0;i<vec.size()-1;i++){
+            res+=min(vec[i],vec[i+1]);
+        }
+        return res;
+    }
+    int countBinarySubstrings(string s) {
+        return solveMethod2(s);
+    }
+};
