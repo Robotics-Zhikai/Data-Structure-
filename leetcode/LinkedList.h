@@ -1197,3 +1197,95 @@ public:
 
     }
 };
+
+
+/*
+143. 重排链表
+给定一个单链表 L 的头节点 head ，单链表 L 表示为：
+
+ L0 → L1 → … → Ln-1 → Ln 
+请将其重新排列后变为：
+
+L0 → Ln → L1 → Ln-1 → L2 → Ln-2 → …
+
+不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+
+*/
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution143 {
+public:
+    void solveMethod1(ListNode* head){
+        ListNode* cur = head;
+        vector<ListNode*> vecnode;
+        while(cur!=nullptr){
+            vecnode.push_back(cur);
+            cur = cur->next;
+        }
+        int left = 0;
+        int right = vecnode.size()-1;
+        while(left<right){
+            vecnode[left]->next = vecnode[right];
+            left++;
+            vecnode[right]->next = vecnode[left];
+            right--;
+        }
+        vecnode[left]->next = nullptr;
+    }
+
+    ListNode* findmid(ListNode* head){
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while(slow!=nullptr && fast!=nullptr){
+            slow = slow->next;
+            fast = fast->next!=nullptr?fast->next->next:fast->next;
+        }
+        return slow;
+    }
+    ListNode* reverse(ListNode* head){
+        ListNode* cur = head;
+        ListNode* last = nullptr;
+        while(cur!=nullptr){
+            ListNode* next = cur->next;
+            cur->next = last;
+            last = cur;
+            cur = next;
+        }
+        return last;
+    }
+    ListNode* merge(ListNode* head1,ListNode* head2){
+        if (head1!=nullptr && head2==nullptr){
+            head1->next = head2;
+            return head1;
+        }
+        else if (head1==nullptr && head2==nullptr){
+            return nullptr;
+        }
+        ListNode* storage1 = head1->next;
+        ListNode* storage2 = head2->next;
+        head1->next = head2;
+        head2->next = merge(storage1,storage2);
+        return head1;
+    }
+    void solveMethod2(ListNode* head){
+        ListNode* mid = findmid(head);
+        ListNode* cur = head;
+        while(cur->next!=mid){
+            cur = cur->next;
+        }
+        cur->next = nullptr;
+        ListNode* headreverse = reverse(mid);
+        merge(head,headreverse);
+    }
+    void reorderList(ListNode* head) {
+        solveMethod2(head);
+    }
+};
