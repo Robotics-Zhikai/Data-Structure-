@@ -977,7 +977,7 @@ public:
         }
         return res;
     }
-    int Twoptr(vector<int>& height) //双指针的方法
+    int Twoptr(vector<int>& height) //双指针的方法 双指针想到了很简单
     {
         int ans = 0;
         int left = 0, right = height.size() - 1;
