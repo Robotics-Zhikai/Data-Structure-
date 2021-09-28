@@ -3053,3 +3053,99 @@ public:
         return dp[word1.size()-1][word2.size()-1];
     }
 };
+
+
+/*
+32. 最长有效括号
+给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的长度。
+*/
+class Solution32 {
+public:
+    int solveMethod1(string s){
+        //动态规划的方法做
+        if (s.empty()){
+            return 0;
+        }
+        vector<int> dp(s.size(),0);//dp[i]表示以i结尾的最长有效括号子串长度
+        dp[0] = 0;
+        for(int i = 1;i<s.size();i++){
+            if (s[i]=='('){ //如果当前是这个的话，肯定最长有效括号子串长度为0
+                dp[i] = 0;
+            }
+            else{
+                if (s[i-1]=='('){ //看前一个的情况
+                    if (i-2>=0){
+                        dp[i] = dp[i-2] + 2;
+                    }
+                    else{
+                        dp[i] = 2;
+                    }
+                }
+                else{
+                    if (i-dp[i-1]-1<0){
+                        dp[i] = 0;
+                    }
+                    else {
+                        if (s[i-dp[i-1]-1]==')'){
+                            dp[i] = 0;
+                        }
+                        else{
+                            dp[i] = dp[i-1]+2;
+                            int tmp = i-dp[i-1]-2;
+                            if (tmp>=0){
+                                dp[i]+=dp[tmp];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int res = INT_MIN;
+        for(int i = 0;i<dp.size();i++){
+            res = max(res,dp[i]);
+        }
+        return res;
+    }
+    int solveMethod2(string s){
+        int left = 0;
+        int right = 0;
+        int res = INT_MIN;
+        for(int i = 0;i<s.size();i++){
+            if (s[i]=='('){
+                left++;
+            }
+            else{
+                right++;
+            }
+            if (left == right){
+                res = max(res,2*left);
+            }
+            else if (left<right){
+                left = 0;
+                right = 0;
+            }
+        }
+        left = 0;
+        right = 0;
+        for(int i = s.size()-1;i>=0;i--){
+            if (s[i]=='('){
+                left++;
+            }
+            else{
+                right++;
+            }
+            if (left == right){
+                res = max(res,2*left);
+            }
+            else if (left>right){
+                left = 0;
+                right = 0;
+            }
+        }
+        return res<0?0:res;
+    }
+    int longestValidParentheses(string s) {
+        return solveMethod2(s);
+        return solveMethod1(s);
+    }
+};
