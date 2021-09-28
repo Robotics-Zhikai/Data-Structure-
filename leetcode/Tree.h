@@ -1910,3 +1910,32 @@ public:
         return solveMethod2(root);
     }
 };
+
+/*
+199. 二叉树的右视图
+给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+*/
+
+class Solution199 {
+public:
+    int MAXlevel = INT_MIN;
+    vector<int> res;
+    void DFS(TreeNode* root,int& level){
+        if (root==nullptr){
+            return;
+        }
+        level++;
+        if (level>MAXlevel){
+            MAXlevel = level;
+            res.push_back(root->val);
+        }
+        DFS(root->right,level);
+        DFS(root->left,level);
+        level--;
+    }
+    vector<int> rightSideView(TreeNode* root) {
+        int level = 0;
+        DFS(root,level);
+        return res;
+    }
+};
