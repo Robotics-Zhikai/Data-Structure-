@@ -180,6 +180,59 @@ public:
 
 class Solution3 {
 public:
+    int solveMethod1review(string s){
+        if (s.empty()){
+            return 0;
+        }
+        int left = 0;
+        int right = 0;
+        unordered_set<char> SET;
+        int res = INT_MIN;
+
+        while(right<s.size()){
+            while(right<s.size() && SET.find(s[right])==SET.end()){
+                SET.insert(s[right]);
+                right++;
+            }
+            res = max(res,right-left);
+            if(right<s.size()){
+                while(SET.find(s[right])!=SET.end()){
+                    SET.erase(s[left]);
+                    left++;
+                }
+                SET.insert(s[right]);
+                right++;
+                res = max(res,right-left);
+            }
+        }
+        return res;
+    }
+
+    int solveMethod2review(string s){
+        //这种方法更高效些
+        if (s.empty()){
+            return 0;
+        }
+        unordered_map<char,int> MAP; //存储字符和最后一次出现的位置
+        int left = 0;
+        int right = 0;
+        int i = 0;
+        int res = INT_MIN;
+        while(i<s.size()){
+            if (MAP.count(s[i])==0 || (MAP.count(s[i])==1 && MAP[s[i]]<left)){
+                right++;
+            }
+            else {
+                left = MAP[s[i]]+1;
+                right++;
+            }
+            res = max(res,right-left);
+            MAP[s[i]] = i;
+            i++;
+        }
+        return res;
+    }
+
     int review(string s){
         if (s.empty()){
             return 0;
