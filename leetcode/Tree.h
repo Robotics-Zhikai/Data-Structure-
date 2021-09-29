@@ -1939,3 +1939,27 @@ public:
         return res;
     }
 };
+
+/*
+101. 对称二叉树
+给定一个二叉树，检查它是否是镜像对称的。
+*/
+
+class Solution101 {
+public:
+    bool DFS(TreeNode* root1,TreeNode* root2){
+        if (root1==nullptr && root2==nullptr){
+            return 1;
+        }
+        else if (root1==nullptr || root2==nullptr){
+            return 0;
+        }
+        if (root1->val != root2->val){
+            return 0;
+        }
+        return DFS(root1->left,root2->right) && DFS(root1->right,root2->left);
+    }
+    bool isSymmetric(TreeNode* root) {
+        return DFS(root->left,root->right);
+    }
+};
