@@ -36,5 +36,6 @@
         "xlocinfo": "cpp",
         "xlocnum": "cpp",
         "xmemory": "cpp"
-    }
+    },
+    "ros.distro": "melodic"
 }
